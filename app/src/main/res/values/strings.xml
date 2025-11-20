@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">Forumus-admin</string>
+    <string name="app_name">Forumus Admin</string>
+    <string name="stat_icon">Statistic Icon</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="total_users">Total Users</string>
+    <string name="total_posts">Total Posts</string>
+    <string name="blacklisted_users">Blacklisted Users</string>
+    <string name="reported_posts">Reported Posts</string>
+    <string name="posts_over_time">Posts Over Time</string>
+    <string name="posts_by_topic">Posts by Topic</string>
+    <string name="manage">Manage</string>
+    <string name="day">Day</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="education">Education</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="others">Others</string>
+    <string name="sports">Sports</string>
+    <string name="technology">Technology</string>
 </resources>

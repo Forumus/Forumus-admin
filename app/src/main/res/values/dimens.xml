@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="spacing_large">20dp</dimen>
+    <dimen name="spacing_xlarge">24dp</dimen>
+    
+    <!-- Text Sizes -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_normal">14sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    
+    <!-- Corner Radius -->
+    <dimen name="corner_radius_small">6dp</dimen>
+    <dimen name="corner_radius_medium">8dp</dimen>
+    <dimen name="corner_radius_normal">10dp</dimen>
+    <dimen name="corner_radius_large">14dp</dimen>
+    <dimen name="corner_radius_xlarge">40dp</dimen>
+    
+    <!-- Icon Sizes -->
+    <dimen name="icon_size_small">16dp</dimen>
+    <dimen name="icon_size_normal">24dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
+    <dimen name="icon_size_large">48dp</dimen>
+    
+    <!-- Card -->
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    
+    <!-- Header -->
+    <dimen name="header_height">70dp</dimen>
+    <dimen name="avatar_size">36dp</dimen>
+    
+    <!-- Border -->
+    <dimen name="border_width">1dp</dimen>
+    
+    <!-- Chart -->
+    <dimen name="chart_height">200dp</dimen>
+    <dimen name="pie_chart_height">250dp</dimen>
+</resources>

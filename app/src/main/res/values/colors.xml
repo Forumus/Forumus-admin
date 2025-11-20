@@ -2,4 +2,17 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    
+    <!-- Dashboard Colors -->
+    <color name="primary_blue">#4A90E2</color>
+    <color name="success_green">#00C853</color>
+    <color name="danger_red">#E53935</color>
+    <color name="warning_orange">#FF9800</color>
+    <color name="chart_blue">#2196F3</color>
+    <color name="chart_brown">#A1887F</color>
+    <color name="text_secondary">#666666</color>
+    <color name="text_primary">#212121</color>
+    <color name="border_gray">#e0e0e0</color>
+    <color name="background_gray">#F5F5F5</color>
+    <color name="card_background">#FFFFFF</color>
 </resources>

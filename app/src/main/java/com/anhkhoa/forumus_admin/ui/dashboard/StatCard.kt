@@ -1,0 +1,14 @@
+package com.anhkhoa.forumus_admin.ui.dashboard
+
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+
+/**
+ * Data class representing a statistic card on the dashboard
+ */
+data class StatCard(
+    @DrawableRes val iconRes: Int,
+    @ColorRes val colorRes: Int,
+    val label: String,
+    val value: String
+)
