@@ -6,7 +6,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -31,23 +31,15 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         
         // Setup NavigationView with NavController
-        navigationView.setupWithNavController(navController)
+        NavigationUI.setupWithNavController(navigationView, navController)
         
         // Handle navigation item selection
         navigationView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.nav_dashboard -> {
-                    navController.navigate(R.id.dashboardFragment)
-                }
-                R.id.nav_assistant -> {
-                    navController.navigate(R.id.assistantFragment)
-                }
-                R.id.nav_settings -> {
-                    navController.navigate(R.id.settingsFragment)
-                }
+            val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)
+            if (handled) {
+                drawerLayout.closeDrawer(GravityCompat.START)
             }
-            drawerLayout.closeDrawer(GravityCompat.START)
-            true
+            handled
         }
     }
     
@@ -55,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.openDrawer(GravityCompat.START)
     }
     
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START)

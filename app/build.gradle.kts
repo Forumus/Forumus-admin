@@ -49,7 +49,10 @@ dependencies {
     
     // MPAndroidChart for charts
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    
+    // Navigation
     implementation(libs.androidx.navigation.fragment)
+    implementation(libs.androidx.navigation.ui)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

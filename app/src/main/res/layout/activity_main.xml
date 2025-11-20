@@ -39,6 +39,7 @@
         app:itemShapeInsetStart="0dp"
         app:itemShapeInsetEnd="0dp"
         app:itemShapeInsetTop="0dp"
-        app:itemShapeInsetBottom="0dp" />
+        app:itemShapeInsetBottom="0dp"
+        tools:ignore="VisualLintBounds" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

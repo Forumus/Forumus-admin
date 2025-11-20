@@ -55,7 +55,7 @@ class DashboardFragment : Fragment() {
         // Total Posts Card
         setupStatCard(
             binding.statCardPosts.root,
-            R.drawable.ic_posts,
+            R.drawable.ic_total_posts,
             R.color.success_green,
             getString(R.string.total_posts),
             "5,678"
@@ -64,7 +64,7 @@ class DashboardFragment : Fragment() {
         // Blacklisted Users Card
         setupStatCard(
             binding.statCardBlacklisted.root,
-            R.drawable.ic_block,
+            R.drawable.ic_blacklist,
             R.color.danger_red,
             getString(R.string.blacklisted_users),
             "23"
@@ -73,7 +73,7 @@ class DashboardFragment : Fragment() {
         // Reported Posts Card
         setupStatCard(
             binding.statCardReported.root,
-            R.drawable.ic_report,
+            R.drawable.ic_reported_posts,
             R.color.warning_orange,
             getString(R.string.reported_posts),
             "45"
@@ -202,6 +202,10 @@ class DashboardFragment : Fragment() {
             transparentCircleRadius = 0f
             animateY(1000)
             
+            // Add extra offset to prevent legend truncation
+            setExtraOffsets(10f, 10f, 10f, 20f)
+            minOffset = 20f
+            
             // Configure legend
             legend.apply {
                 isEnabled = true
@@ -210,11 +214,16 @@ class DashboardFragment : Fragment() {
                 orientation = Legend.LegendOrientation.VERTICAL
                 setDrawInside(false)
                 textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
-                textSize = 12f
+                textSize = 13f
                 form = Legend.LegendForm.CIRCLE
-                formSize = 12f
-                xEntrySpace = 8f
-                yEntrySpace = 4f
+                formSize = 14f
+                xEntrySpace = 12f
+                yEntrySpace = 8f
+                formToTextSpace = 8f
+                yOffset = 12f
+                xOffset = 8f
+                isWordWrapEnabled = true
+                maxSizePercent = 0.95f
             }
             
             invalidate()
