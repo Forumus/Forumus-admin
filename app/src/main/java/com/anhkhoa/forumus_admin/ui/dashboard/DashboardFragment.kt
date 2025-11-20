@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.anhkhoa.forumus_admin.MainActivity
 import com.anhkhoa.forumus_admin.R
 import com.anhkhoa.forumus_admin.databinding.FragmentDashboardBinding
 import com.github.mikephil.charting.components.Legend
@@ -221,6 +222,11 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupButtonListeners() {
+        // Menu icon to open drawer
+        binding.menuIcon.setOnClickListener {
+            (activity as? MainActivity)?.openDrawer()
+        }
+        
         // Time range toggle buttons (now TextViews)
         binding.btnDay.setOnClickListener {
             updateToggleSelection(binding.btnDay)
