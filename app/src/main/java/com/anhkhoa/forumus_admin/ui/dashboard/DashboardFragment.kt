@@ -1,12 +1,14 @@
 package com.anhkhoa.forumus_admin.ui.dashboard
 
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -18,6 +20,12 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+
+data class TopicData(
+    val name: String,
+    val percentage: Float,
+    val color: Int
+)
 
 class DashboardFragment : Fragment() {
 
@@ -92,9 +100,16 @@ class DashboardFragment : Fragment() {
         val labelText = cardView.findViewById<TextView>(R.id.labelText)
         val valueText = cardView.findViewById<TextView>(R.id.valueText)
 
-        // Set icon and background color
+        // Set icon
         iconImage.setImageResource(iconRes)
-        iconContainer.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
+        
+        // Set background color while maintaining rounded corners
+        val drawable = android.graphics.drawable.GradientDrawable().apply {
+            shape = android.graphics.drawable.GradientDrawable.RECTANGLE
+            setColor(ContextCompat.getColor(requireContext(), colorRes))
+            cornerRadius = resources.getDimension(R.dimen.corner_radius_normal)
+        }
+        iconContainer.background = drawable
         
         // Set text values
         labelText.text = label
@@ -160,30 +175,25 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupPieChart() {
+        // Sample data - Replace this with data from your database
+        val topicsData = getSampleTopicData()
+        updatePieChart(topicsData)
+    }
+    
+    // Call this method to reload data from database
+    fun updatePieChart(topicsData: List<TopicData>) {
         val pieChart = binding.pieChart
         
-        // Sample data for posts by topic
-        val entries = listOf(
-            PieEntry(30f, getString(R.string.education)),
-            PieEntry(25f, getString(R.string.entertainment)),
-            PieEntry(15f, getString(R.string.others)),
-            PieEntry(15f, getString(R.string.sports)),
-            PieEntry(15f, getString(R.string.technology))
-        )
-
-        val colors = listOf(
-            ContextCompat.getColor(requireContext(), R.color.chart_blue),
-            ContextCompat.getColor(requireContext(), R.color.danger_red),
-            ContextCompat.getColor(requireContext(), R.color.text_secondary),
-            ContextCompat.getColor(requireContext(), R.color.chart_brown),
-            ContextCompat.getColor(requireContext(), R.color.primary_blue)
-        )
+        // Prepare entries and colors from data
+        val entries = topicsData.map { PieEntry(it.percentage, it.name) }
+        val colors = topicsData.map { it.color }
 
         val dataSet = PieDataSet(entries, "Topics").apply {
             setColors(colors)
+            sliceSpace = 2f
+            setDrawValues(true)
             valueTextSize = 12f
             valueTextColor = Color.WHITE
-            sliceSpace = 2f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     return "${value.toInt()}%"
@@ -202,32 +212,69 @@ class DashboardFragment : Fragment() {
             transparentCircleRadius = 0f
             animateY(1000)
             
-            // Add extra offset to prevent legend truncation
-            setExtraOffsets(10f, 10f, 10f, 20f)
-            minOffset = 20f
-            
-            // Configure legend
-            legend.apply {
-                isEnabled = true
-                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                orientation = Legend.LegendOrientation.VERTICAL
-                setDrawInside(false)
-                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
-                textSize = 13f
-                form = Legend.LegendForm.CIRCLE
-                formSize = 14f
-                xEntrySpace = 12f
-                yEntrySpace = 8f
-                formToTextSpace = 8f
-                yOffset = 12f
-                xOffset = 8f
-                isWordWrapEnabled = true
-                maxSizePercent = 0.95f
-            }
+            // Disable built-in legend - we'll create custom legend below
+            legend.isEnabled = false
             
             invalidate()
         }
+        
+        // Update custom legends
+        updateCustomLegends(topicsData)
+    }
+    
+    private fun updateCustomLegends(topicsData: List<TopicData>) {
+        val legendContainer = binding.customLegendContainer
+        legendContainer.removeAllViews()
+        
+        topicsData.forEach { topic ->
+            val legendView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.item_legend, legendContainer, false)
+            
+            val colorIndicator = legendView.findViewById<View>(R.id.legendColorIndicator)
+            val labelText = legendView.findViewById<TextView>(R.id.legendLabel)
+            
+            // Set the color using GradientDrawable to ensure proper coloring
+            val drawable = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(topic.color)
+            }
+            colorIndicator.background = drawable
+            
+            labelText.text = topic.name
+            
+            legendContainer.addView(legendView)
+        }
+    }
+    
+    // Sample data method - Replace with your database query
+    private fun getSampleTopicData(): List<TopicData> {
+        return listOf(
+            TopicData(
+                getString(R.string.education),
+                30f,
+                ContextCompat.getColor(requireContext(), R.color.chart_blue)
+            ),
+            TopicData(
+                getString(R.string.entertainment),
+                25f,
+                ContextCompat.getColor(requireContext(), R.color.chart_red)
+            ),
+            TopicData(
+                getString(R.string.others),
+                15f,
+                ContextCompat.getColor(requireContext(), R.color.chart_gray)
+            ),
+            TopicData(
+                getString(R.string.sports),
+                15f,
+                ContextCompat.getColor(requireContext(), R.color.chart_brown)
+            ),
+            TopicData(
+                getString(R.string.technology),
+                15f,
+                ContextCompat.getColor(requireContext(), R.color.chart_tech_blue)
+            )
+        )
     }
 
     private fun setupButtonListeners() {

@@ -295,8 +295,16 @@
                     <com.github.mikephil.charting.charts.PieChart
                         android:id="@+id/pieChart"
                         android:layout_width="match_parent"
-                        android:layout_height="280dp"
+                        android:layout_height="200dp"
                         android:layout_marginTop="16dp" />
+
+                    <!-- Custom Legend Container -->
+                    <LinearLayout
+                        android:id="@+id/customLegendContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:orientation="vertical" />
 
                 </LinearLayout>
 

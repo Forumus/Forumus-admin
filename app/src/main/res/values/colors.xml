@@ -8,8 +8,11 @@
     <color name="success_green">#00C853</color>
     <color name="danger_red">#E53935</color>
     <color name="warning_orange">#FF9800</color>
-    <color name="chart_blue">#2196F3</color>
-    <color name="chart_brown">#A1887F</color>
+    <color name="chart_blue">#1976d2</color>
+    <color name="chart_red">#e7000b</color>
+    <color name="chart_gray">#666666</color>
+    <color name="chart_brown">#c49a68</color>
+    <color name="chart_tech_blue">#3f78e0</color>
     <color name="text_secondary">#666666</color>
     <color name="text_primary">#212121</color>
     <color name="border_gray">#e0e0e0</color>
