@@ -108,6 +108,7 @@ class AiModerationViewModel : ViewModel() {
     
     private fun getSamplePosts(): List<Post> {
         return listOf(
+            // AI Approved Posts
             Post(
                 id = "1",
                 title = "Getting Started with React Hooks",
@@ -143,6 +144,43 @@ class AiModerationViewModel : ViewModel() {
                     Tag("CSS", R.color.tag_css_bg, R.color.tag_css_text)
                 ),
                 isAiApproved = true
+            ),
+            // AI Rejected Posts
+            Post(
+                id = "4",
+                title = "10 Ways to Get Rich Quick Online",
+                author = "Anonymous User",
+                date = "November 20, 2025",
+                description = "Make money fast with these amazing tricks! No experience needed. Click here to learn the secret methods that gurus don't want you to know!",
+                tags = listOf(
+                    Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
+                    Tag("React", R.color.tag_react_bg, R.color.tag_react_text)
+                ),
+                isAiApproved = false
+            ),
+            Post(
+                id = "5",
+                title = "Why This Framework is GARBAGE",
+                author = "Angry Developer",
+                date = "November 19, 2025",
+                description = "This framework is absolute trash and anyone who uses it is an idiot. I can't believe people actually waste their time with this garbage.",
+                tags = listOf(
+                    Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
+                    Tag("TypeScript", R.color.tag_typescript_bg, R.color.tag_typescript_text)
+                ),
+                isAiApproved = false
+            ),
+            Post(
+                id = "6",
+                title = "BUY MY COURSE NOW!!! LIMITED OFFER!!!",
+                author = "Marketing Spammer",
+                date = "November 18, 2025",
+                description = "🔥🔥🔥 EXCLUSIVE OFFER!!! Learn web development in 24 hours!!! Buy now for $9999! Limited slots available! Don't miss out! 🚀💰",
+                tags = listOf(
+                    Tag("Design", R.color.tag_design_bg, R.color.tag_design_text),
+                    Tag("CSS", R.color.tag_css_bg, R.color.tag_css_text)
+                ),
+                isAiApproved = false
             )
         )
     }

@@ -311,6 +311,23 @@ All required dependencies are already in the project:
 - `androidx.lifecycle:lifecycle-viewmodel-ktx` (for ViewModels)
 - `androidx.lifecycle:lifecycle-livedata-ktx` (for LiveData)
 
+## AI Rejected Tab - Visual Differences
+
+When users switch to the **AI rejected** tab, the following visual changes occur:
+
+### Button Styling
+- **Approve Button**: Changes from gray (#a8a8a8) to blue (#3f78e0) to emphasize the action
+- **Reject Button**: Remains white with red border (consistent across both tabs)
+
+### Implementation
+The adapter (`AiPostsAdapter.kt`) dynamically changes the approve button background:
+- For AI rejected posts: Uses `bg_approve_button_active.xml` (blue)
+- For AI approved posts: Uses `bg_approve_button.xml` (gray)
+
+### Sample Data
+- 3 AI approved posts (IDs: 1-3)
+- 3 AI rejected posts (IDs: 4-6) - same content for testing purposes
+
 ## Testing Checklist
 
 - [x] Navigation from drawer menu works
@@ -325,6 +342,8 @@ All required dependencies are already in the project:
 - [x] Reject button moves post to rejected
 - [x] Empty state shows when no posts
 - [x] RecyclerView scrolls smoothly
+- [x] Approve button shows blue on AI rejected tab
+- [x] Approve button shows gray on AI approved tab
 - [ ] Menu icon opens drawer (requires MainActivity integration)
 - [ ] Sort button shows options (not implemented)
 - [ ] Filter button shows options (not implemented)

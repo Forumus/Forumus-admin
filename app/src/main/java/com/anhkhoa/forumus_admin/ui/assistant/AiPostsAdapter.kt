@@ -62,6 +62,14 @@ class AiPostsAdapter(
                     tagsContainer.addView(chip)
                 }
 
+                // Update approve button style based on post status
+                // If post is AI rejected (not approved), show blue active style
+                if (!post.isAiApproved) {
+                    approveButton.setBackgroundResource(com.anhkhoa.forumus_admin.R.drawable.bg_approve_button_active)
+                } else {
+                    approveButton.setBackgroundResource(com.anhkhoa.forumus_admin.R.drawable.bg_approve_button)
+                }
+
                 // Set click listeners
                 approveButton.setOnClickListener {
                     onApprove(post.id)

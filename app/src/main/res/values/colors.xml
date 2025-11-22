@@ -33,6 +33,7 @@
     <color name="reject_button">#e7000b</color>
     <color name="reject_button_border">#ffc9c9</color>
     <color name="approve_button">#a8a8a8</color>
+    <color name="approve_button_active">#3f78e0</color>
     <color name="tag_programming_bg">#e3f2fd</color>
     <color name="tag_programming_text">#1976d2</color>
     <color name="tag_react_bg">#e1f5fe</color>
