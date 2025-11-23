@@ -107,18 +107,52 @@ The implementation follows the Figma design specifications:
 - Status badges have correct colors and styling
 - Icons and UI elements match the design
 
+## Recent Updates
+
+### Search Feature (Implemented)
+✅ Real-time search functionality
+- Filters users by name or ID as you type
+- Case-insensitive search
+- Shows "No results found" toast when no matches
+- Clear search to show all users again
+
+### Interactive Buttons with Confirmation Dialogs (Implemented)
+✅ Remove Button
+- Clicking "Remove" shows a confirmation dialog
+- Dialog asks: "Are you sure you want to remove [user name] from the blacklist?"
+- OK button removes the user from the list
+- Cancel button dismisses the dialog
+
+✅ Status Badge Actions
+- Clicking on any status badge (Ban/Warning/Remind) shows an action menu
+- Menu displays options: Ban, Warning, Remind
+- Selecting an option shows a confirmation dialog:
+  - Ban: "Are you sure you want to ban [user]? This will prevent them from accessing the platform."
+  - Warning: "Are you sure you want to send a warning to [user]?"
+  - Remind: "Are you sure you want to send a reminder to [user]?"
+- OK button executes the action and updates the user's status
+- Cancel button dismisses the dialog
+- Toast notifications confirm successful actions
+
+### User Experience Features
+✅ All actions require confirmation before execution
+✅ Success messages shown via Toast after actions complete
+✅ Status badges are clickable and change color based on current status
+✅ Search filter persists across status changes
+✅ Real-time list updates when users are removed or status changes
+
 ## Future Enhancements
-The following features are marked as TODO and can be implemented later:
-1. Implement more options menu functionality
-2. Implement search functionality with text filtering
-3. Implement filter button with filter options
-4. Load user avatars from URLs using image loading library (Glide/Coil)
-5. Connect to backend API/database for real user data
-6. Implement remove user from blacklist functionality
-7. Implement pagination logic for large user lists
-8. Add pull-to-refresh functionality
-9. Add empty state when no users are blacklisted
-10. Add loading states while fetching data
+The following features can be implemented later:
+1. Implement more options menu in top bar (export, bulk actions, etc.)
+2. Implement filter button with advanced filter options (by status, date added, etc.)
+3. Load user avatars from URLs using image loading library (Glide/Coil)
+4. Connect to backend API/database for persistent data storage
+5. Implement pagination logic for large user lists (currently shows all)
+6. Add pull-to-refresh functionality
+7. Add empty state UI when no users are blacklisted
+8. Add loading states/shimmer effect while fetching data
+9. Implement undo functionality for remove action
+10. Add user detail view when clicking on user name/avatar
 
 ## Testing
 To test the implementation:

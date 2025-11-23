@@ -11,7 +11,8 @@ import com.anhkhoa.forumus_admin.R
 
 class BlacklistAdapter(
     private var users: List<BlacklistedUser>,
-    private val onRemoveClick: (BlacklistedUser) -> Unit
+    private val onRemoveClick: (BlacklistedUser) -> Unit,
+    private val onStatusClick: (BlacklistedUser) -> Unit
 ) : RecyclerView.Adapter<BlacklistAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -62,6 +63,11 @@ class BlacklistAdapter(
         // Handle remove button click
         holder.removeButton.setOnClickListener {
             onRemoveClick(user)
+        }
+        
+        // Handle status badge click to change status
+        holder.statusBadge.setOnClickListener {
+            onStatusClick(user)
         }
         
         // TODO: Load avatar image from URL using Glide or similar image loading library

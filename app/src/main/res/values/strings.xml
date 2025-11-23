@@ -34,4 +34,19 @@
     <string name="user_avatar">User Avatar</string>
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
+    
+    <!-- Dialog Messages -->
+    <string name="confirm_remove_title">Remove User</string>
+    <string name="confirm_remove_message">Are you sure you want to remove %s from the blacklist?</string>
+    <string name="confirm_ban_title">Ban User</string>
+    <string name="confirm_ban_message">Are you sure you want to ban %s? This will prevent them from accessing the platform.</string>
+    <string name="confirm_warning_title">Warn User</string>
+    <string name="confirm_warning_message">Are you sure you want to send a warning to %s?</string>
+    <string name="confirm_remind_title">Remind User</string>
+    <string name="confirm_remind_message">Are you sure you want to send a reminder to %s?</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="action_success">Action completed successfully</string>
+    <string name="change_status">Change Status</string>
+    <string name="no_results_found">No users found</string>
 </resources>

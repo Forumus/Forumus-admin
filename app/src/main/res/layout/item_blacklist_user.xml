@@ -57,6 +57,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:background="@drawable/bg_badge_warning"
+        android:clickable="true"
+        android:focusable="true"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:paddingHorizontal="6dp"
