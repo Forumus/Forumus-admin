@@ -16,7 +16,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="20dp"
-        android:paddingVertical="16dp">
+        android:paddingTop="40dp"
+        android:paddingBottom="16dp">
 
         <FrameLayout
             android:id="@+id/menuIcon"
