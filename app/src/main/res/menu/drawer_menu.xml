@@ -7,7 +7,7 @@
     <item
         android:id="@+id/assistantFragment"
         android:icon="@drawable/ic_assistant"
-        android:title="AI Assistant" />
+        android:title="AI Moderation" />
     <item
         android:id="@+id/settingsFragment"
         android:icon="@drawable/ic_settings"

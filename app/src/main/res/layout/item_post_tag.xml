@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tagText"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/tag_height"
+    android:paddingStart="@dimen/tag_padding_horizontal"
+    android:paddingEnd="@dimen/tag_padding_horizontal"
+    android:paddingTop="@dimen/tag_padding_vertical"
+    android:paddingBottom="@dimen/tag_padding_vertical"
+    android:textSize="12sp"
+    android:layout_marginEnd="@dimen/spacing_small"
+    android:gravity="center" />

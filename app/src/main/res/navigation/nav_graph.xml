@@ -35,8 +35,8 @@
     <fragment
         android:id="@+id/assistantFragment"
         android:name="com.anhkhoa.forumus_admin.ui.assistant.AssistantFragment"
-        android:label="AI Assistant"
-        tools:layout="@layout/fragment_assistant" />
+        android:label="AI Moderation"
+        tools:layout="@layout/fragment_ai_moderation" />
 
     <fragment
         android:id="@+id/settingsFragment"

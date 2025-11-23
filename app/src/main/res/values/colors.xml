@@ -18,4 +18,30 @@
     <color name="border_gray">#e0e0e0</color>
     <color name="background_gray">#F5F5F5</color>
     <color name="card_background">#FFFFFF</color>
+    
+    <!-- AI Moderation Colors -->
+    <color name="tab_selected">#155dfc</color>
+    <color name="tab_unselected">#4a5565</color>
+    <color name="tab_indicator">#155dfc</color>
+    <color name="search_background">#f5f5f5</color>
+    <color name="search_border">#e0e0e0</color>
+    <color name="search_hint">#98a2b3</color>
+    <color name="text_title">#155dfc</color>
+    <color name="text_body">#4a5565</color>
+    <color name="text_meta">#6a7282</color>
+    <color name="separator">#d1d5db</color>
+    <color name="reject_button">#e7000b</color>
+    <color name="reject_button_border">#ffc9c9</color>
+    <color name="approve_button">#a8a8a8</color>
+    <color name="approve_button_active">#3f78e0</color>
+    <color name="tag_programming_bg">#e3f2fd</color>
+    <color name="tag_programming_text">#1976d2</color>
+    <color name="tag_react_bg">#e1f5fe</color>
+    <color name="tag_react_text">#0288d1</color>
+    <color name="tag_typescript_bg">#f3e5f5</color>
+    <color name="tag_typescript_text">#7b1fa2</color>
+    <color name="tag_design_bg">#fce4ec</color>
+    <color name="tag_design_text">#c2185b</color>
+    <color name="tag_css_bg">#fff3e0</color>
+    <color name="tag_css_text">#e65100</color>
 </resources>

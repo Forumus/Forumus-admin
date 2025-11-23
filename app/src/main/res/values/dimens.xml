@@ -41,4 +41,16 @@
     <!-- Chart -->
     <dimen name="chart_height">200dp</dimen>
     <dimen name="pie_chart_height">250dp</dimen>
+    
+    <!-- AI Moderation -->
+    <dimen name="toolbar_height">65dp</dimen>
+    <dimen name="tab_height">57dp</dimen>
+    <dimen name="search_bar_height">40dp</dimen>
+    <dimen name="action_button_size">40dp</dimen>
+    <dimen name="post_card_padding">17dp</dimen>
+    <dimen name="tag_padding_horizontal">10dp</dimen>
+    <dimen name="tag_padding_vertical">4dp</dimen>
+    <dimen name="tag_height">26dp</dimen>
+    <dimen name="button_height">32dp</dimen>
+    <dimen name="tab_indicator_height">2dp</dimen>
 </resources>
