@@ -9,7 +9,18 @@
         android:id="@+id/dashboardFragment"
         android:name="com.anhkhoa.forumus_admin.ui.dashboard.DashboardFragment"
         android:label="Dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
+        
+        <action
+            android:id="@+id/action_dashboardFragment_to_blacklistFragment"
+            app:destination="@id/blacklistFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/blacklistFragment"
+        android:name="com.anhkhoa.forumus_admin.ui.blacklist.BlacklistFragment"
+        android:label="Blacklisted Users"
+        tools:layout="@layout/fragment_blacklist" />
 
     <fragment
         android:id="@+id/assistantFragment"

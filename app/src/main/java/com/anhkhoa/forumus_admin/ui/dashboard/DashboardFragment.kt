@@ -12,6 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.anhkhoa.forumus_admin.MainActivity
 import com.anhkhoa.forumus_admin.R
 import com.anhkhoa.forumus_admin.databinding.FragmentDashboardBinding
@@ -77,6 +78,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.blacklisted_users),
             "23"
         )
+        
+        // Add click listener to navigate to blacklist screen
+        binding.statCardBlacklisted.root.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboardFragment_to_blacklistFragment)
+        }
 
         // Reported Posts Card
         setupStatCard(
