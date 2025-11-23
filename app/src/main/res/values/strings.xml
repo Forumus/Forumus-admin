@@ -34,7 +34,7 @@
     <string name="user_avatar">User Avatar</string>
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
-    
+
     <!-- Dialog Messages -->
     <string name="confirm_remove_title">Remove User</string>
     <string name="confirm_remove_message">Are you sure you want to remove %s from the blacklist?</string>
@@ -49,4 +49,14 @@
     <string name="action_success">Action completed successfully</string>
     <string name="change_status">Change Status</string>
     <string name="no_results_found">No users found</string>
+
+    <!-- Reported Posts Screen -->
+    <string name="dismiss">Dismiss</string>
+    <string name="delete_post">Delete Post</string>
+    <string name="delete_post_title">Delete Post</string>
+    <string name="dismiss_report">Dismiss Report</string>
+    <string name="confirm_dismiss_message">Are you sure you want to dismiss the report for &quot;%s&quot;?</string>
+    <string name="confirm_delete_post_message">Are you sure you want to permanently delete the post &quot;%s&quot;?</string>
+    <string name="report_dismissed">Report dismissed successfully</string>
+    <string name="post_deleted">Post deleted successfully</string>
 </resources>

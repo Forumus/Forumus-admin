@@ -92,6 +92,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.reported_posts),
             "45"
         )
+        
+        // Add click listener to navigate to reported posts screen
+        binding.statCardReported.root.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboardFragment_to_reportedPostsFragment)
+        }
     }
 
     private fun setupStatCard(

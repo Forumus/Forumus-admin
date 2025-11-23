@@ -14,6 +14,10 @@
         <action
             android:id="@+id/action_dashboardFragment_to_blacklistFragment"
             app:destination="@id/blacklistFragment" />
+        
+        <action
+            android:id="@+id/action_dashboardFragment_to_reportedPostsFragment"
+            app:destination="@id/reportedPostsFragment" />
     </fragment>
 
     <fragment
@@ -21,6 +25,12 @@
         android:name="com.anhkhoa.forumus_admin.ui.blacklist.BlacklistFragment"
         android:label="Blacklisted Users"
         tools:layout="@layout/fragment_blacklist" />
+
+    <fragment
+        android:id="@+id/reportedPostsFragment"
+        android:name="com.anhkhoa.forumus_admin.ui.reported.ReportedPostsFragment"
+        android:label="Reported Posts"
+        tools:layout="@layout/fragment_reported_posts" />
 
     <fragment
         android:id="@+id/assistantFragment"
