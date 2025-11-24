@@ -7,10 +7,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.anhkhoa.forumus_admin.R
 import com.anhkhoa.forumus_admin.databinding.FragmentBlacklistBinding
+import com.anhkhoa.forumus_admin.data.repository.UserRepository
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 data class BlacklistedUser(
     val id: String,
@@ -38,11 +42,13 @@ class BlacklistFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var adapter: BlacklistAdapter
+    private val userRepository = UserRepository()
     private var allUsers: List<BlacklistedUser> = emptyList()
     private var filteredUsers: List<BlacklistedUser> = emptyList()
     private var currentPage = 0
     private val itemsPerPage = 15
     private var totalPages = 0
+    private var isLoading = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,14 +79,9 @@ class BlacklistFragment : Fragment() {
     }
 
     private fun setupUsersList() {
-        // Sample data - Replace this with data from your database
-        allUsers = getSampleBlacklistedUsers()
-        filteredUsers = allUsers
-        calculateTotalPages()
-        
         // Set up RecyclerView
         adapter = BlacklistAdapter(
-            users = getCurrentPageUsers(),
+            users = emptyList(),
             onRemoveClick = { user -> showConfirmationDialog(user, ActionType.REMOVE) },
             onStatusClick = { user -> showStatusActionMenu(user) }
         )
@@ -89,6 +90,93 @@ class BlacklistFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = this@BlacklistFragment.adapter
         }
+        
+        // Load users from Firebase
+        loadUsersFromFirebase()
+    }
+    
+    private fun loadUsersFromFirebase() {
+        if (isLoading) return
+        
+        isLoading = true
+        showLoading(true)
+        
+        lifecycleScope.launch {
+            try {
+                val result = userRepository.getAllUsers()
+                
+                result.onSuccess { firestoreUsers ->
+                    if (firestoreUsers.isEmpty()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "No users found in database",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        // Use empty list instead of fallback
+                        allUsers = emptyList()
+                    } else {
+                        // Convert Firestore users to BlacklistedUser with simulated status
+                        allUsers = firestoreUsers.map { firestoreUser ->
+                            BlacklistedUser(
+                                id = extractIdFromEmail(firestoreUser.email),
+                                name = firestoreUser.fullName.ifEmpty { 
+                                    extractIdFromEmail(firestoreUser.email) 
+                                },
+                                avatarUrl = firestoreUser.profilePictureUrl,
+                                status = getRandomStatus()
+                            )
+                        }
+                        
+                        Toast.makeText(
+                            requireContext(),
+                            "Loaded ${allUsers.size} users from database",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    
+                    filteredUsers = allUsers
+                    calculateTotalPages()
+                    adapter.updateUsers(getCurrentPageUsers())
+                    updatePaginationUI()
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Error loading users: ${exception.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    // Initialize with empty list on error
+                    allUsers = emptyList()
+                    filteredUsers = allUsers
+                    calculateTotalPages()
+                    adapter.updateUsers(getCurrentPageUsers())
+                    updatePaginationUI()
+                }
+            } finally {
+                isLoading = false
+                showLoading(false)
+            }
+        }
+    }
+    
+    private fun extractIdFromEmail(email: String): String {
+        // Extract the part before @ from email
+        return email.substringBefore("@")
+    }
+    
+    private fun getRandomStatus(): UserStatus {
+        // Simulate random status for demonstration
+        return when (Random.nextInt(3)) {
+            0 -> UserStatus.BAN
+            1 -> UserStatus.WARNING
+            else -> UserStatus.REMIND
+        }
+    }
+    
+    private fun showLoading(show: Boolean) {
+        binding.usersRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+        // You can add a progress bar to your layout and show/hide it here
+        // binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
     
     private fun showStatusActionMenu(user: BlacklistedUser) {
