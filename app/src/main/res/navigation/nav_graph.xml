@@ -22,6 +22,10 @@
         <action
             android:id="@+id/action_dashboardFragment_to_totalPostsFragment"
             app:destination="@id/totalPostsFragment" />
+        
+        <action
+            android:id="@+id/action_dashboardFragment_to_totalUsersFragment"
+            app:destination="@id/totalUsersFragment" />
     </fragment>
 
     <fragment
@@ -53,6 +57,12 @@
         android:name="com.anhkhoa.forumus_admin.ui.totalposts.TotalPostsFragment"
         android:label="Total Posts"
         tools:layout="@layout/fragment_total_posts" />
+
+    <fragment
+        android:id="@+id/totalUsersFragment"
+        android:name="com.anhkhoa.forumus_admin.ui.totalusers.TotalUsersFragment"
+        android:label="Total Users"
+        tools:layout="@layout/fragment_total_users" />
 
 </navigation>
     

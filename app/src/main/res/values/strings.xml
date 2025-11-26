@@ -18,7 +18,7 @@
     <string name="sports">Sports</string>
     <string name="technology">Technology</string>
     
-    <!-- Blacklist Screen -->
+    <!-- Blacklist Screen & Total Users Screen -->
     <string name="back">Back</string>
     <string name="more_options">More Options</string>
     <string name="search_violated_posts">Search violated posts...</string>
@@ -29,11 +29,14 @@
     <string name="status">Status</string>
     <string name="warning">Warning</string>
     <string name="ban">Ban</string>
+    <string name="warn">Warn</string>
     <string name="remind">Remind</string>
+    <string name="normal">Normal</string>
     <string name="remove">Remove</string>
     <string name="user_avatar">User Avatar</string>
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
+    <string name="search_users_hint">Search users by name or ID...</string>
 
     <!-- Dialog Messages -->
     <string name="confirm_remove_title">Remove User</string>

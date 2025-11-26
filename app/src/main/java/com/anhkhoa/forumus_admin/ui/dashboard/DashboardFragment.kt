@@ -60,6 +60,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.total_users),
             "1,234"
         )
+        
+        // Add click listener to navigate to total users screen
+        binding.statCardUsers.root.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboardFragment_to_totalUsersFragment)
+        }
 
         // Total Posts Card
         setupStatCard(
