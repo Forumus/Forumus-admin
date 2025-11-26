@@ -32,6 +32,7 @@ class TotalPostsFragment : Fragment() {
     private var endDate: Date? = null
     private val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.US)
     private val displayDateFormat = SimpleDateFormat("MMMM dd, yyyy", Locale.US)
+    private val maxDaysRange = 31
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,6 +48,7 @@ class TotalPostsFragment : Fragment() {
 
         setupToolbar()
         setupRecyclerView()
+        initializeDefaultDates()
         setupDatePickers()
         setupSearchBar()
         setupPagination()
@@ -57,6 +59,20 @@ class TotalPostsFragment : Fragment() {
         binding.backButton.setOnClickListener {
             findNavController().navigateUp()
         }
+    }
+
+    private fun initializeDefaultDates() {
+        val calendar = Calendar.getInstance()
+        endDate = calendar.time
+        binding.endDateInput.setText(dateFormat.format(endDate!!))
+
+        // Set start date to 31 days before end date
+        calendar.add(Calendar.DAY_OF_YEAR, -maxDaysRange)
+        startDate = calendar.time
+        binding.startDateInput.setText(dateFormat.format(startDate!!))
+
+        // Update date range display
+        binding.dateRangeText.text = "${dateFormat.format(startDate!!)} - ${dateFormat.format(endDate!!)}"
     }
 
     private fun setupRecyclerView() {
@@ -173,11 +189,22 @@ class TotalPostsFragment : Fragment() {
             return
         }
 
+        // Validate 31-day maximum range
+        val daysDifference = calculateDaysDifference(start, end)
+        if (daysDifference > maxDaysRange) {
+            Toast.makeText(
+                requireContext(),
+                "Date range cannot exceed $maxDaysRange days. Please select a shorter period.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         // In a real app, you would filter by actual post dates
         // For mock data, we'll just show a toast
         Toast.makeText(
             requireContext(),
-            "Filter applied: ${dateFormat.format(start)} to ${dateFormat.format(end)}",
+            "Filter applied: ${dateFormat.format(start)} to ${dateFormat.format(end)} ($daysDifference days)",
             Toast.LENGTH_SHORT
         ).show()
 
@@ -235,6 +262,11 @@ class TotalPostsFragment : Fragment() {
 
     private fun updateTotalCount() {
         binding.totalPostCountText.text = filteredPosts.size.toString()
+    }
+
+    private fun calculateDaysDifference(startDate: Date, endDate: Date): Long {
+        val diffInMillis = endDate.time - startDate.time
+        return diffInMillis / (1000 * 60 * 60 * 24)
     }
 
     private fun generateMockPosts(): List<Post> {
