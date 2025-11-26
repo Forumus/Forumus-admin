@@ -37,6 +37,11 @@
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
     <string name="search_users_hint">Search users by name or ID...</string>
+    <string name="user_details">User Details</string>
+    <string name="close">Close</string>
+    <string name="user_id">User ID</string>
+    <string name="role">Role</string>
+    <string name="created_at">Created At</string>
 
     <!-- Dialog Messages -->
     <string name="confirm_remove_title">Remove User</string>
@@ -62,6 +67,25 @@
     <string name="confirm_delete_post_message">Are you sure you want to permanently delete the post &quot;%s&quot;?</string>
     <string name="report_dismissed">Report dismissed successfully</string>
     <string name="post_deleted">Post deleted successfully</string>
+    <string name="sort">Sort</string>
+    <string name="sort_by">Sort By</string>
+    <string name="what_to_sort_by">What to sort by</string>
+    <string name="sort_order">Sort order</string>
+    <string name="reports">Reports</string>
+    <string name="violations">Violations</string>
+    <string name="low_to_high">Low to High</string>
+    <string name="high_to_low">High to Low</string>
+    <string name="fewest_first">Fewest first</string>
+    <string name="most_first">Most first</string>
+    <string name="apply">Apply</string>
+    <string name="sort_by_reports_asc">Reports: Low to High</string>
+    <string name="sort_by_reports_desc">Reports: High to Low</string>
+    <string name="sort_by_violations_asc">Violations: Low to High</string>
+    <string name="sort_by_violations_desc">Violations: High to Low</string>
+    <string name="sorted_by_reports_asc">Sorted by reports (ascending)</string>
+    <string name="sorted_by_reports_desc">Sorted by reports (descending)</string>
+    <string name="sorted_by_violations_asc">Sorted by violations (ascending)</string>
+    <string name="sorted_by_violations_desc">Sorted by violations (descending)</string>
 
     <!-- AI Moderation -->
     <string name="ai_moderation">AI Moderation</string>

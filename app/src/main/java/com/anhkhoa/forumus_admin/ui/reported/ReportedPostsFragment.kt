@@ -84,8 +84,8 @@ class ReportedPostsFragment : Fragment() {
             }
         })
         
-        binding.filterButton.setOnClickListener {
-            Toast.makeText(requireContext(), "Filter options coming soon", Toast.LENGTH_SHORT).show()
+        binding.sortButton.setOnClickListener {
+            showSortDialog()
         }
     }
     
@@ -104,6 +104,108 @@ class ReportedPostsFragment : Fragment() {
         if (filteredPosts.isEmpty() && query.isNotEmpty()) {
             Toast.makeText(requireContext(), getString(R.string.no_results_found), Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    private fun showSortDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_sort, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        // Make dialog background transparent for rounded corners
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // Track selections
+        var sortBy = "reports" // "reports" or "violations"
+        var sortOrder = "asc" // "asc" or "desc"
+        
+        // Get all views
+        val closeButton = dialogView.findViewById<View>(R.id.closeButton)
+        val reportsButton = dialogView.findViewById<View>(R.id.reportsButton)
+        val violationsButton = dialogView.findViewById<View>(R.id.violationsButton)
+        val reportsIndicator = dialogView.findViewById<View>(R.id.reportsIndicator)
+        val violationsIndicator = dialogView.findViewById<View>(R.id.violationsIndicator)
+        val lowToHighButton = dialogView.findViewById<View>(R.id.lowToHighButton)
+        val highToLowButton = dialogView.findViewById<View>(R.id.highToLowButton)
+        val lowToHighIndicator = dialogView.findViewById<View>(R.id.lowToHighIndicator)
+        val highToLowIndicator = dialogView.findViewById<View>(R.id.highToLowIndicator)
+        val applyButton = dialogView.findViewById<View>(R.id.applyButton)
+        
+        // Close button
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Sort by selection
+        reportsButton.setOnClickListener {
+            sortBy = "reports"
+            reportsButton.setBackgroundResource(R.drawable.bg_sort_option_selected)
+            violationsButton.setBackgroundResource(R.drawable.bg_sort_option_unselected)
+            reportsIndicator.visibility = View.VISIBLE
+            violationsIndicator.visibility = View.GONE
+        }
+        
+        violationsButton.setOnClickListener {
+            sortBy = "violations"
+            reportsButton.setBackgroundResource(R.drawable.bg_sort_option_unselected)
+            violationsButton.setBackgroundResource(R.drawable.bg_sort_option_selected)
+            reportsIndicator.visibility = View.GONE
+            violationsIndicator.visibility = View.VISIBLE
+        }
+        
+        // Sort order selection
+        lowToHighButton.setOnClickListener {
+            sortOrder = "asc"
+            lowToHighButton.setBackgroundResource(R.drawable.bg_sort_order_selected)
+            highToLowButton.setBackgroundResource(R.drawable.bg_sort_order_unselected)
+            lowToHighIndicator.setBackgroundResource(R.drawable.bg_radio_order_selected)
+            highToLowIndicator.setBackgroundResource(R.drawable.bg_radio_order_unselected)
+        }
+        
+        highToLowButton.setOnClickListener {
+            sortOrder = "desc"
+            lowToHighButton.setBackgroundResource(R.drawable.bg_sort_order_unselected)
+            highToLowButton.setBackgroundResource(R.drawable.bg_sort_order_selected)
+            lowToHighIndicator.setBackgroundResource(R.drawable.bg_radio_order_unselected)
+            highToLowIndicator.setBackgroundResource(R.drawable.bg_radio_order_selected)
+        }
+        
+        // Apply button
+        applyButton.setOnClickListener {
+            when {
+                sortBy == "reports" && sortOrder == "asc" -> sortByReportsAscending()
+                sortBy == "reports" && sortOrder == "desc" -> sortByReportsDescending()
+                sortBy == "violations" && sortOrder == "asc" -> sortByViolationsAscending()
+                sortBy == "violations" && sortOrder == "desc" -> sortByViolationsDescending()
+            }
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+    }
+    
+    private fun sortByReportsAscending() {
+        filteredPosts = filteredPosts.sortedBy { it.reportCount }
+        adapter.updatePosts(filteredPosts)
+        Toast.makeText(requireContext(), getString(R.string.sorted_by_reports_asc), Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun sortByReportsDescending() {
+        filteredPosts = filteredPosts.sortedByDescending { it.reportCount }
+        adapter.updatePosts(filteredPosts)
+        Toast.makeText(requireContext(), getString(R.string.sorted_by_reports_desc), Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun sortByViolationsAscending() {
+        filteredPosts = filteredPosts.sortedBy { it.violationCount }
+        adapter.updatePosts(filteredPosts)
+        Toast.makeText(requireContext(), getString(R.string.sorted_by_violations_asc), Toast.LENGTH_SHORT).show()
+    }
+    
+    private fun sortByViolationsDescending() {
+        filteredPosts = filteredPosts.sortedByDescending { it.violationCount }
+        adapter.updatePosts(filteredPosts)
+        Toast.makeText(requireContext(), getString(R.string.sorted_by_violations_desc), Toast.LENGTH_SHORT).show()
     }
     
     private fun showDismissConfirmation(post: ReportedPost) {
