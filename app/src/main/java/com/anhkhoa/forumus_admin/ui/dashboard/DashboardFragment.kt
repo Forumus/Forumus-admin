@@ -69,6 +69,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.total_posts),
             "5,678"
         )
+        
+        // Add click listener to navigate to total posts screen
+        binding.statCardPosts.root.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboardFragment_to_totalPostsFragment)
+        }
 
         // Blacklisted Users Card
         setupStatCard(

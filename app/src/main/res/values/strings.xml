@@ -78,4 +78,14 @@
     <string name="filter_icon">Filter Icon</string>
     <string name="reject_icon">Reject Icon</string>
     <string name="approve_icon">Approve Icon</string>
+
+    <!-- Total Posts Screen -->
+    <string name="total_post_count">Total Post Count</string>
+    <string name="filter_by_date_range">Filter by Date Range</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="select_start_date">Select start date</string>
+    <string name="select_end_date">Select end date</string>
+    <string name="apply_filter">Apply Filter</string>
+    <string name="search_posts_hint">Search posts by title or author...</string>
 </resources>

@@ -18,6 +18,10 @@
         <action
             android:id="@+id/action_dashboardFragment_to_reportedPostsFragment"
             app:destination="@id/reportedPostsFragment" />
+        
+        <action
+            android:id="@+id/action_dashboardFragment_to_totalPostsFragment"
+            app:destination="@id/totalPostsFragment" />
     </fragment>
 
     <fragment
@@ -43,6 +47,12 @@
         android:name="com.anhkhoa.forumus_admin.ui.settings.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/totalPostsFragment"
+        android:name="com.anhkhoa.forumus_admin.ui.totalposts.TotalPostsFragment"
+        android:label="Total Posts"
+        tools:layout="@layout/fragment_total_posts" />
 
 </navigation>
     
