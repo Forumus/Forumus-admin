@@ -422,15 +422,15 @@ class BlacklistFragment : Fragment() {
         if (isSelected) {
             when (button.id) {
                 R.id.remindButton -> {
-                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_blue)
+                    button.setBackgroundResource(R.drawable.bg_badge_remind)
                     textView?.setTextColor(android.graphics.Color.parseColor("#155DFC"))
                 }
                 R.id.warningButton -> {
-                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_orange)
+                    button.setBackgroundResource(R.drawable.bg_report_badge)
                     textView?.setTextColor(android.graphics.Color.parseColor("#F54900"))
                 }
                 R.id.banButton -> {
-                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_red)
+                    button.setBackgroundResource(R.drawable.bg_badge_ban)
                     textView?.setTextColor(android.graphics.Color.parseColor("#E7000B"))
                 }
             }

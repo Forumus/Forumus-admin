@@ -28,6 +28,10 @@ class TotalUsersFragment : Fragment() {
     private var currentPage = 0
     private val itemsPerPage = 10
     private var totalPages = 0
+    
+    // Filter state
+    private val selectedStatuses = mutableSetOf<UserStatus>()
+    private val selectedRoles = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,8 +88,7 @@ class TotalUsersFragment : Fragment() {
         })
 
         binding.filterButton.setOnClickListener {
-            // TODO: Implement filter options
-            Toast.makeText(requireContext(), "Filter options coming soon", Toast.LENGTH_SHORT).show()
+            showFilterDialog()
         }
     }
 
@@ -131,6 +134,14 @@ class TotalUsersFragment : Fragment() {
             UserStatus.BAN, UserStatus.REMIND, UserStatus.NORMAL, UserStatus.WARNING
         )
         
+        val roles = listOf(
+            "Teacher", "Student", "Student", "Teacher",
+            "Student", "Student", "Teacher", "Student",
+            "Student", "Teacher", "Student", "Student",
+            "Teacher", "Student", "Student", "Teacher",
+            "Student", "Teacher", "Student", "Student"
+        )
+        
         for (i in names.indices) {
             val id = String.format("231201%02d", 32 + i)
             users.add(
@@ -138,7 +149,8 @@ class TotalUsersFragment : Fragment() {
                     id = id,
                     name = names[i],
                     avatarUrl = null,
-                    status = statuses[i % statuses.size]
+                    status = statuses[i % statuses.size],
+                    role = roles[i % roles.size]
                 )
             )
         }
@@ -147,10 +159,23 @@ class TotalUsersFragment : Fragment() {
     }
 
     private fun applySearchFilter(query: String) {
+        var users = allUsers
+        
+        // Apply status filter first
+        if (selectedStatuses.isNotEmpty()) {
+            users = users.filter { it.status in selectedStatuses }
+        }
+        
+        // Apply role filter
+        if (selectedRoles.isNotEmpty()) {
+            users = users.filter { it.role in selectedRoles }
+        }
+        
+        // Apply search query
         filteredUsers = if (query.isEmpty()) {
-            allUsers
+            users
         } else {
-            allUsers.filter {
+            users.filter {
                 it.name.contains(query, ignoreCase = true) ||
                         it.id.contains(query, ignoreCase = true)
             }
@@ -188,6 +213,208 @@ class TotalUsersFragment : Fragment() {
         adapter.updateUsers(getCurrentPageUsers())
         updatePaginationUI()
         binding.usersRecyclerView.scrollToPosition(0)
+    }
+
+    private fun showFilterDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_filter_users, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        // Make dialog background transparent for rounded corners
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // Track current selections (copy of selected filters)
+        val tempSelectedStatuses = selectedStatuses.toMutableSet()
+        val tempSelectedRoles = selectedRoles.toMutableSet()
+        
+        // Get all views
+        val closeButton = dialogView.findViewById<View>(R.id.closeButton)
+        val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
+        val normalButton = dialogView.findViewById<View>(R.id.normalButton)
+        val remindButton = dialogView.findViewById<View>(R.id.remindButton)
+        val warningButton = dialogView.findViewById<View>(R.id.warningButton)
+        val banButton = dialogView.findViewById<View>(R.id.banButton)
+        val teacherButton = dialogView.findViewById<View>(R.id.teacherButton)
+        val studentButton = dialogView.findViewById<View>(R.id.studentButton)
+        val normalCheckmark = dialogView.findViewById<View>(R.id.normalCheckmark)
+        val remindCheckmark = dialogView.findViewById<View>(R.id.remindCheckmark)
+        val warningCheckmark = dialogView.findViewById<View>(R.id.warningCheckmark)
+        val banCheckmark = dialogView.findViewById<View>(R.id.banCheckmark)
+        val teacherCheckmark = dialogView.findViewById<View>(R.id.teacherCheckmark)
+        val studentCheckmark = dialogView.findViewById<View>(R.id.studentCheckmark)
+        val applyButton = dialogView.findViewById<View>(R.id.applyButton)
+        
+        // Initialize UI based on current selections
+        updateFilterButtonState(normalButton, normalCheckmark, UserStatus.NORMAL in tempSelectedStatuses)
+        updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMIND in tempSelectedStatuses)
+        updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNING in tempSelectedStatuses)
+        updateFilterButtonState(banButton, banCheckmark, UserStatus.BAN in tempSelectedStatuses)
+        updateRoleButtonState(teacherButton, teacherCheckmark, "Teacher" in tempSelectedRoles)
+        updateRoleButtonState(studentButton, studentCheckmark, "Student" in tempSelectedRoles)
+        
+        // Close button
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Clear all button
+        clearAllButton.setOnClickListener {
+            tempSelectedStatuses.clear()
+            tempSelectedRoles.clear()
+            updateFilterButtonState(normalButton, normalCheckmark, false)
+            updateFilterButtonState(remindButton, remindCheckmark, false)
+            updateFilterButtonState(warningButton, warningCheckmark, false)
+            updateFilterButtonState(banButton, banCheckmark, false)
+            updateRoleButtonState(teacherButton, teacherCheckmark, false)
+            updateRoleButtonState(studentButton, studentCheckmark, false)
+        }
+        
+        // Normal button
+        normalButton.setOnClickListener {
+            val isSelected = UserStatus.NORMAL in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.NORMAL)
+            } else {
+                tempSelectedStatuses.add(UserStatus.NORMAL)
+            }
+            updateFilterButtonState(normalButton, normalCheckmark, !isSelected)
+        }
+        
+        // Remind button
+        remindButton.setOnClickListener {
+            val isSelected = UserStatus.REMIND in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.REMIND)
+            } else {
+                tempSelectedStatuses.add(UserStatus.REMIND)
+            }
+            updateFilterButtonState(remindButton, remindCheckmark, !isSelected)
+        }
+        
+        // Warning button
+        warningButton.setOnClickListener {
+            val isSelected = UserStatus.WARNING in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.WARNING)
+            } else {
+                tempSelectedStatuses.add(UserStatus.WARNING)
+            }
+            updateFilterButtonState(warningButton, warningCheckmark, !isSelected)
+        }
+        
+        // Ban button
+        banButton.setOnClickListener {
+            val isSelected = UserStatus.BAN in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.BAN)
+            } else {
+                tempSelectedStatuses.add(UserStatus.BAN)
+            }
+            updateFilterButtonState(banButton, banCheckmark, !isSelected)
+        }
+        
+        // Teacher button
+        teacherButton.setOnClickListener {
+            val isSelected = "Teacher" in tempSelectedRoles
+            if (isSelected) {
+                tempSelectedRoles.remove("Teacher")
+            } else {
+                tempSelectedRoles.add("Teacher")
+            }
+            updateRoleButtonState(teacherButton, teacherCheckmark, !isSelected)
+        }
+        
+        // Student button
+        studentButton.setOnClickListener {
+            val isSelected = "Student" in tempSelectedRoles
+            if (isSelected) {
+                tempSelectedRoles.remove("Student")
+            } else {
+                tempSelectedRoles.add("Student")
+            }
+            updateRoleButtonState(studentButton, studentCheckmark, !isSelected)
+        }
+        
+        // Apply button
+        applyButton.setOnClickListener {
+            selectedStatuses.clear()
+            selectedStatuses.addAll(tempSelectedStatuses)
+            selectedRoles.clear()
+            selectedRoles.addAll(tempSelectedRoles)
+            applySearchFilter(binding.searchInput.query.toString())
+            
+            val filterParts = mutableListOf<String>()
+            if (selectedStatuses.isNotEmpty()) {
+                filterParts.add("Status: ${selectedStatuses.joinToString(", ")}")
+            }
+            if (selectedRoles.isNotEmpty()) {
+                filterParts.add("Role: ${selectedRoles.joinToString(", ")}")
+            }
+            
+            val filterMessage = if (filterParts.isEmpty()) {
+                "Filter cleared"
+            } else {
+                "Filtered by ${filterParts.joinToString(" | ")}"
+            }
+            Toast.makeText(requireContext(), filterMessage, Toast.LENGTH_SHORT).show()
+            
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+    }
+    
+    private fun updateFilterButtonState(button: View, checkmark: View, isSelected: Boolean) {
+        // Get the TextView inside the button (first child TextView)
+        val textView = (button as? ViewGroup)?.let { group ->
+            (0 until group.childCount).map { group.getChildAt(it) }
+                .firstOrNull { it is android.widget.TextView } as? android.widget.TextView
+        }
+        
+        if (isSelected) {
+            when (button.id) {
+                R.id.normalButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_green)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#00A63E"))
+                }
+                R.id.remindButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_blue)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#155DFC"))
+                }
+                R.id.warningButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_orange)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#F54900"))
+                }
+                R.id.banButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_red)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#E7000B"))
+                }
+            }
+            checkmark.visibility = View.VISIBLE
+        } else {
+            button.setBackgroundResource(R.drawable.bg_filter_option_unselected)
+            textView?.setTextColor(android.graphics.Color.parseColor("#364153"))
+            checkmark.visibility = View.GONE
+        }
+    }
+    
+    private fun updateRoleButtonState(button: View, checkmark: View, isSelected: Boolean) {
+        // Get the TextView inside the button (first child TextView)
+        val textView = (button as? ViewGroup)?.let { group ->
+            (0 until group.childCount).map { group.getChildAt(it) }
+                .firstOrNull { it is android.widget.TextView } as? android.widget.TextView
+        }
+        
+        if (isSelected) {
+            button.setBackgroundResource(R.drawable.bg_filter_option_selected_purple)
+            textView?.setTextColor(android.graphics.Color.parseColor("#9810FA"))
+            checkmark.visibility = View.VISIBLE
+        } else {
+            button.setBackgroundResource(R.drawable.bg_filter_option_unselected)
+            textView?.setTextColor(android.graphics.Color.parseColor("#364153"))
+            checkmark.visibility = View.GONE
+        }
     }
 
     private fun showUserDetailsDialog(user: User) {

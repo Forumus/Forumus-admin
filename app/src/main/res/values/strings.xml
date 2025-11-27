@@ -45,6 +45,10 @@
     <string name="user_id">User ID</string>
     <string name="role">Role</string>
     <string name="created_at">Created At</string>
+    <string name="filter_users">Filter Users</string>
+    <string name="select_filters">Select filters</string>
+    <string name="teacher">Teacher</string>
+    <string name="student">Student</string>
 
     <!-- Dialog Messages -->
     <string name="confirm_remove_title">Remove User</string>
