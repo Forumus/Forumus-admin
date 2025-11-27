@@ -8,9 +8,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.anhkhoa.forumus_admin.R
+import com.anhkhoa.forumus_admin.data.repository.PostRepository
+import com.anhkhoa.forumus_admin.data.repository.UserRepository
 import com.anhkhoa.forumus_admin.databinding.FragmentReportedPostsBinding
+import kotlinx.coroutines.launch
 
 data class ReportedPost(
     val id: String,
@@ -29,8 +33,11 @@ class ReportedPostsFragment : Fragment() {
     private val binding get() = _binding!!
     
     private lateinit var adapter: ReportedPostsAdapter
+    private val postRepository = PostRepository()
+    private val userRepository = UserRepository()
     private var allPosts: List<ReportedPost> = emptyList()
     private var filteredPosts: List<ReportedPost> = emptyList()
+    private var isLoading = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,11 +63,8 @@ class ReportedPostsFragment : Fragment() {
     }
 
     private fun setupPostsList() {
-        allPosts = getSampleReportedPosts()
-        filteredPosts = allPosts
-        
         adapter = ReportedPostsAdapter(
-            posts = filteredPosts,
+            posts = emptyList(),
             onDismissClick = { post -> showDismissConfirmation(post) },
             onDeleteClick = { post -> showDeleteConfirmation(post) }
         )
@@ -69,6 +73,8 @@ class ReportedPostsFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             this.adapter = this@ReportedPostsFragment.adapter
         }
+        
+        loadReportedPostsFromFirebase()
     }
 
     private fun setupSearchBar() {
@@ -242,59 +248,98 @@ class ReportedPostsFragment : Fragment() {
         Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
     }
 
-    private fun getSampleReportedPosts(): List<ReportedPost> {
-        return listOf(
-            ReportedPost(
-                id = "1",
-                title = "Spam Advertisement for Math Courses",
-                author = "Sarah Wilson",
-                date = "November 15, 2025",
-                categories = listOf("Mathematics", "Pure Mathematics", "Algebra"),
-                description = "This post is pure spam advertising paid courses with no educational value and multiple affiliate links.",
-                violationCount = 2,
-                reportCount = 20
-            ),
-            ReportedPost(
-                id = "2",
-                title = "Plagiarized Machine Learning Research",
-                author = "Mike Johnson",
-                date = "November 16, 2025",
-                categories = listOf("Information Technology", "Artificial Intelligence", "Machine Learning"),
-                description = "This post is directly copied from published research papers without proper attribution or permission from the original authors.",
-                violationCount = 2,
-                reportCount = 15
-            ),
-            ReportedPost(
-                id = "3",
-                title = "Misleading Information about React",
-                author = "John Doe",
-                date = "November 18, 2025",
-                categories = listOf("Information Technology", "Software Engineering", "Web Development"),
-                description = "This article contains misleading information about React best practices and promotes outdated patterns that could harm application performance.",
-                violationCount = 3,
-                reportCount = 12
-            ),
-            ReportedPost(
-                id = "4",
-                title = "Offensive Language in TypeScript Tutorial",
-                author = "Jane Smith",
-                date = "November 17, 2025",
-                categories = listOf("Information Technology", "Software Engineering", "Programming Languages"),
-                description = "Tutorial contains inappropriate language and offensive comments that violate community guidelines and create a hostile environment.",
-                violationCount = 2,
-                reportCount = 8
-            ),
-            ReportedPost(
-                id = "5",
-                title = "Inappropriate Calculus Examples",
-                author = "Tom Brown",
-                date = "November 14, 2025",
-                categories = listOf("Mathematics", "Applied Mathematics", "Calculus"),
-                description = "Contains offensive imagery and inappropriate examples that violate community standards.",
-                violationCount = 2,
-                reportCount = 6
-            )
-        )
+    private fun loadReportedPostsFromFirebase() {
+        if (isLoading) return
+        
+        isLoading = true
+        showLoading(true)
+        
+        lifecycleScope.launch {
+            try {
+                val postsResult = postRepository.getAllPosts()
+                val usersResult = userRepository.getAllUsers()
+                
+                postsResult.onSuccess { firestorePosts ->
+                    usersResult.onSuccess { firestoreUsers ->
+                        // Create a map of uid to user for quick lookup
+                        val userMap = firestoreUsers.associateBy { it.uid }
+                        
+                        // Filter posts with report_count > 0
+                        val reportedFirestorePosts = firestorePosts.filter { it.report_count > 0 }
+                        
+                        if (reportedFirestorePosts.isEmpty()) {
+                            Toast.makeText(
+                                requireContext(),
+                                "No reported posts found",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            allPosts = emptyList()
+                        } else {
+                            // Convert Firestore posts to ReportedPost model
+                            allPosts = reportedFirestorePosts.map { firestorePost ->
+                                val author = userMap[firestorePost.authorId]?.fullName 
+                                    ?: firestorePost.authorId
+                                
+                                ReportedPost(
+                                    id = firestorePost.post_id,
+                                    title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                    author = author,
+                                    date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                    categories = firestorePost.topic,
+                                    description = firestorePost.content.take(200),
+                                    violationCount = firestorePost.violation_type.size,
+                                    reportCount = firestorePost.report_count.toInt()
+                                )
+                            }
+                            
+                            Toast.makeText(
+                                requireContext(),
+                                "Loaded ${allPosts.size} reported posts",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        
+                        filteredPosts = allPosts
+                        adapter.updatePosts(filteredPosts)
+                    }.onFailure {
+                        // Continue without user names
+                        val reportedFirestorePosts = firestorePosts.filter { it.report_count > 0 }
+                        
+                        allPosts = reportedFirestorePosts.map { firestorePost ->
+                            ReportedPost(
+                                id = firestorePost.post_id,
+                                title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                author = firestorePost.authorId,
+                                date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                categories = firestorePost.topic,
+                                description = firestorePost.content.take(200),
+                                violationCount = firestorePost.violation_type.size,
+                                reportCount = firestorePost.report_count.toInt()
+                            )
+                        }
+                        filteredPosts = allPosts
+                        adapter.updatePosts(filteredPosts)
+                    }
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Error loading posts: ${exception.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    allPosts = emptyList()
+                    filteredPosts = allPosts
+                    adapter.updatePosts(filteredPosts)
+                }
+            } finally {
+                isLoading = false
+                showLoading(false)
+            }
+        }
+    }
+    
+    private fun showLoading(show: Boolean) {
+        binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
     }
 
     override fun onDestroyView() {
