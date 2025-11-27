@@ -11,11 +11,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.anhkhoa.forumus_admin.R
 import com.anhkhoa.forumus_admin.data.model.User
 import com.anhkhoa.forumus_admin.data.model.UserStatus
+import com.anhkhoa.forumus_admin.data.repository.UserRepository
 import com.anhkhoa.forumus_admin.databinding.FragmentTotalUsersBinding
+import kotlinx.coroutines.launch
 
 class TotalUsersFragment : Fragment() {
 
@@ -23,11 +26,13 @@ class TotalUsersFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: TotalUsersAdapter
+    private val userRepository = UserRepository()
     private var allUsers: List<User> = emptyList()
     private var filteredUsers: List<User> = emptyList()
     private var currentPage = 0
     private val itemsPerPage = 10
     private var totalPages = 0
+    private var isLoading = false
     
     // Filter state
     private val selectedStatuses = mutableSetOf<UserStatus>()
@@ -49,7 +54,7 @@ class TotalUsersFragment : Fragment() {
         setupRecyclerView()
         setupSearchBar()
         setupPagination()
-        loadMockData()
+        loadUsersFromFirebase()
     }
 
     private fun setupToolbar() {
@@ -108,54 +113,81 @@ class TotalUsersFragment : Fragment() {
         }
     }
 
-    private fun loadMockData() {
-        allUsers = generateMockUsers()
-        filteredUsers = allUsers
-        calculateTotalPages()
-        updatePage()
-    }
-
-    private fun generateMockUsers(): List<User> {
-        val users = mutableListOf<User>()
+    private fun loadUsersFromFirebase() {
+        if (isLoading) return
         
-        val names = listOf(
-            "Cao Trong Khang", "Tô Thanh Long", "Nguyễn Viết Toàn", "Trần Anh Khoa",
-            "Võ Tất Toàn", "Nguyễn Văn A", "Nguyễn Văn B", "Nguyễn Văn C",
-            "Trần Thị D", "Lê Văn E", "Phạm Minh F", "Hoàng Thị G",
-            "Đặng Văn H", "Bùi Thị I", "Vũ Văn K", "Lý Thị L",
-            "Phan Văn M", "Đinh Thị N", "Mai Văn O", "Trương Thị P"
-        )
+        isLoading = true
+        showLoading(true)
         
-        val statuses = listOf(
-            UserStatus.WARNING, UserStatus.BAN, UserStatus.REMIND, UserStatus.WARNING,
-            UserStatus.BAN, UserStatus.REMIND, UserStatus.NORMAL, UserStatus.WARNING,
-            UserStatus.REMIND, UserStatus.NORMAL, UserStatus.WARNING, UserStatus.BAN,
-            UserStatus.NORMAL, UserStatus.REMIND, UserStatus.WARNING, UserStatus.NORMAL,
-            UserStatus.BAN, UserStatus.REMIND, UserStatus.NORMAL, UserStatus.WARNING
-        )
-        
-        val roles = listOf(
-            "Teacher", "Student", "Student", "Teacher",
-            "Student", "Student", "Teacher", "Student",
-            "Student", "Teacher", "Student", "Student",
-            "Teacher", "Student", "Student", "Teacher",
-            "Student", "Teacher", "Student", "Student"
-        )
-        
-        for (i in names.indices) {
-            val id = String.format("231201%02d", 32 + i)
-            users.add(
-                User(
-                    id = id,
-                    name = names[i],
-                    avatarUrl = null,
-                    status = statuses[i % statuses.size],
-                    role = roles[i % roles.size]
-                )
-            )
+        lifecycleScope.launch {
+            try {
+                val result = userRepository.getAllUsers()
+                
+                result.onSuccess { firestoreUsers ->
+                    if (firestoreUsers.isEmpty()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "No users found in database",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        allUsers = emptyList()
+                    } else {
+                        // Convert Firestore users to User model
+                        allUsers = firestoreUsers.map { firestoreUser ->
+                            User(
+                                id = extractIdFromEmail(firestoreUser.email),
+                                name = firestoreUser.fullName.ifEmpty { 
+                                    extractIdFromEmail(firestoreUser.email) 
+                                },
+                                avatarUrl = firestoreUser.profilePictureUrl,
+                                status = UserRepository.mapStatusToEnum(firestoreUser.status),
+                                role = mapRoleToDisplayName(firestoreUser.role)
+                            )
+                        }
+                        
+                        Toast.makeText(
+                            requireContext(),
+                            "Loaded ${allUsers.size} users",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    
+                    filteredUsers = allUsers
+                    calculateTotalPages()
+                    updatePage()
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Error loading users: ${exception.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    allUsers = emptyList()
+                    filteredUsers = allUsers
+                    calculateTotalPages()
+                    updatePage()
+                }
+            } finally {
+                isLoading = false
+                showLoading(false)
+            }
         }
-        
-        return users
+    }
+    
+    private fun extractIdFromEmail(email: String): String {
+        return email.substringBefore("@")
+    }
+    
+    private fun mapRoleToDisplayName(role: String): String {
+        return when (role.uppercase()) {
+            "STUDENT" -> "Student"
+            "TEACHER" -> "Teacher"
+            else -> role.replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    private fun showLoading(show: Boolean) {
+        binding.usersRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
     }
 
     private fun applySearchFilter(query: String) {
