@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.anhkhoa.forumus_admin.R
 import com.anhkhoa.forumus_admin.databinding.FragmentBlacklistBinding
 import com.anhkhoa.forumus_admin.data.repository.UserRepository
+import com.anhkhoa.forumus_admin.data.model.UserStatus
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 data class BlacklistedUser(
     val id: String,
@@ -22,12 +22,6 @@ data class BlacklistedUser(
     val avatarUrl: String?,
     val status: UserStatus
 )
-
-enum class UserStatus {
-    BAN,
-    WARNING,
-    REMIND
-}
 
 enum class ActionType {
     REMOVE,
@@ -106,19 +100,19 @@ class BlacklistFragment : Fragment() {
         
         lifecycleScope.launch {
             try {
-                val result = userRepository.getAllUsers()
+                val result = userRepository.getBlacklistedUsers()
                 
                 result.onSuccess { firestoreUsers ->
                     if (firestoreUsers.isEmpty()) {
                         Toast.makeText(
                             requireContext(),
-                            "No users found in database",
+                            "No blacklisted users found",
                             Toast.LENGTH_SHORT
                         ).show()
                         // Use empty list instead of fallback
                         allUsers = emptyList()
                     } else {
-                        // Convert Firestore users to BlacklistedUser with simulated status
+                        // Convert Firestore users to BlacklistedUser with actual status from Firebase
                         allUsers = firestoreUsers.map { firestoreUser ->
                             BlacklistedUser(
                                 id = extractIdFromEmail(firestoreUser.email),
@@ -126,13 +120,13 @@ class BlacklistFragment : Fragment() {
                                     extractIdFromEmail(firestoreUser.email) 
                                 },
                                 avatarUrl = firestoreUser.profilePictureUrl,
-                                status = getRandomStatus()
+                                status = UserRepository.mapStatusToEnum(firestoreUser.status)
                             )
                         }
                         
                         Toast.makeText(
                             requireContext(),
-                            "Loaded ${allUsers.size} users from database",
+                            "Loaded ${allUsers.size} blacklisted users",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -165,15 +159,6 @@ class BlacklistFragment : Fragment() {
     private fun extractIdFromEmail(email: String): String {
         // Extract the part before @ from email
         return email.substringBefore("@")
-    }
-    
-    private fun getRandomStatus(): UserStatus {
-        // Simulate random status for demonstration
-        return when (Random.nextInt(3)) {
-            0 -> UserStatus.BAN
-            1 -> UserStatus.WARNING
-            else -> UserStatus.REMIND
-        }
     }
     
     private fun showLoading(show: Boolean) {

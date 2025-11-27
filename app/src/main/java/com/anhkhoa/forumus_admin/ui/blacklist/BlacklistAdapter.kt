@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.anhkhoa.forumus_admin.R
+import com.anhkhoa.forumus_admin.data.model.UserStatus
 
 class BlacklistAdapter(
     private var users: List<BlacklistedUser>,
@@ -56,6 +57,14 @@ class BlacklistAdapter(
                 holder.statusBadge.setBackgroundResource(R.drawable.bg_badge_remind)
                 holder.statusBadge.setTextColor(
                     ContextCompat.getColor(holder.itemView.context, R.color.primary_blue)
+                )
+            }
+            UserStatus.NORMAL -> {
+                // This case shouldn't appear in blacklist, but handle it for completeness
+                holder.statusBadge.text = "Normal"
+                holder.statusBadge.setBackgroundResource(R.drawable.bg_badge_remind)
+                holder.statusBadge.setTextColor(
+                    ContextCompat.getColor(holder.itemView.context, R.color.text_secondary)
                 )
             }
         }
