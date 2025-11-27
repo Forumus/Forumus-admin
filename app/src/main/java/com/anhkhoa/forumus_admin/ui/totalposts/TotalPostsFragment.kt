@@ -8,11 +8,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.anhkhoa.forumus_admin.R
 import com.anhkhoa.forumus_admin.data.model.Post
 import com.anhkhoa.forumus_admin.data.model.Tag
+import com.anhkhoa.forumus_admin.data.repository.PostRepository
+import com.anhkhoa.forumus_admin.data.repository.UserRepository
 import com.anhkhoa.forumus_admin.databinding.FragmentTotalPostsBinding
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,11 +26,14 @@ class TotalPostsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: TotalPostsAdapter
+    private val postRepository = PostRepository()
+    private val userRepository = UserRepository()
     private var allPosts: List<Post> = emptyList()
     private var filteredPosts: List<Post> = emptyList()
     private var currentPage = 0
     private val itemsPerPage = 10
     private var totalPages = 0
+    private var isLoading = false
 
     private var startDate: Date? = null
     private var endDate: Date? = null
@@ -52,7 +59,7 @@ class TotalPostsFragment : Fragment() {
         setupDatePickers()
         setupSearchBar()
         setupPagination()
-        loadMockData()
+        loadPostsFromFirebase()
     }
 
     private fun setupToolbar() {
@@ -150,12 +157,105 @@ class TotalPostsFragment : Fragment() {
         }
     }
 
-    private fun loadMockData() {
-        allPosts = generateMockPosts()
-        filteredPosts = allPosts
-        calculateTotalPages()
-        updateTotalCount()
-        updatePage()
+    private fun loadPostsFromFirebase() {
+        if (isLoading) return
+        
+        isLoading = true
+        showLoading(true)
+        
+        lifecycleScope.launch {
+            try {
+                val postsResult = postRepository.getAllPosts()
+                val usersResult = userRepository.getAllUsers()
+                
+                postsResult.onSuccess { firestorePosts ->
+                    usersResult.onSuccess { firestoreUsers ->
+                        // Create a map of uid to user for quick lookup
+                        val userMap = firestoreUsers.associateBy { it.uid }
+                        
+                        if (firestorePosts.isEmpty()) {
+                            Toast.makeText(
+                                requireContext(),
+                                "No posts found in database",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            allPosts = emptyList()
+                        } else {
+                            // Convert Firestore posts to Post model
+                            allPosts = firestorePosts.map { firestorePost ->
+                                val author = userMap[firestorePost.authorId]?.fullName 
+                                    ?: firestorePost.authorId
+                                
+                                Post(
+                                    id = firestorePost.post_id,
+                                    title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                    author = author,
+                                    date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                    description = firestorePost.content.take(200),
+                                    tags = firestorePost.topic.map { topicName ->
+                                        Tag(
+                                            name = topicName,
+                                            backgroundColor = 0xFFE3F2FD.toInt(),
+                                            textColor = 0xFF1976D2.toInt()
+                                        )
+                                    },
+                                    isAiApproved = firestorePost.status == "approved"
+                                )
+                            }
+                            
+                            Toast.makeText(
+                                requireContext(),
+                                "Loaded ${allPosts.size} posts",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        
+                        filteredPosts = allPosts
+                        applyDateFilter()
+                    }.onFailure {
+                        // Continue without user names
+                        allPosts = firestorePosts.map { firestorePost ->
+                            Post(
+                                id = firestorePost.post_id,
+                                title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                author = firestorePost.authorId,
+                                date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                description = firestorePost.content.take(200),
+                                tags = firestorePost.topic.map { topicName ->
+                                    Tag(
+                                        name = topicName,
+                                        backgroundColor = 0xFFE3F2FD.toInt(),
+                                        textColor = 0xFF1976D2.toInt()
+                                    )
+                                },
+                                isAiApproved = firestorePost.status == "approved"
+                            )
+                        }
+                        filteredPosts = allPosts
+                        applyDateFilter()
+                    }
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Error loading posts: ${exception.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    
+                    allPosts = emptyList()
+                    filteredPosts = allPosts
+                    calculateTotalPages()
+                    updateTotalCount()
+                    updatePage()
+                }
+            } finally {
+                isLoading = false
+                showLoading(false)
+            }
+        }
+    }
+    
+    private fun showLoading(show: Boolean) {
+        binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
     }
 
     private fun applySearchFilter(query: String) {
@@ -200,16 +300,71 @@ class TotalPostsFragment : Fragment() {
             return
         }
 
-        // In a real app, you would filter by actual post dates
-        // For mock data, we'll just show a toast
-        Toast.makeText(
-            requireContext(),
-            "Filter applied: ${dateFormat.format(start)} to ${dateFormat.format(end)} ($daysDifference days)",
-            Toast.LENGTH_SHORT
-        ).show()
-
-        // Update date range display
-        binding.dateRangeText.text = "${dateFormat.format(start)} - ${dateFormat.format(end)}"
+        // Filter posts by date range
+        isLoading = true
+        showLoading(true)
+        
+        lifecycleScope.launch {
+            try {
+                val result = postRepository.getAllPosts()
+                
+                result.onSuccess { firestorePosts ->
+                    val usersResult = userRepository.getAllUsers()
+                    val userMap = usersResult.getOrNull()?.associateBy { it.uid } ?: emptyMap()
+                    
+                    // Filter posts by date range
+                    val filteredFirestorePosts = firestorePosts.filter { post ->
+                        val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
+                        postDate != null && !postDate.before(start) && !postDate.after(end)
+                    }
+                    
+                    allPosts = filteredFirestorePosts.map { firestorePost ->
+                        val author = userMap[firestorePost.authorId]?.fullName 
+                            ?: firestorePost.authorId
+                        
+                        Post(
+                            id = firestorePost.post_id,
+                            title = firestorePost.title.ifEmpty { "Untitled Post" },
+                            author = author,
+                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                            description = firestorePost.content.take(200),
+                            tags = firestorePost.topic.map { topicName ->
+                                Tag(
+                                    name = topicName,
+                                    backgroundColor = 0xFFE3F2FD.toInt(),
+                                    textColor = 0xFF1976D2.toInt()
+                                )
+                            },
+                            isAiApproved = firestorePost.status == "approved"
+                        )
+                    }
+                    
+                    filteredPosts = allPosts
+                    currentPage = 0
+                    calculateTotalPages()
+                    updateTotalCount()
+                    updatePage()
+                    
+                    Toast.makeText(
+                        requireContext(),
+                        "Found ${allPosts.size} posts between ${dateFormat.format(start)} and ${dateFormat.format(end)}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(),
+                        "Error filtering posts: ${exception.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                
+                // Update date range display
+                binding.dateRangeText.text = "${dateFormat.format(start)} - ${dateFormat.format(end)}"
+            } finally {
+                isLoading = false
+                showLoading(false)
+            }
+        }
     }
 
     private fun calculateTotalPages() {
@@ -269,101 +424,7 @@ class TotalPostsFragment : Fragment() {
         return diffInMillis / (1000 * 60 * 60 * 24)
     }
 
-    private fun generateMockPosts(): List<Post> {
-        val posts = mutableListOf<Post>()
 
-        // Sample tags
-        val techTags = listOf(
-            Tag("Information Technology", 0xFFE3F2FD.toInt(), 0xFF1976D2.toInt()),
-            Tag("Software Engineering", 0xFFE1F5FE.toInt(), 0xFF0288D1.toInt()),
-            Tag("Web Development", 0xFF155DFC.toInt(), 0xFFFFFFFF.toInt())
-        )
-
-        val mathTags = listOf(
-            Tag("Mathematics", 0xFFF3E5F5.toInt(), 0xFF7B1FA2.toInt()),
-            Tag("Pure Mathematics", 0xFFFCE4EC.toInt(), 0xFFC2185B.toInt()),
-            Tag("Algebra", 0xFFFFF3E0.toInt(), 0xFFE65100.toInt())
-        )
-
-        val scienceTags = listOf(
-            Tag("Science", 0xFFE8F5E9.toInt(), 0xFF2E7D32.toInt()),
-            Tag("Physics", 0xFFE0F2F1.toInt(), 0xFF00695C.toInt()),
-            Tag("Chemistry", 0xFFFFF9C4.toInt(), 0xFFF57F17.toInt())
-        )
-
-        val businessTags = listOf(
-            Tag("Business", 0xFFEFEBE9.toInt(), 0xFF4E342E.toInt()),
-            Tag("Marketing", 0xFFF1F8E9.toInt(), 0xFF558B2F.toInt()),
-            Tag("Finance", 0xFFE8EAF6.toInt(), 0xFF283593.toInt())
-        )
-
-        // Generate 25 mock posts
-        val titles = listOf(
-            "Misleading Information about React",
-            "Best Practices for TypeScript Development",
-            "Understanding Machine Learning Algorithms",
-            "Introduction to Quantum Computing",
-            "Advanced CSS Techniques for Modern Web",
-            "Database Optimization Strategies",
-            "Mobile App Development with Flutter",
-            "Cloud Computing Architecture Patterns",
-            "Cybersecurity Best Practices",
-            "Data Structures and Algorithms Guide",
-            "Introduction to Linear Algebra",
-            "Calculus Fundamentals Explained",
-            "Statistics for Data Science",
-            "Number Theory and Cryptography",
-            "Graph Theory Applications",
-            "Introduction to Thermodynamics",
-            "Quantum Mechanics Basics",
-            "Organic Chemistry Overview",
-            "Classical Mechanics Principles",
-            "Electromagnetism Fundamentals",
-            "Digital Marketing Strategies",
-            "Business Analytics and Intelligence",
-            "Financial Management Principles",
-            "Entrepreneurship and Innovation",
-            "Supply Chain Management"
-        )
-
-        val authors = listOf(
-            "John Doe", "Jane Smith", "Mike Johnson", "Sarah Wilson", "David Brown",
-            "Emily Davis", "Alex Martinez", "Lisa Anderson", "Tom White", "Rachel Green"
-        )
-
-        val descriptions = listOf(
-            "This article contains comprehensive information about best practices and promotes modern patterns that improve application performance.",
-            "An in-depth guide covering essential concepts and practical examples for beginners and intermediate learners.",
-            "Detailed explanation of fundamental principles with real-world applications and case studies.",
-            "A thorough exploration of key topics with step-by-step instructions and helpful illustrations.",
-            "Complete tutorial covering everything from basic concepts to advanced techniques with code examples."
-        )
-
-        for (i in 0 until 25) {
-            val tagSet = when (i % 4) {
-                0 -> techTags
-                1 -> mathTags
-                2 -> scienceTags
-                else -> businessTags
-            }
-
-            val calendar = Calendar.getInstance()
-            calendar.add(Calendar.DAY_OF_YEAR, -i)
-
-            posts.add(
-                Post(
-                    id = "post_$i",
-                    title = titles[i],
-                    author = authors[i % authors.size],
-                    date = displayDateFormat.format(calendar.time),
-                    description = descriptions[i % descriptions.size],
-                    tags = tagSet.take(2 + (i % 2))
-                )
-            )
-        }
-
-        return posts
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
