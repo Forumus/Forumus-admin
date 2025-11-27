@@ -140,10 +140,17 @@
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp">
 
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_reports"
+                        app:tint="#C10007" />
+
                     <TextView
                         android:id="@+id/reportBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
                         android:fontFamily="sans-serif"
                         android:text="20 reports"
                         android:textColor="#CA3500"

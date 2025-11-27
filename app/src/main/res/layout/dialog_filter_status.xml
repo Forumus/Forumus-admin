@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/filter_by_status"
+            android:textColor="#0A0A0A"
+            android:textSize="18sp"
+            android:textStyle="normal" />
+
+        <ImageButton
+            android:id="@+id/closeButton"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            android:contentDescription="@string/close" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:background="#1A000000" />
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="20dp">
+
+        <!-- Header with Clear All -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/select_status_to_filter"
+                android:textColor="#4A5565"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/clearAllButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear_all"
+                android:textColor="#155DFC"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp" />
+        </LinearLayout>
+
+        <!-- Filter Options -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Remind Option -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="59dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:id="@+id/remindButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_badge_remind"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/remind"
+                        android:textColor="#155DFC"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/remindCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:contentDescription="@string/remind" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Warning Option -->
+            <LinearLayout
+                android:id="@+id/warningButton"
+                android:layout_width="match_parent"
+                android:layout_height="59dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_filter_option_unselected"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/warning"
+                    android:textColor="#364153"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/warningCheckmark"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_checkmark"
+                    android:visibility="gone"
+                    android:contentDescription="@string/warning" />
+            </LinearLayout>
+
+            <!-- Ban Option -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="59dp">
+
+                <LinearLayout
+                    android:id="@+id/banButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_badge_ban"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ban"
+                        android:textColor="#E7000B"
+                        android:textSize="16sp" />
+
+                    <ImageView
+                        android:id="@+id/banCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:contentDescription="@string/ban" />
+                </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:background="#1A000000" />
+
+    <!-- Footer with Apply Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <Button
+            android:id="@+id/applyButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="@string/apply"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_primary"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -61,91 +61,109 @@
             android:layout_marginBottom="24dp">
 
             <!-- Reports Button -->
-            <LinearLayout
-                android:id="@+id/reportsButton"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="111dp"
                 android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_sort_option_selected"
-                android:padding="16dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_marginEnd="6dp">
 
-                <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_sort_icon_selected">
+                <LinearLayout
+                    android:id="@+id/reportsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_sort_option_selected"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_reports"
-                        app:tint="#4F39F6"
-                        android:contentDescription="@string/reports" />
-                </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_sort_icon_selected">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/reports"
-                    android:textColor="#0F172B"
-                    android:textSize="14sp" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_reports"
+                            app:tint="#4F39F6"
+                            android:contentDescription="@string/reports" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/reports"
+                        android:textColor="#0F172B"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
                 <!-- Selection indicator -->
-            </LinearLayout>
+                <View
+                    android:id="@+id/reportsIndicator"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_radio_selected" />
+            </FrameLayout>
 
             <!-- Violations Button -->
-            <LinearLayout
-                android:id="@+id/violationsButton"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="111dp"
                 android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/bg_sort_option_unselected"
-                android:padding="16dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_marginStart="6dp">
 
-                <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:background="@drawable/bg_sort_icon_unselected">
+                <LinearLayout
+                    android:id="@+id/violationsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:background="@drawable/bg_sort_option_unselected"
+                    android:padding="16dp"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_warning"
-                        app:tint="#e7000b"
-                        android:contentDescription="@string/violations" />
-                </FrameLayout>
+                    <FrameLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/bg_sort_icon_unselected">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/violations"
-                    android:textColor="#45556C"
-                    android:textSize="14sp" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_warning"
+                            app:tint="#e7000b"
+                            android:contentDescription="@string/violations" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/violations"
+                        android:textColor="#45556C"
+                        android:textSize="14sp" />
+                </LinearLayout>
 
                 <!-- Selection indicator (hidden) -->
                 <View
                     android:id="@+id/violationsIndicator"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:layout_gravity="end|top"
-                    android:layout_marginTop="-95dp"
-                    android:layout_marginEnd="-10dp"
+                    android:layout_gravity="top|end"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
                     android:visibility="gone"
                     android:background="@drawable/bg_radio_selected" />
-            </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
 
         <View

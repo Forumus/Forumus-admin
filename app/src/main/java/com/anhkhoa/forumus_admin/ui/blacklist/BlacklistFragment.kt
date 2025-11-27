@@ -49,6 +49,9 @@ class BlacklistFragment : Fragment() {
     private val itemsPerPage = 15
     private var totalPages = 0
     private var isLoading = false
+    
+    // Filter state
+    private val selectedStatuses = mutableSetOf<UserStatus>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -282,16 +285,23 @@ class BlacklistFragment : Fragment() {
         })
         
         binding.filterButton.setOnClickListener {
-            // TODO: Implement filter options (by status, date, etc.)
-            Toast.makeText(requireContext(), "Filter options coming soon", Toast.LENGTH_SHORT).show()
+            showFilterDialog()
         }
     }
     
     private fun applySearchFilter(query: String) {
+        var users = allUsers
+        
+        // Apply status filter first
+        if (selectedStatuses.isNotEmpty()) {
+            users = users.filter { it.status in selectedStatuses }
+        }
+        
+        // Apply search query
         filteredUsers = if (query.isEmpty()) {
-            allUsers
+            users
         } else {
-            allUsers.filter {
+            users.filter {
                 it.name.contains(query, ignoreCase = true) ||
                 it.id.contains(query, ignoreCase = true)
             }
@@ -306,6 +316,129 @@ class BlacklistFragment : Fragment() {
         // Show a message if no results found
         if (filteredUsers.isEmpty() && query.isNotEmpty()) {
             Toast.makeText(requireContext(), getString(R.string.no_results_found), Toast.LENGTH_SHORT).show()
+        }
+    }
+    
+    private fun showFilterDialog() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_filter_status, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        // Make dialog background transparent for rounded corners
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // Track current selections (copy of selected statuses)
+        val tempSelectedStatuses = selectedStatuses.toMutableSet()
+        
+        // Get all views
+        val closeButton = dialogView.findViewById<View>(R.id.closeButton)
+        val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
+        val remindButton = dialogView.findViewById<View>(R.id.remindButton)
+        val warningButton = dialogView.findViewById<View>(R.id.warningButton)
+        val banButton = dialogView.findViewById<View>(R.id.banButton)
+        val remindCheckmark = dialogView.findViewById<View>(R.id.remindCheckmark)
+        val warningCheckmark = dialogView.findViewById<View>(R.id.warningCheckmark)
+        val banCheckmark = dialogView.findViewById<View>(R.id.banCheckmark)
+        val applyButton = dialogView.findViewById<View>(R.id.applyButton)
+        
+        // Initialize UI based on current selections
+        updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMIND in tempSelectedStatuses)
+        updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNING in tempSelectedStatuses)
+        updateFilterButtonState(banButton, banCheckmark, UserStatus.BAN in tempSelectedStatuses)
+        
+        // Close button
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Clear all button
+        clearAllButton.setOnClickListener {
+            tempSelectedStatuses.clear()
+            updateFilterButtonState(remindButton, remindCheckmark, false)
+            updateFilterButtonState(warningButton, warningCheckmark, false)
+            updateFilterButtonState(banButton, banCheckmark, false)
+        }
+        
+        // Remind button
+        remindButton.setOnClickListener {
+            val isSelected = UserStatus.REMIND in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.REMIND)
+            } else {
+                tempSelectedStatuses.add(UserStatus.REMIND)
+            }
+            updateFilterButtonState(remindButton, remindCheckmark, !isSelected)
+        }
+        
+        // Warning button
+        warningButton.setOnClickListener {
+            val isSelected = UserStatus.WARNING in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.WARNING)
+            } else {
+                tempSelectedStatuses.add(UserStatus.WARNING)
+            }
+            updateFilterButtonState(warningButton, warningCheckmark, !isSelected)
+        }
+        
+        // Ban button
+        banButton.setOnClickListener {
+            val isSelected = UserStatus.BAN in tempSelectedStatuses
+            if (isSelected) {
+                tempSelectedStatuses.remove(UserStatus.BAN)
+            } else {
+                tempSelectedStatuses.add(UserStatus.BAN)
+            }
+            updateFilterButtonState(banButton, banCheckmark, !isSelected)
+        }
+        
+        // Apply button
+        applyButton.setOnClickListener {
+            selectedStatuses.clear()
+            selectedStatuses.addAll(tempSelectedStatuses)
+            applySearchFilter(binding.searchInput.query.toString())
+            
+            val filterMessage = if (selectedStatuses.isEmpty()) {
+                "Filter cleared"
+            } else {
+                "Filtered by: ${selectedStatuses.joinToString(", ")}"
+            }
+            Toast.makeText(requireContext(), filterMessage, Toast.LENGTH_SHORT).show()
+            
+            dialog.dismiss()
+        }
+        
+        dialog.show()
+    }
+    
+    private fun updateFilterButtonState(button: View, checkmark: View, isSelected: Boolean) {
+        // Get the TextView inside the button (first child TextView)
+        val textView = (button as? ViewGroup)?.let { group ->
+            (0 until group.childCount).map { group.getChildAt(it) }
+                .firstOrNull { it is android.widget.TextView } as? android.widget.TextView
+        }
+        
+        if (isSelected) {
+            when (button.id) {
+                R.id.remindButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_blue)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#155DFC"))
+                }
+                R.id.warningButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_orange)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#F54900"))
+                }
+                R.id.banButton -> {
+                    button.setBackgroundResource(R.drawable.bg_filter_option_selected_red)
+                    textView?.setTextColor(android.graphics.Color.parseColor("#E7000B"))
+                }
+            }
+            checkmark.visibility = View.VISIBLE
+        } else {
+            button.setBackgroundResource(R.drawable.bg_filter_option_unselected)
+            textView?.setTextColor(android.graphics.Color.parseColor("#364153"))
+            checkmark.visibility = View.GONE
         }
     }
 

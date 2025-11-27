@@ -23,6 +23,9 @@
     <string name="more_options">More Options</string>
     <string name="search_violated_posts">Search violated posts...</string>
     <string name="filter">Filter</string>
+    <string name="filter_by_status">Filter by Status</string>
+    <string name="select_status_to_filter">Select status to filter</string>
+    <string name="clear_all">Clear all</string>
     <string name="avatar">Avatar</string>
     <string name="name">Name</string>
     <string name="id">Id</string>
