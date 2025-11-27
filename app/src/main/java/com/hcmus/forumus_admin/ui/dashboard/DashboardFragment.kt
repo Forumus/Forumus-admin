@@ -1,4 +1,4 @@
-package com.anhkhoa.forumus_admin.ui.dashboard
+package com.hcmus.forumus_admin.ui.dashboard
 
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -8,14 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.anhkhoa.forumus_admin.MainActivity
-import com.anhkhoa.forumus_admin.R
-import com.anhkhoa.forumus_admin.databinding.FragmentDashboardBinding
-import com.github.mikephil.charting.components.Legend
+import com.hcmus.forumus_admin.MainActivity
+import com.hcmus.forumus_admin.R
+import com.hcmus.forumus_admin.databinding.FragmentDashboardBinding
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter

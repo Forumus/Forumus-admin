@@ -5,7 +5,8 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:fitsSystemWindows="true">
 
     <!-- Main Content -->
     <androidx.fragment.app.FragmentContainerView
@@ -33,6 +34,7 @@
         app:itemBackground="@drawable/nav_item_background"
         app:itemHorizontalPadding="24dp"
         app:itemVerticalPadding="12dp"
+        android:paddingTop="36dp"
         app:itemIconPadding="12dp"
         app:itemIconSize="20dp"
         app:itemShapeFillColor="@android:color/transparent"

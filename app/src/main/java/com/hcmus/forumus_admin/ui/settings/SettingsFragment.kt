@@ -1,11 +1,11 @@
-package com.anhkhoa.forumus_admin.ui.settings
+package com.hcmus.forumus_admin.ui.settings
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.anhkhoa.forumus_admin.R
+import com.hcmus.forumus_admin.R
 
 class SettingsFragment : Fragment() {
 

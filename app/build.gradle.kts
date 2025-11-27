@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.anhkhoa.forumus_admin"
+    namespace = "com.hcmus.forumus_admin"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.anhkhoa.forumus_admin"
+        applicationId = "com.hcmus.forumus_admin"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

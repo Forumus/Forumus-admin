@@ -1,4 +1,4 @@
-package com.anhkhoa.forumus_admin.ui.assistant
+package com.hcmus.forumus_admin.ui.assistant
 
 import android.os.Bundle
 import android.text.Editable
@@ -10,9 +10,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.anhkhoa.forumus_admin.MainActivity
-import com.anhkhoa.forumus_admin.R
-import com.anhkhoa.forumus_admin.databinding.FragmentAiModerationBinding
+import com.hcmus.forumus_admin.MainActivity
+import com.hcmus.forumus_admin.R
+import com.hcmus.forumus_admin.databinding.FragmentAiModerationBinding
 
 class AssistantFragment : Fragment() {
 

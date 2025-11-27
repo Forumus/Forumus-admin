@@ -1,4 +1,4 @@
-package com.anhkhoa.forumus_admin
+package com.hcmus.forumus_admin
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

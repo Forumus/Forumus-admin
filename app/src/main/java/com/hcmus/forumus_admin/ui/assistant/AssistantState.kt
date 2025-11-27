@@ -1,6 +1,6 @@
-package com.anhkhoa.forumus_admin.ui.assistant
+package com.hcmus.forumus_admin.ui.assistant
 
-import com.anhkhoa.forumus_admin.data.model.Post
+import com.hcmus.forumus_admin.data.model.Post
 
 data class AiModerationState(
     val posts: List<Post> = emptyList(),

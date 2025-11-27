@@ -1,4 +1,4 @@
-package com.anhkhoa.forumus_admin.data.model
+package com.hcmus.forumus_admin.data.model
 
 data class Tag(
     val name: String,

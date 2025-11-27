@@ -1,11 +1,11 @@
-package com.anhkhoa.forumus_admin.ui.assistant
+package com.hcmus.forumus_admin.ui.assistant
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.anhkhoa.forumus_admin.R
-import com.anhkhoa.forumus_admin.data.model.Post
-import com.anhkhoa.forumus_admin.data.model.Tag
+import com.hcmus.forumus_admin.R
+import com.hcmus.forumus_admin.data.model.Post
+import com.hcmus.forumus_admin.data.model.Tag
 
 class AiModerationViewModel : ViewModel() {
     

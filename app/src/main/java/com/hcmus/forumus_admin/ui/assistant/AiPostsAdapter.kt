@@ -1,16 +1,13 @@
-package com.anhkhoa.forumus_admin.ui.assistant
+package com.hcmus.forumus_admin.ui.assistant
 
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.anhkhoa.forumus_admin.databinding.ItemAiPostCardBinding
-import com.anhkhoa.forumus_admin.data.model.Post
-import com.anhkhoa.forumus_admin.data.model.Tag
+import com.hcmus.forumus_admin.databinding.ItemAiPostCardBinding
+import com.hcmus.forumus_admin.data.model.Post
 import com.google.android.material.chip.Chip
 
 class AiPostsAdapter(
@@ -65,9 +62,9 @@ class AiPostsAdapter(
                 // Update approve button style based on post status
                 // If post is AI rejected (not approved), show blue active style
                 if (!post.isAiApproved) {
-                    approveButton.setBackgroundResource(com.anhkhoa.forumus_admin.R.drawable.bg_approve_button_active)
+                    approveButton.setBackgroundResource(com.hcmus.forumus_admin.R.drawable.bg_approve_button_active)
                 } else {
-                    approveButton.setBackgroundResource(com.anhkhoa.forumus_admin.R.drawable.bg_approve_button)
+                    approveButton.setBackgroundResource(com.hcmus.forumus_admin.R.drawable.bg_approve_button)
                 }
 
                 // Set click listeners

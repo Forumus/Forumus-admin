@@ -1,4 +1,4 @@
-package com.anhkhoa.forumus_admin.ui.dashboard
+package com.hcmus.forumus_admin.ui.dashboard
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
