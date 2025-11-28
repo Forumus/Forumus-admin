@@ -59,6 +59,28 @@ class PostRepository {
         }
     }
 
+    suspend fun deletePost(postId: String): Result<Unit> {
+        return try {
+            // Find the document with matching post_id field
+            val snapshot = postsCollection
+                .whereEqualTo("post_id", postId)
+                .get()
+                .await()
+            
+            if (snapshot.documents.isNotEmpty()) {
+                // Delete the first matching document
+                snapshot.documents.first().reference.delete().await()
+                Result.success(Unit)
+            } else {
+                // If no document found with post_id field, try using postId as document ID
+                postsCollection.document(postId).delete().await()
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     companion object {
         fun formatFirebaseTimestamp(timestamp: Any?): String {
             return try {

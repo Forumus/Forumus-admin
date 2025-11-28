@@ -243,9 +243,30 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun deletePost(post: ReportedPost) {
-        allPosts = allPosts.filter { it.id != post.id }
-        applySearchFilter(binding.searchInput.query.toString())
-        Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
+        lifecycleScope.launch {
+            try {
+                val result = postRepository.deletePost(post.id)
+                
+                result.onSuccess {
+                    // Remove from local list
+                    allPosts = allPosts.filter { it.id != post.id }
+                    applySearchFilter(binding.searchInput.query.toString())
+                    Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(), 
+                        "Failed to delete post: ${exception.message}", 
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(), 
+                    "Error deleting post: ${e.message}", 
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
     private fun loadReportedPostsFromFirebase() {
