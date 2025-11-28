@@ -12,10 +12,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.anhkhoa.forumus_admin.MainActivity
 import com.anhkhoa.forumus_admin.R
+import com.anhkhoa.forumus_admin.data.repository.PostRepository
+import com.anhkhoa.forumus_admin.data.repository.UserRepository
 import com.anhkhoa.forumus_admin.databinding.FragmentDashboardBinding
+import kotlinx.coroutines.launch
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
@@ -32,6 +36,9 @@ class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
+    
+    private val userRepository = UserRepository()
+    private val postRepository = PostRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +56,7 @@ class DashboardFragment : Fragment() {
         setupBarChart()
         setupPieChart()
         setupButtonListeners()
+        loadDashboardData()
     }
 
     private fun setupStatCards() {
@@ -58,7 +66,7 @@ class DashboardFragment : Fragment() {
             R.drawable.ic_total_users,
             R.color.primary_blue,
             getString(R.string.total_users),
-            "1,234"
+            "..."
         )
         
         // Add click listener to navigate to total users screen
@@ -72,7 +80,7 @@ class DashboardFragment : Fragment() {
             R.drawable.ic_total_posts,
             R.color.success_green,
             getString(R.string.total_posts),
-            "5,678"
+            "..."
         )
         
         // Add click listener to navigate to total posts screen
@@ -86,7 +94,7 @@ class DashboardFragment : Fragment() {
             R.drawable.ic_blacklist,
             R.color.danger_red,
             getString(R.string.blacklisted_users),
-            "23"
+            "..."
         )
         
         // Add click listener to navigate to blacklist screen
@@ -100,13 +108,56 @@ class DashboardFragment : Fragment() {
             R.drawable.ic_reported_posts,
             R.color.warning_orange,
             getString(R.string.reported_posts),
-            "45"
+            "..."
         )
         
         // Add click listener to navigate to reported posts screen
         binding.statCardReported.root.setOnClickListener {
             findNavController().navigate(R.id.action_dashboardFragment_to_reportedPostsFragment)
         }
+    }
+
+    private fun loadDashboardData() {
+        lifecycleScope.launch {
+            try {
+                // Load users data
+                val usersResult = userRepository.getAllUsers()
+                usersResult.onSuccess { allUsers ->
+                    val totalUsers = allUsers.size
+                    val blacklistedUsers = allUsers.count { user ->
+                        val status = user.status.lowercase()
+                        status == "ban" || status == "warning" || status == "remind"
+                    }
+                    
+                    updateStatCard(binding.statCardUsers.root, formatNumber(totalUsers))
+                    updateStatCard(binding.statCardBlacklisted.root, blacklistedUsers.toString())
+                }
+                
+                // Load posts data
+                val postsResult = postRepository.getAllPosts()
+                postsResult.onSuccess { allPosts ->
+                    val totalPosts = allPosts.size
+                    val reportedPosts = allPosts.count { it.report_count > 0 }
+                    
+                    updateStatCard(binding.statCardPosts.root, formatNumber(totalPosts))
+                    updateStatCard(binding.statCardReported.root, reportedPosts.toString())
+                }
+            } catch (e: Exception) {
+                // Keep loading indicators if error occurs
+            }
+        }
+    }
+    
+    private fun formatNumber(number: Int): String {
+        return when {
+            number >= 1000 -> String.format("%,d", number)
+            else -> number.toString()
+        }
+    }
+    
+    private fun updateStatCard(cardView: View, value: String) {
+        val valueText = cardView.findViewById<TextView>(R.id.valueText)
+        valueText.text = value
     }
 
     private fun setupStatCard(
