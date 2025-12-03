@@ -13,6 +13,10 @@
     <color name="chart_gray">#666666</color>
     <color name="chart_brown">#c49a68</color>
     <color name="chart_tech_blue">#3f78e0</color>
+    <color name="chart_purple">#9C27B0</color>
+    <color name="chart_orange">#FF5722</color>
+    <color name="chart_teal">#009688</color>
+    <color name="chart_pink">#E91E63</color>
     <color name="text_secondary">#666666</color>
     <color name="text_primary">#212121</color>
     <color name="border_gray">#e0e0e0</color>

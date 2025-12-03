@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.hcmus.forumus_admin.MainActivity
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.repository.PostRepository
+import com.hcmus.forumus_admin.data.repository.TopicRepository
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.databinding.FragmentDashboardBinding
 import kotlinx.coroutines.launch
@@ -23,6 +24,8 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 
 data class TopicData(
     val name: String,
@@ -37,6 +40,22 @@ class DashboardFragment : Fragment() {
     
     private val userRepository = UserRepository()
     private val postRepository = PostRepository()
+    private val topicRepository = TopicRepository()
+    
+    // Threshold for grouping small topics into "Others" (3%)
+    private val othersThreshold = 3f
+    
+    // Predefined colors for topics
+    private val topicColors = listOf(
+        R.color.chart_blue,
+        R.color.chart_red,
+        R.color.chart_brown,
+        R.color.chart_tech_blue,
+        R.color.chart_purple,
+        R.color.chart_orange,
+        R.color.chart_teal,
+        R.color.chart_pink
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -245,9 +264,77 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupPieChart() {
-        // Sample data - Replace this with data from your database
-        val topicsData = getSampleTopicData()
-        updatePieChart(topicsData)
+        // Load real data from Firebase
+        loadTopicsData()
+    }
+    
+    private fun loadTopicsData() {
+        lifecycleScope.launch {
+            try {
+                val topicsResult = topicRepository.getAllTopics()
+                topicsResult.onSuccess { topics ->
+                    val topicsData = processTopicsData(topics)
+                    updatePieChart(topicsData)
+                }.onFailure {
+                    // Fallback to sample data if Firebase fails
+                    updatePieChart(getSampleTopicData())
+                }
+            } catch (e: Exception) {
+                // Fallback to sample data if error occurs
+                updatePieChart(getSampleTopicData())
+            }
+        }
+    }
+    
+    private fun processTopicsData(topics: List<com.hcmus.forumus_admin.data.repository.FirestoreTopic>): List<TopicData> {
+        // Calculate total posts across all topics
+        val totalPosts = topics.sumOf { it.postCount }
+        
+        if (totalPosts == 0) {
+            return getSampleTopicData()
+        }
+        
+        // Calculate percentage for each topic
+        val topicsWithPercentage = topics.map { topic ->
+            val percentage = (topic.postCount.toFloat() / totalPosts) * 100f
+            Triple(topic.name, percentage, topic.postCount)
+        }.sortedByDescending { it.second }
+        
+        // Separate topics above and below threshold
+        val mainTopics = mutableListOf<TopicData>()
+        var othersPercentage = 0f
+        var colorIndex = 0
+        
+        for ((name, percentage, _) in topicsWithPercentage) {
+            if (percentage >= othersThreshold) {
+                // Add topic with assigned color
+                val colorRes = topicColors.getOrElse(colorIndex) { R.color.chart_gray }
+                mainTopics.add(
+                    TopicData(
+                        name = name,
+                        percentage = percentage,
+                        color = ContextCompat.getColor(requireContext(), colorRes)
+                    )
+                )
+                colorIndex++
+            } else {
+                // Accumulate into "Others"
+                othersPercentage += percentage
+            }
+        }
+        
+        // Add "Others" category if there are small topics
+        if (othersPercentage > 0f) {
+            mainTopics.add(
+                TopicData(
+                    name = getString(R.string.others),
+                    percentage = othersPercentage,
+                    color = ContextCompat.getColor(requireContext(), R.color.chart_gray)
+                )
+            )
+        }
+        
+        return mainTopics
     }
     
     // Call this method to reload data from database
@@ -261,9 +348,16 @@ class DashboardFragment : Fragment() {
         val dataSet = PieDataSet(entries, "Topics").apply {
             setColors(colors)
             sliceSpace = 2f
-            setDrawValues(true)
-            valueTextSize = 12f
+            // Hide all percentage labels by default
+            setDrawValues(false)
+            valueTextSize = 10f
             valueTextColor = Color.WHITE
+            // Position values in outer area of segment for better readability
+            valueLinePart1OffsetPercentage = 80f
+            valueLinePart1Length = 0.3f
+            valueLinePart2Length = 0.4f
+            // Set selection shift for expanding effect when clicked
+            selectionShift = 12f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
                     return "${value.toInt()}%"
@@ -284,6 +378,29 @@ class DashboardFragment : Fragment() {
             
             // Disable built-in legend - we'll create custom legend below
             legend.isEnabled = false
+            
+            // Add click listener for segment selection
+            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+                override fun onValueSelected(e: Entry?, h: Highlight?) {
+                    if (e != null && h != null) {
+                        // Show percentage only for selected segment
+                        dataSet.setDrawValues(true)
+                        dataSet.valueFormatter = object : ValueFormatter() {
+                            override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
+                                // Only show value for the selected entry
+                                return if (pieEntry == e) "${value.toInt()}%" else ""
+                            }
+                        }
+                        invalidate()
+                    }
+                }
+
+                override fun onNothingSelected() {
+                    // Hide all values when nothing is selected
+                    dataSet.setDrawValues(false)
+                    invalidate()
+                }
+            })
             
             invalidate()
         }
@@ -316,7 +433,7 @@ class DashboardFragment : Fragment() {
         }
     }
     
-    // Sample data method - Replace with your database query
+    // Fallback sample data when Firebase fails
     private fun getSampleTopicData(): List<TopicData> {
         return listOf(
             TopicData(
