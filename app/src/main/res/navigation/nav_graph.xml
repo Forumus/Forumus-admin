@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/dashboardFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.dashboard.DashboardFragment"
+        android:name="com.hcmus.forumus_admin.ui.dashboard.DashboardFragment"
         android:label="Dashboard"
         tools:layout="@layout/fragment_dashboard">
         
@@ -30,37 +30,37 @@
 
     <fragment
         android:id="@+id/blacklistFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.blacklist.BlacklistFragment"
+        android:name="com.hcmus.forumus_admin.ui.blacklist.BlacklistFragment"
         android:label="Blacklisted Users"
         tools:layout="@layout/fragment_blacklist" />
 
     <fragment
         android:id="@+id/reportedPostsFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.reported.ReportedPostsFragment"
+        android:name="com.hcmus.forumus_admin.ui.reported.ReportedPostsFragment"
         android:label="Reported Posts"
         tools:layout="@layout/fragment_reported_posts" />
 
     <fragment
         android:id="@+id/assistantFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.assistant.AssistantFragment"
+        android:name="com.hcmus.forumus_admin.ui.assistant.AssistantFragment"
         android:label="AI Moderation"
         tools:layout="@layout/fragment_ai_moderation" />
 
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.settings.SettingsFragment"
+        android:name="com.hcmus.forumus_admin.ui.settings.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/totalPostsFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.totalposts.TotalPostsFragment"
+        android:name="com.hcmus.forumus_admin.ui.totalposts.TotalPostsFragment"
         android:label="Total Posts"
         tools:layout="@layout/fragment_total_posts" />
 
     <fragment
         android:id="@+id/totalUsersFragment"
-        android:name="com.anhkhoa.forumus_admin.ui.totalusers.TotalUsersFragment"
+        android:name="com.hcmus.forumus_admin.ui.totalusers.TotalUsersFragment"
         android:label="Total Users"
         tools:layout="@layout/fragment_total_users" />
 
