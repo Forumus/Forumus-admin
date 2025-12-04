@@ -54,4 +54,33 @@ class TopicRepository {
             Result.failure(e)
         }
     }
+    
+    suspend fun addTopic(name: String, description: String): Result<FirestoreTopic> {
+        return try {
+            val topicId = name.lowercase().replace(" ", "_")
+            val topicData = hashMapOf(
+                "name" to name,
+                "description" to description,
+                "postCount" to 0
+            )
+            topicsCollection.document(topicId).set(topicData).await()
+            Result.success(FirestoreTopic(
+                id = topicId,
+                name = name,
+                description = description,
+                postCount = 0
+            ))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    suspend fun deleteTopic(topicId: String): Result<Boolean> {
+        return try {
+            topicsCollection.document(topicId).delete().await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

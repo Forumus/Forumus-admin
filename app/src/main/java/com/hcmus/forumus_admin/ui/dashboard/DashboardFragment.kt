@@ -6,13 +6,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.hcmus.forumus_admin.MainActivity
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.repository.PostRepository
@@ -45,17 +53,21 @@ class DashboardFragment : Fragment() {
     // Threshold for grouping small topics into "Others" (3%)
     private val othersThreshold = 3f
     
-    // Predefined colors for topics
+    // Predefined colors for topics - matching pie chart legend colors
     private val topicColors = listOf(
-        R.color.chart_blue,
-        R.color.chart_red,
-        R.color.chart_brown,
-        R.color.chart_tech_blue,
+        R.color.chart_tech_blue,  // Technology
+        R.color.chart_blue,       // Education
+        R.color.chart_brown,      // Sports
+        R.color.chart_red,        // Entertainment
         R.color.chart_purple,
         R.color.chart_orange,
         R.color.chart_teal,
-        R.color.chart_pink
+        R.color.chart_pink,
+        R.color.chart_gray        // Others
     )
+    
+    // Cache for topics loaded from Firebase (used in manage dialog)
+    private var cachedFirebaseTopics: List<com.hcmus.forumus_admin.data.repository.FirestoreTopic> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -273,6 +285,8 @@ class DashboardFragment : Fragment() {
             try {
                 val topicsResult = topicRepository.getAllTopics()
                 topicsResult.onSuccess { topics ->
+                    // Cache topics for use in manage dialog
+                    cachedFirebaseTopics = topics
                     val topicsData = processTopicsData(topics)
                     updatePieChart(topicsData)
                 }.onFailure {
@@ -488,9 +502,227 @@ class DashboardFragment : Fragment() {
         
         // Manage topics button
         binding.btnManageTopics.setOnClickListener {
-            // Navigate to manage topics screen
-            // TODO: Implement navigation
+            showManageTopicsDialog()
         }
+    }
+    
+    private fun showManageTopicsDialog() {
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_manage_topics, null)
+        
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogView)
+            .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded))
+            .create()
+        
+        val btnClose = dialogView.findViewById<ImageButton>(R.id.btnClose)
+        val etNewTopic = dialogView.findViewById<EditText>(R.id.etNewTopic)
+        val btnAddTopic = dialogView.findViewById<MaterialButton>(R.id.btnAddTopic)
+        val rvTopics = dialogView.findViewById<RecyclerView>(R.id.rvTopics)
+        
+        // Get current topics from Firebase cache with their colors
+        val currentTopics = mutableListOf<ManageTopicItem>()
+        
+        val adapter = ManageTopicsAdapter { topic ->
+            // Show confirmation dialog before deleting
+            showDeleteTopicConfirmation(topic, currentTopics, dialog)
+        }
+        
+        rvTopics.layoutManager = LinearLayoutManager(requireContext())
+        rvTopics.adapter = adapter
+        
+        // Load topics from Firebase
+        loadTopicsForDialog(currentTopics, adapter)
+        
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        btnAddTopic.setOnClickListener {
+            val topicName = etNewTopic.text.toString().trim()
+            if (topicName.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.topic_name_empty, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            // Check if topic already exists
+            if (currentTopics.any { it.name.equals(topicName, ignoreCase = true) }) {
+                Toast.makeText(requireContext(), R.string.topic_already_exists, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            // Show description dialog
+            showTopicDescriptionDialog(topicName, currentTopics, adapter, etNewTopic)
+        }
+        
+        dialog.show()
+    }
+    
+    private fun showTopicDescriptionDialog(
+        topicName: String,
+        topicsList: MutableList<ManageTopicItem>,
+        adapter: ManageTopicsAdapter,
+        etNewTopic: EditText
+    ) {
+        val descDialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_topic_description, null)
+        
+        val descDialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(descDialogView)
+            .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded))
+            .create()
+        
+        val tvTopicName = descDialogView.findViewById<TextView>(R.id.tvTopicName)
+        val etDescription = descDialogView.findViewById<EditText>(R.id.etDescription)
+        val btnCancel = descDialogView.findViewById<MaterialButton>(R.id.btnCancel)
+        val btnSave = descDialogView.findViewById<MaterialButton>(R.id.btnSave)
+        
+        tvTopicName.text = getString(R.string.topic_name_label, topicName)
+        
+        btnCancel.setOnClickListener {
+            descDialog.dismiss()
+        }
+        
+        btnSave.setOnClickListener {
+            val description = etDescription.text.toString().trim()
+            if (description.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.topic_description_empty, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            // Save to Firebase
+            lifecycleScope.launch {
+                try {
+                    val result = topicRepository.addTopic(topicName, description)
+                    result.onSuccess { newFirestoreTopic ->
+                        // Add new topic with a color from predefined palette
+                        val colorIndex = topicsList.size % topicColors.size
+                        val newTopic = ManageTopicItem(
+                            id = newFirestoreTopic.id,
+                            name = newFirestoreTopic.name,
+                            description = newFirestoreTopic.description,
+                            color = ContextCompat.getColor(requireContext(), topicColors[colorIndex])
+                        )
+                        topicsList.add(newTopic)
+                        adapter.submitList(topicsList.toList())
+                        etNewTopic.text.clear()
+                        
+                        Toast.makeText(requireContext(), R.string.topic_added, Toast.LENGTH_SHORT).show()
+                        
+                        // Refresh the pie chart
+                        refreshPieChart()
+                        descDialog.dismiss()
+                    }.onFailure {
+                        Toast.makeText(requireContext(), R.string.topic_add_failed, Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), R.string.topic_add_failed, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        
+        descDialog.show()
+    }
+    
+    private fun loadTopicsForDialog(topicsList: MutableList<ManageTopicItem>, adapter: ManageTopicsAdapter) {
+        // Load topics from Firebase
+        lifecycleScope.launch {
+            try {
+                val result = topicRepository.getAllTopics()
+                result.onSuccess { topics ->
+                    topicsList.clear()
+                    topics.forEachIndexed { index, topic ->
+                        val colorIndex = index % topicColors.size
+                        topicsList.add(
+                            ManageTopicItem(
+                                id = topic.id,
+                                name = topic.name,
+                                description = topic.description,
+                                color = ContextCompat.getColor(requireContext(), topicColors[colorIndex])
+                            )
+                        )
+                    }
+                    adapter.submitList(topicsList.toList())
+                }.onFailure {
+                    // Show error or use cached data
+                    loadCachedTopicsForDialog(topicsList, adapter)
+                }
+            } catch (e: Exception) {
+                loadCachedTopicsForDialog(topicsList, adapter)
+            }
+        }
+    }
+    
+    private fun loadCachedTopicsForDialog(topicsList: MutableList<ManageTopicItem>, adapter: ManageTopicsAdapter) {
+        // Use cached Firebase topics if available
+        if (cachedFirebaseTopics.isNotEmpty()) {
+            topicsList.clear()
+            cachedFirebaseTopics.forEachIndexed { index, topic ->
+                val colorIndex = index % topicColors.size
+                topicsList.add(
+                    ManageTopicItem(
+                        id = topic.id,
+                        name = topic.name,
+                        description = topic.description,
+                        color = ContextCompat.getColor(requireContext(), topicColors[colorIndex])
+                    )
+                )
+            }
+            adapter.submitList(topicsList.toList())
+        }
+    }
+    
+    private fun getRandomTopicColor(): Int {
+        val colors = listOf(
+            R.color.chart_blue,
+            R.color.chart_red,
+            R.color.chart_brown,
+            R.color.chart_tech_blue,
+            R.color.chart_purple,
+            R.color.chart_orange,
+            R.color.chart_teal,
+            R.color.chart_pink
+        )
+        return ContextCompat.getColor(requireContext(), colors.random())
+    }
+    
+    private fun showDeleteTopicConfirmation(
+        topic: ManageTopicItem,
+        topicsList: MutableList<ManageTopicItem>,
+        parentDialog: AlertDialog
+    ) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.confirm_delete_topic_title)
+            .setMessage(getString(R.string.confirm_delete_topic_message, topic.name))
+            .setPositiveButton(R.string.ok) { _, _ ->
+                // Delete from Firebase
+                lifecycleScope.launch {
+                    try {
+                        val result = topicRepository.deleteTopic(topic.id)
+                        result.onSuccess {
+                            topicsList.remove(topic)
+                            (parentDialog.findViewById<RecyclerView>(R.id.rvTopics)?.adapter as? ManageTopicsAdapter)
+                                ?.submitList(topicsList.toList())
+                            
+                            Toast.makeText(requireContext(), R.string.topic_deleted, Toast.LENGTH_SHORT).show()
+                            
+                            // Refresh the pie chart
+                            refreshPieChart()
+                        }.onFailure {
+                            Toast.makeText(requireContext(), R.string.topic_delete_failed, Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), R.string.topic_delete_failed, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    private fun refreshPieChart() {
+        // Refresh the pie chart with updated topics
+        setupPieChart()
     }
     
     private fun updateToggleSelection(selectedButton: View) {

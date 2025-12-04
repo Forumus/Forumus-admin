@@ -122,4 +122,26 @@
     <string name="select_end_date">Select end date</string>
     <string name="apply_filter">Apply Filter</string>
     <string name="search_posts_hint">Search posts by title or author...</string>
+    
+    <!-- Manage Topics Dialog -->
+    <string name="manage_topics">Manage Topics</string>
+    <string name="manage_topics_description">Add or remove topics for your posts categorization.</string>
+    <string name="new_topic_name">New topic name</string>
+    <string name="delete_topic">Delete topic</string>
+    <string name="add_topic">Add topic</string>
+    <string name="topic_added">Topic added successfully</string>
+    <string name="topic_deleted">Topic deleted successfully</string>
+    <string name="topic_name_empty">Please enter a topic name</string>
+    <string name="topic_already_exists">Topic already exists</string>
+    <string name="confirm_delete_topic_title">Delete Topic</string>
+    <string name="confirm_delete_topic_message">Are you sure you want to delete \"%s\"? This action cannot be undone.</string>
+    <string name="add_topic_description_title">Add Topic Description</string>
+    <string name="add_topic_description_subtitle">Provide a description for the new topic</string>
+    <string name="topic_description_hint">Enter topic description...</string>
+    <string name="save">Save</string>
+    <string name="topic_description_empty">Please enter a description</string>
+    <string name="topic_add_failed">Failed to add topic</string>
+    <string name="topic_delete_failed">Failed to delete topic</string>
+    <string name="loading_topics">Loading topics...</string>
+    <string name="topic_name_label">Topic: %s</string>
 </resources>

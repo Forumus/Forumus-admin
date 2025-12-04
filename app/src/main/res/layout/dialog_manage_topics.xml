@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <!-- Header -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/manage_topics"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/manage_topics_description"
+                android:textColor="#717182"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end|top"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            android:alpha="0.7"
+            android:contentDescription="@string/close" />
+
+    </FrameLayout>
+
+    <!-- Add Topic Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/etNewTopic"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_input_field"
+            android:hint="@string/new_topic_name"
+            android:textColorHint="#717182"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:paddingHorizontal="12dp"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:fontFamily="sans-serif" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddTopic"
+            android:layout_width="40dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            app:icon="@drawable/ic_plus"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="16dp"
+            app:iconTint="@color/white"
+            app:cornerRadius="8dp"
+            app:backgroundTint="#030213" />
+
+    </LinearLayout>
+
+    <!-- Topics List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTopics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:paddingHorizontal="24dp"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false"
+        android:maxHeight="300dp"
+        android:nestedScrollingEnabled="true" />
+
+</LinearLayout>
