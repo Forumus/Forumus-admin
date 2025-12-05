@@ -83,6 +83,13 @@ class DashboardFragment : Fragment() {
     
     // Current chart period
     private var currentChartPeriod = "week"
+    
+    // Navigation state for charts
+    private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
+    private var currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+    private var currentWeekStart: Calendar = Calendar.getInstance().apply {
+        set(Calendar.DAY_OF_WEEK, firstDayOfWeek)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -233,6 +240,10 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupPostsOverTimeChart() {
+        // Setup navigation buttons
+        binding.btnPrevPeriod.setOnClickListener { navigateToPreviousPeriod() }
+        binding.btnNextPeriod.setOnClickListener { navigateToNextPeriod() }
+        
         // Load posts from Firebase and setup chart
         lifecycleScope.launch {
             try {
@@ -250,146 +261,116 @@ class DashboardFragment : Fragment() {
         }
     }
     
-    private fun updateChartWithPeriod(period: String) {
-        currentChartPeriod = period
-        when (period) {
-            "day" -> {
-                binding.lineChart.visibility = View.VISIBLE
-                binding.barChart.visibility = View.GONE
-                binding.tvChartTitle.text = getString(R.string.chart_title_day)
-                setupLineChartForDay()
+    private fun navigateToPreviousPeriod() {
+        when (currentChartPeriod) {
+            "month" -> {
+                currentYear--
             }
             "week" -> {
-                binding.lineChart.visibility = View.GONE
-                binding.barChart.visibility = View.VISIBLE
+                if (currentMonth == 0) {
+                    currentMonth = 11
+                    currentYear--
+                } else {
+                    currentMonth--
+                }
+            }
+            "day" -> {
+                currentWeekStart.add(Calendar.WEEK_OF_YEAR, -1)
+            }
+        }
+        updateChartWithPeriod(currentChartPeriod)
+    }
+    
+    private fun navigateToNextPeriod() {
+        when (currentChartPeriod) {
+            "month" -> {
+                currentYear++
+            }
+            "week" -> {
+                if (currentMonth == 11) {
+                    currentMonth = 0
+                    currentYear++
+                } else {
+                    currentMonth++
+                }
+            }
+            "day" -> {
+                currentWeekStart.add(Calendar.WEEK_OF_YEAR, 1)
+            }
+        }
+        updateChartWithPeriod(currentChartPeriod)
+    }
+    
+    private fun updatePeriodLabel() {
+        val monthNames = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        val label = when (currentChartPeriod) {
+            "month" -> currentYear.toString()
+            "week" -> "${monthNames[currentMonth]} $currentYear"
+            "day" -> {
+                val weekEnd = currentWeekStart.clone() as Calendar
+                weekEnd.add(Calendar.DAY_OF_WEEK, 6)
+                val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
+                "${dateFormat.format(currentWeekStart.time)} - ${dateFormat.format(weekEnd.time)}, ${currentWeekStart.get(Calendar.YEAR)}"
+            }
+            else -> ""
+        }
+        binding.tvCurrentPeriod.text = label
+    }
+    
+    private fun updateChartWithPeriod(period: String) {
+        currentChartPeriod = period
+        updatePeriodLabel()
+        
+        when (period) {
+            "day" -> {
+                binding.tvChartTitle.text = getString(R.string.chart_title_day)
+                setupBarChartForDay()
+            }
+            "week" -> {
                 binding.tvChartTitle.text = getString(R.string.chart_title_week)
                 setupBarChartForWeek()
             }
             "month" -> {
-                binding.lineChart.visibility = View.GONE
-                binding.barChart.visibility = View.VISIBLE
                 binding.tvChartTitle.text = getString(R.string.chart_title_month)
                 setupBarChartForMonth()
             }
         }
     }
     
-    private fun setupLineChartForDay() {
-        val lineChart = binding.lineChart
-        
-        // Get posts from last 24 hours grouped by hour
-        val calendar = Calendar.getInstance()
-        val now = calendar.time
-        calendar.add(Calendar.HOUR_OF_DAY, -24)
-        val startTime = calendar.time
-        
-        // Initialize hourly counts (0-23)
-        val hourlyCounts = IntArray(24) { 0 }
-        val hourLabels = mutableListOf<String>()
-        
-        // Generate hour labels
-        val hourFormat = SimpleDateFormat("HH:00", Locale.getDefault())
-        calendar.time = startTime
-        for (i in 0 until 24) {
-            hourLabels.add(hourFormat.format(calendar.time))
-            calendar.add(Calendar.HOUR_OF_DAY, 1)
-        }
-        
-        // Count posts per hour
-        cachedPosts.forEach { post ->
-            val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
-            if (postDate != null && postDate.after(startTime) && postDate.before(now)) {
-                val postCalendar = Calendar.getInstance()
-                postCalendar.time = postDate
-                val hoursSinceStart = ((postDate.time - startTime.time) / (1000 * 60 * 60)).toInt()
-                if (hoursSinceStart in 0..23) {
-                    hourlyCounts[hoursSinceStart]++
-                }
-            }
-        }
-        
-        // Create line entries
-        val entries = hourlyCounts.mapIndexed { index, count ->
-            Entry(index.toFloat(), count.toFloat())
-        }
-        
-        val dataSet = LineDataSet(entries, "Posts").apply {
-            color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
-            lineWidth = 2f
-            setDrawCircles(true)
-            circleRadius = 4f
-            setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary_blue))
-            setDrawCircleHole(true)
-            circleHoleRadius = 2f
-            setDrawValues(false)
-            mode = LineDataSet.Mode.CUBIC_BEZIER
-            setDrawFilled(true)
-            fillColor = ContextCompat.getColor(requireContext(), R.color.primary_blue)
-            fillAlpha = 30
-        }
-        
-        val lineData = LineData(dataSet)
-        
-        lineChart.apply {
-            data = lineData
-            description.isEnabled = false
-            setDrawGridBackground(false)
-            animateX(1000)
-            
-            // Configure X axis
-            xAxis.apply {
-                position = XAxis.XAxisPosition.BOTTOM
-                setDrawGridLines(false)
-                granularity = 4f
-                labelCount = 6
-                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
-                textSize = 10f
-                valueFormatter = IndexAxisValueFormatter(hourLabels)
-            }
-            
-            // Configure left Y axis
-            axisLeft.apply {
-                setDrawGridLines(true)
-                gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
-                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
-                axisMinimum = 0f
-                granularity = 1f
-            }
-            
-            // Disable right Y axis
-            axisRight.isEnabled = false
-            legend.isEnabled = false
-            
-            invalidate()
-        }
-    }
-    
-    private fun setupBarChartForWeek() {
+    private fun setupBarChartForDay() {
         val barChart = binding.barChart
         
-        // Get posts from last 7 days
-        val calendar = Calendar.getInstance()
-        val now = calendar.time
-        calendar.add(Calendar.DAY_OF_YEAR, -7)
-        val startTime = calendar.time
+        // Get the week start and end
+        val weekStart = currentWeekStart.clone() as Calendar
+        weekStart.set(Calendar.HOUR_OF_DAY, 0)
+        weekStart.set(Calendar.MINUTE, 0)
+        weekStart.set(Calendar.SECOND, 0)
+        weekStart.set(Calendar.MILLISECOND, 0)
         
-        // Initialize daily counts
+        val weekEnd = weekStart.clone() as Calendar
+        weekEnd.add(Calendar.DAY_OF_WEEK, 7)
+        
+        // Initialize daily counts for 7 days of the week
         val dailyCounts = IntArray(7) { 0 }
         val dayLabels = mutableListOf<String>()
         
         // Generate day labels
         val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
-        calendar.time = startTime
+        val tempCal = weekStart.clone() as Calendar
         for (i in 0 until 7) {
-            dayLabels.add(dayFormat.format(calendar.time))
-            calendar.add(Calendar.DAY_OF_YEAR, 1)
+            dayLabels.add(dayFormat.format(tempCal.time))
+            tempCal.add(Calendar.DAY_OF_WEEK, 1)
         }
         
-        // Count posts per day
+        // Count posts per day in this week
         cachedPosts.forEach { post ->
             val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
-            if (postDate != null && postDate.after(startTime) && postDate.before(now)) {
-                val daysSinceStart = ((postDate.time - startTime.time) / (1000 * 60 * 60 * 24)).toInt()
+            if (postDate != null && !postDate.before(weekStart.time) && postDate.before(weekEnd.time)) {
+                val postCalendar = Calendar.getInstance()
+                postCalendar.time = postDate
+                
+                val daysSinceStart = ((postDate.time - weekStart.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
                 if (daysSinceStart in 0..6) {
                     dailyCounts[daysSinceStart]++
                 }
@@ -446,43 +427,129 @@ class DashboardFragment : Fragment() {
         }
     }
     
-    private fun setupBarChartForMonth() {
+    private fun setupBarChartForWeek() {
         val barChart = binding.barChart
         
-        // Get posts from last 12 months
+        // Get weeks in the selected month
         val calendar = Calendar.getInstance()
-        val now = calendar.time
-        calendar.add(Calendar.MONTH, -12)
-        val startTime = calendar.time
+        calendar.set(Calendar.YEAR, currentYear)
+        calendar.set(Calendar.MONTH, currentMonth)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
         
-        // Initialize monthly counts
-        val monthlyCounts = IntArray(12) { 0 }
-        val monthLabels = mutableListOf<String>()
+        val monthStart = calendar.time
         
-        // Generate month labels
-        val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
-        calendar.time = startTime
-        for (i in 0 until 12) {
-            monthLabels.add(monthFormat.format(calendar.time))
-            calendar.add(Calendar.MONTH, 1)
-        }
+        // Get the number of weeks in this month
+        val maxWeek = calendar.getActualMaximum(Calendar.WEEK_OF_MONTH)
         
-        // Count posts per month
-        calendar.time = startTime
+        // Move to next month for end boundary
+        calendar.add(Calendar.MONTH, 1)
+        val monthEnd = calendar.time
+        
+        // Initialize weekly counts
+        val weeklyCounts = IntArray(maxWeek) { 0 }
+        val weekLabels = (1..maxWeek).map { "Week $it" }
+        
+        // Count posts per week in this month
         cachedPosts.forEach { post ->
             val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
-            if (postDate != null && postDate.after(startTime) && postDate.before(now)) {
+            if (postDate != null && !postDate.before(monthStart) && postDate.before(monthEnd)) {
                 val postCalendar = Calendar.getInstance()
                 postCalendar.time = postDate
                 
-                val startCalendar = Calendar.getInstance()
-                startCalendar.time = startTime
+                // Get week of month (1-based)
+                val weekOfMonth = postCalendar.get(Calendar.WEEK_OF_MONTH) - 1
+                if (weekOfMonth in 0 until maxWeek) {
+                    weeklyCounts[weekOfMonth]++
+                }
+            }
+        }
+        
+        // Create bar entries
+        val entries = weeklyCounts.mapIndexed { index, count ->
+            BarEntry(index.toFloat(), count.toFloat())
+        }
+        
+        val dataSet = BarDataSet(entries, "Posts").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
+            valueTextColor = Color.TRANSPARENT
+            setDrawValues(false)
+        }
+        
+        val barData = BarData(dataSet).apply {
+            barWidth = 0.5f
+        }
+        
+        barChart.apply {
+            data = barData
+            description.isEnabled = false
+            setFitBars(true)
+            setDrawGridBackground(false)
+            setDrawBarShadow(false)
+            setDrawBorders(false)
+            animateY(1000)
+            
+            // Configure X axis
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                granularity = 1f
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+                valueFormatter = IndexAxisValueFormatter(weekLabels)
+            }
+            
+            // Configure left Y axis
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+                axisMinimum = 0f
+                granularity = 1f
+            }
+            
+            // Disable right Y axis
+            axisRight.isEnabled = false
+            legend.isEnabled = false
+            
+            invalidate()
+        }
+    }
+    
+    private fun setupBarChartForMonth() {
+        val barChart = binding.barChart
+        
+        // Get all 12 months in the selected year
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.YEAR, currentYear)
+        calendar.set(Calendar.MONTH, 0) // January
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        
+        val yearStart = calendar.time
+        
+        // Move to next year for end boundary
+        calendar.add(Calendar.YEAR, 1)
+        val yearEnd = calendar.time
+        
+        // Initialize monthly counts
+        val monthlyCounts = IntArray(12) { 0 }
+        val monthLabels = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        
+        // Count posts per month in this year
+        cachedPosts.forEach { post ->
+            val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
+            if (postDate != null && !postDate.before(yearStart) && postDate.before(yearEnd)) {
+                val postCalendar = Calendar.getInstance()
+                postCalendar.time = postDate
                 
-                // Calculate month difference
-                val yearDiff = postCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR)
-                val monthDiff = postCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH)
-                val monthIndex = yearDiff * 12 + monthDiff
-                
+                val monthIndex = postCalendar.get(Calendar.MONTH)
                 if (monthIndex in 0..11) {
                     monthlyCounts[monthIndex]++
                 }

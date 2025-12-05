@@ -225,20 +225,51 @@
 
                     </LinearLayout>
 
+                    <!-- Navigation Controls -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageButton
+                            android:id="@+id/btnPrevPeriod"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_chevron_left"
+                            android:contentDescription="@string/previous_period"
+                            app:tint="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/tvCurrentPeriod"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/btnNextPeriod"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_chevron_right"
+                            android:contentDescription="@string/next_period"
+                            app:tint="@color/text_secondary" />
+
+                    </LinearLayout>
+
                     <!-- Chart Container -->
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="220dp"
-                        android:layout_marginTop="16dp">
+                        android:layout_marginTop="12dp">
 
-                        <!-- Line Chart (for Day view) -->
-                        <com.github.mikephil.charting.charts.LineChart
-                            android:id="@+id/lineChart"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:visibility="gone" />
-
-                        <!-- Bar Chart (for Week/Month view) -->
+                        <!-- Bar Chart (for all views now) -->
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/barChart"
                             android:layout_width="match_parent"

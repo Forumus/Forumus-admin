@@ -12,9 +12,11 @@
     <string name="day">Day</string>
     <string name="week">Week</string>
     <string name="month">Month</string>
-    <string name="chart_title_day">Posts per hour (Last 24 hours)</string>
-    <string name="chart_title_week">Posts per day (Last 7 days)</string>
-    <string name="chart_title_month">Posts per month (Last 12 months)</string>
+    <string name="chart_title_day">Posts per day in this week</string>
+    <string name="chart_title_week">Posts per week in this month</string>
+    <string name="chart_title_month">Posts per month in this year</string>
+    <string name="previous_period">Previous Period</string>
+    <string name="next_period">Next Period</string>
     <string name="education">Education</string>
     <string name="entertainment">Entertainment</string>
     <string name="others">Others</string>
