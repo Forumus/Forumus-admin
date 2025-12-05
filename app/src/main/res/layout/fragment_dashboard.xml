@@ -225,12 +225,37 @@
 
                     </LinearLayout>
 
-                    <!-- Bar Chart -->
-                    <com.github.mikephil.charting.charts.BarChart
-                        android:id="@+id/barChart"
+                    <!-- Chart Container -->
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="220dp"
-                        android:layout_marginTop="16dp" />
+                        android:layout_marginTop="16dp">
+
+                        <!-- Line Chart (for Day view) -->
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/lineChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone" />
+
+                        <!-- Bar Chart (for Week/Month view) -->
+                        <com.github.mikephil.charting.charts.BarChart
+                            android:id="@+id/barChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </FrameLayout>
+
+                    <!-- Chart Title -->
+                    <TextView
+                        android:id="@+id/tvChartTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="@string/chart_title_week"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
 
                 </LinearLayout>
 

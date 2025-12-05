@@ -23,6 +23,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.hcmus.forumus_admin.MainActivity
 import com.hcmus.forumus_admin.R
+import com.hcmus.forumus_admin.data.repository.FirestorePost
 import com.hcmus.forumus_admin.data.repository.PostRepository
 import com.hcmus.forumus_admin.data.repository.TopicRepository
 import com.hcmus.forumus_admin.data.repository.UserRepository
@@ -34,6 +35,8 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class TopicData(
     val name: String,
@@ -74,6 +77,12 @@ class DashboardFragment : Fragment() {
     
     // Cache for topics loaded from Firebase (used in manage dialog)
     private var cachedFirebaseTopics: List<com.hcmus.forumus_admin.data.repository.FirestoreTopic> = emptyList()
+    
+    // Cache for posts loaded from Firebase (used in charts)
+    private var cachedPosts: List<FirestorePost> = emptyList()
+    
+    // Current chart period
+    private var currentChartPeriod = "week"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -88,7 +97,7 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         
         setupStatCards()
-        setupBarChart()
+        setupPostsOverTimeChart()
         setupPieChart()
         setupButtonListeners()
         loadDashboardData()
@@ -223,27 +232,185 @@ class DashboardFragment : Fragment() {
         valueText.text = value
     }
 
-    private fun setupBarChart() {
+    private fun setupPostsOverTimeChart() {
+        // Load posts from Firebase and setup chart
+        lifecycleScope.launch {
+            try {
+                val result = postRepository.getAllPosts()
+                result.onSuccess { posts ->
+                    cachedPosts = posts
+                    updateChartWithPeriod(currentChartPeriod)
+                }.onFailure {
+                    // Use empty data if Firebase fails
+                    updateChartWithPeriod(currentChartPeriod)
+                }
+            } catch (e: Exception) {
+                updateChartWithPeriod(currentChartPeriod)
+            }
+        }
+    }
+    
+    private fun updateChartWithPeriod(period: String) {
+        currentChartPeriod = period
+        when (period) {
+            "day" -> {
+                binding.lineChart.visibility = View.VISIBLE
+                binding.barChart.visibility = View.GONE
+                binding.tvChartTitle.text = getString(R.string.chart_title_day)
+                setupLineChartForDay()
+            }
+            "week" -> {
+                binding.lineChart.visibility = View.GONE
+                binding.barChart.visibility = View.VISIBLE
+                binding.tvChartTitle.text = getString(R.string.chart_title_week)
+                setupBarChartForWeek()
+            }
+            "month" -> {
+                binding.lineChart.visibility = View.GONE
+                binding.barChart.visibility = View.VISIBLE
+                binding.tvChartTitle.text = getString(R.string.chart_title_month)
+                setupBarChartForMonth()
+            }
+        }
+    }
+    
+    private fun setupLineChartForDay() {
+        val lineChart = binding.lineChart
+        
+        // Get posts from last 24 hours grouped by hour
+        val calendar = Calendar.getInstance()
+        val now = calendar.time
+        calendar.add(Calendar.HOUR_OF_DAY, -24)
+        val startTime = calendar.time
+        
+        // Initialize hourly counts (0-23)
+        val hourlyCounts = IntArray(24) { 0 }
+        val hourLabels = mutableListOf<String>()
+        
+        // Generate hour labels
+        val hourFormat = SimpleDateFormat("HH:00", Locale.getDefault())
+        calendar.time = startTime
+        for (i in 0 until 24) {
+            hourLabels.add(hourFormat.format(calendar.time))
+            calendar.add(Calendar.HOUR_OF_DAY, 1)
+        }
+        
+        // Count posts per hour
+        cachedPosts.forEach { post ->
+            val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
+            if (postDate != null && postDate.after(startTime) && postDate.before(now)) {
+                val postCalendar = Calendar.getInstance()
+                postCalendar.time = postDate
+                val hoursSinceStart = ((postDate.time - startTime.time) / (1000 * 60 * 60)).toInt()
+                if (hoursSinceStart in 0..23) {
+                    hourlyCounts[hoursSinceStart]++
+                }
+            }
+        }
+        
+        // Create line entries
+        val entries = hourlyCounts.mapIndexed { index, count ->
+            Entry(index.toFloat(), count.toFloat())
+        }
+        
+        val dataSet = LineDataSet(entries, "Posts").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
+            lineWidth = 2f
+            setDrawCircles(true)
+            circleRadius = 4f
+            setCircleColor(ContextCompat.getColor(requireContext(), R.color.primary_blue))
+            setDrawCircleHole(true)
+            circleHoleRadius = 2f
+            setDrawValues(false)
+            mode = LineDataSet.Mode.CUBIC_BEZIER
+            setDrawFilled(true)
+            fillColor = ContextCompat.getColor(requireContext(), R.color.primary_blue)
+            fillAlpha = 30
+        }
+        
+        val lineData = LineData(dataSet)
+        
+        lineChart.apply {
+            data = lineData
+            description.isEnabled = false
+            setDrawGridBackground(false)
+            animateX(1000)
+            
+            // Configure X axis
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                granularity = 4f
+                labelCount = 6
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+                textSize = 10f
+                valueFormatter = IndexAxisValueFormatter(hourLabels)
+            }
+            
+            // Configure left Y axis
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+                axisMinimum = 0f
+                granularity = 1f
+            }
+            
+            // Disable right Y axis
+            axisRight.isEnabled = false
+            legend.isEnabled = false
+            
+            invalidate()
+        }
+    }
+    
+    private fun setupBarChartForWeek() {
         val barChart = binding.barChart
         
-        // Sample data for weekly posts
-        val entries = listOf(
-            BarEntry(0f, 350f),
-            BarEntry(1f, 280f),
-            BarEntry(2f, 320f),
-            BarEntry(3f, 180f)
-        )
-
+        // Get posts from last 7 days
+        val calendar = Calendar.getInstance()
+        val now = calendar.time
+        calendar.add(Calendar.DAY_OF_YEAR, -7)
+        val startTime = calendar.time
+        
+        // Initialize daily counts
+        val dailyCounts = IntArray(7) { 0 }
+        val dayLabels = mutableListOf<String>()
+        
+        // Generate day labels
+        val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
+        calendar.time = startTime
+        for (i in 0 until 7) {
+            dayLabels.add(dayFormat.format(calendar.time))
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        
+        // Count posts per day
+        cachedPosts.forEach { post ->
+            val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
+            if (postDate != null && postDate.after(startTime) && postDate.before(now)) {
+                val daysSinceStart = ((postDate.time - startTime.time) / (1000 * 60 * 60 * 24)).toInt()
+                if (daysSinceStart in 0..6) {
+                    dailyCounts[daysSinceStart]++
+                }
+            }
+        }
+        
+        // Create bar entries
+        val entries = dailyCounts.mapIndexed { index, count ->
+            BarEntry(index.toFloat(), count.toFloat())
+        }
+        
         val dataSet = BarDataSet(entries, "Posts").apply {
             color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
             valueTextColor = Color.TRANSPARENT
             setDrawValues(false)
         }
-
+        
         val barData = BarData(dataSet).apply {
-            barWidth = 0.4f
+            barWidth = 0.5f
         }
-
+        
         barChart.apply {
             data = barData
             description.isEnabled = false
@@ -259,7 +426,7 @@ class DashboardFragment : Fragment() {
                 setDrawGridLines(false)
                 granularity = 1f
                 textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
-                valueFormatter = IndexAxisValueFormatter(listOf("Week 1", "Week 2", "Week 3", "Week 4"))
+                valueFormatter = IndexAxisValueFormatter(dayLabels)
             }
             
             // Configure left Y axis
@@ -268,13 +435,106 @@ class DashboardFragment : Fragment() {
                 gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
                 textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
                 axisMinimum = 0f
-                granularity = 100f
+                granularity = 1f
             }
             
             // Disable right Y axis
             axisRight.isEnabled = false
+            legend.isEnabled = false
             
-            // Configure legend
+            invalidate()
+        }
+    }
+    
+    private fun setupBarChartForMonth() {
+        val barChart = binding.barChart
+        
+        // Get posts from last 12 months
+        val calendar = Calendar.getInstance()
+        val now = calendar.time
+        calendar.add(Calendar.MONTH, -12)
+        val startTime = calendar.time
+        
+        // Initialize monthly counts
+        val monthlyCounts = IntArray(12) { 0 }
+        val monthLabels = mutableListOf<String>()
+        
+        // Generate month labels
+        val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
+        calendar.time = startTime
+        for (i in 0 until 12) {
+            monthLabels.add(monthFormat.format(calendar.time))
+            calendar.add(Calendar.MONTH, 1)
+        }
+        
+        // Count posts per month
+        calendar.time = startTime
+        cachedPosts.forEach { post ->
+            val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
+            if (postDate != null && postDate.after(startTime) && postDate.before(now)) {
+                val postCalendar = Calendar.getInstance()
+                postCalendar.time = postDate
+                
+                val startCalendar = Calendar.getInstance()
+                startCalendar.time = startTime
+                
+                // Calculate month difference
+                val yearDiff = postCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR)
+                val monthDiff = postCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH)
+                val monthIndex = yearDiff * 12 + monthDiff
+                
+                if (monthIndex in 0..11) {
+                    monthlyCounts[monthIndex]++
+                }
+            }
+        }
+        
+        // Create bar entries
+        val entries = monthlyCounts.mapIndexed { index, count ->
+            BarEntry(index.toFloat(), count.toFloat())
+        }
+        
+        val dataSet = BarDataSet(entries, "Posts").apply {
+            color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
+            valueTextColor = Color.TRANSPARENT
+            setDrawValues(false)
+        }
+        
+        val barData = BarData(dataSet).apply {
+            barWidth = 0.6f
+        }
+        
+        barChart.apply {
+            data = barData
+            description.isEnabled = false
+            setFitBars(true)
+            setDrawGridBackground(false)
+            setDrawBarShadow(false)
+            setDrawBorders(false)
+            animateY(1000)
+            
+            // Configure X axis
+            xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                setDrawGridLines(false)
+                granularity = 1f
+                labelCount = 12
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+                textSize = 9f
+                valueFormatter = IndexAxisValueFormatter(monthLabels)
+            }
+            
+            // Configure left Y axis
+            axisLeft.apply {
+                setDrawGridLines(true)
+                gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+                axisMinimum = 0f
+                granularity = 1f
+            }
+            
+            // Disable right Y axis
+            axisRight.isEnabled = false
             legend.isEnabled = false
             
             invalidate()
@@ -493,17 +753,17 @@ class DashboardFragment : Fragment() {
         // Time range toggle buttons (now TextViews)
         binding.btnDay.setOnClickListener {
             updateToggleSelection(binding.btnDay)
-            updateBarChartData("day")
+            updateChartWithPeriod("day")
         }
         
         binding.btnWeek.setOnClickListener {
             updateToggleSelection(binding.btnWeek)
-            updateBarChartData("week")
+            updateChartWithPeriod("week")
         }
         
         binding.btnMonth.setOnClickListener {
             updateToggleSelection(binding.btnMonth)
-            updateBarChartData("month")
+            updateChartWithPeriod("month")
         }
         
         // Manage topics button
@@ -838,11 +1098,6 @@ class DashboardFragment : Fragment() {
         
         // Set selected button
         selectedButton.setBackgroundResource(R.drawable.bg_toggle_button_selected)
-    }
-
-    private fun updateBarChartData(period: String) {
-        // TODO: Fetch data based on selected period and update chart
-        // This is a placeholder - you can implement actual data fetching logic here
     }
 
     override fun onDestroyView() {
