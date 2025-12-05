@@ -144,4 +144,15 @@
     <string name="topic_delete_failed">Failed to delete topic</string>
     <string name="loading_topics">Loading topics...</string>
     <string name="topic_name_label">Topic: %s</string>
+    
+    <!-- Edit Topic Dialog -->
+    <string name="topic_details_title">Topic Details</string>
+    <string name="topic_details_subtitle">View and edit topic information</string>
+    <string name="topic_color">Topic Color</string>
+    <string name="topic_name">Topic Name</string>
+    <string name="topic_name_hint">Enter topic name</string>
+    <string name="topic_description">Description</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="topic_updated">Topic updated successfully</string>
+    <string name="topic_update_failed">Failed to update topic</string>
 </resources>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <!-- Header with Close Button -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/topic_details_title"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif"
+            android:gravity="center" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="end"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            android:alpha="0.7"
+            android:contentDescription="@string/close" />
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="@string/topic_details_subtitle"
+        android:textColor="#717182"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:gravity="center" />
+
+    <!-- Color Indicator -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <View
+            android:id="@+id/topicColorIndicator"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="@drawable/bg_topic_color" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/topic_color"
+            android:textColor="#717182"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- Topic Name -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/topic_name"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif" />
+
+    <EditText
+        android:id="@+id/etTopicName"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="@string/topic_name_hint"
+        android:textColorHint="#717182"
+        android:textColor="@color/text_primary"
+        android:textSize="16sp"
+        android:paddingHorizontal="12dp"
+        android:singleLine="true"
+        android:inputType="text"
+        android:fontFamily="sans-serif" />
+
+    <!-- Topic Description -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/topic_description"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif" />
+
+    <EditText
+        android:id="@+id/etTopicDescription"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_input_field"
+        android:hint="@string/topic_description_hint"
+        android:textColorHint="#717182"
+        android:textColor="@color/text_primary"
+        android:textSize="14sp"
+        android:padding="12dp"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:fontFamily="sans-serif" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/cancel"
+            android:textColor="#717182"
+            android:textAllCaps="false" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:text="@string/save_changes"
+            android:textAllCaps="false"
+            app:cornerRadius="8dp"
+            app:backgroundTint="#030213" />
+
+    </LinearLayout>
+
+</LinearLayout>

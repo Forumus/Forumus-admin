@@ -19,6 +19,7 @@ data class ManageTopicItem(
 )
 
 class ManageTopicsAdapter(
+    private val onItemClick: (ManageTopicItem) -> Unit,
     private val onDeleteClick: (ManageTopicItem) -> Unit
 ) : ListAdapter<ManageTopicItem, ManageTopicsAdapter.TopicViewHolder>(TopicDiffCallback()) {
 
@@ -47,6 +48,11 @@ class ManageTopicsAdapter(
                 setColor(topic.color)
             }
             colorIndicator.background = drawable
+
+            // Item click to view/edit topic details
+            itemView.setOnClickListener {
+                onItemClick(topic)
+            }
 
             btnDelete.setOnClickListener {
                 onDeleteClick(topic)

@@ -75,6 +75,19 @@ class TopicRepository {
         }
     }
     
+    suspend fun updateTopic(topicId: String, name: String, description: String): Result<Boolean> {
+        return try {
+            val updates = hashMapOf<String, Any>(
+                "name" to name,
+                "description" to description
+            )
+            topicsCollection.document(topicId).update(updates).await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
     suspend fun deleteTopic(topicId: String): Result<Boolean> {
         return try {
             topicsCollection.document(topicId).delete().await()

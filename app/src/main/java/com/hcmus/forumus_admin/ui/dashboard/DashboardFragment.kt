@@ -53,17 +53,23 @@ class DashboardFragment : Fragment() {
     // Threshold for grouping small topics into "Others" (3%)
     private val othersThreshold = 3f
     
-    // Predefined colors for topics - matching pie chart legend colors
+    // Predefined colors for topics - distinct colors for better visibility
     private val topicColors = listOf(
-        R.color.chart_tech_blue,  // Technology
-        R.color.chart_blue,       // Education
-        R.color.chart_brown,      // Sports
-        R.color.chart_red,        // Entertainment
-        R.color.chart_purple,
-        R.color.chart_orange,
-        R.color.chart_teal,
-        R.color.chart_pink,
-        R.color.chart_gray        // Others
+        R.color.chart_tech_blue,    // Bright blue
+        R.color.chart_red,          // Red
+        R.color.chart_green,        // Green
+        R.color.chart_orange,       // Orange
+        R.color.chart_purple,       // Purple
+        R.color.chart_teal,         // Teal
+        R.color.chart_pink,         // Pink
+        R.color.chart_indigo,       // Indigo
+        R.color.chart_amber,        // Amber/Yellow
+        R.color.chart_cyan,         // Cyan
+        R.color.chart_lime,         // Lime
+        R.color.chart_deep_orange,  // Deep Orange
+        R.color.chart_brown,        // Brown
+        R.color.chart_blue_gray,    // Blue Gray
+        R.color.chart_gray          // Gray (last resort)
     )
     
     // Cache for topics loaded from Firebase (used in manage dialog)
@@ -523,10 +529,16 @@ class DashboardFragment : Fragment() {
         // Get current topics from Firebase cache with their colors
         val currentTopics = mutableListOf<ManageTopicItem>()
         
-        val adapter = ManageTopicsAdapter { topic ->
-            // Show confirmation dialog before deleting
-            showDeleteTopicConfirmation(topic, currentTopics, dialog)
-        }
+        val adapter = ManageTopicsAdapter(
+            onItemClick = { topic ->
+                // Show edit dialog when item is clicked
+                showEditTopicDialog(topic, currentTopics, dialog)
+            },
+            onDeleteClick = { topic ->
+                // Show confirmation dialog before deleting
+                showDeleteTopicConfirmation(topic, currentTopics, dialog)
+            }
+        )
         
         rvTopics.layoutManager = LinearLayoutManager(requireContext())
         rvTopics.adapter = adapter
@@ -670,6 +682,99 @@ class DashboardFragment : Fragment() {
             }
             adapter.submitList(topicsList.toList())
         }
+    }
+    
+    private fun showEditTopicDialog(
+        topic: ManageTopicItem,
+        topicsList: MutableList<ManageTopicItem>,
+        parentDialog: AlertDialog
+    ) {
+        val editDialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_edit_topic, null)
+        
+        val editDialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(editDialogView)
+            .setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.bg_dialog_rounded))
+            .create()
+        
+        val btnClose = editDialogView.findViewById<ImageButton>(R.id.btnClose)
+        val colorIndicator = editDialogView.findViewById<View>(R.id.topicColorIndicator)
+        val etTopicName = editDialogView.findViewById<EditText>(R.id.etTopicName)
+        val etTopicDescription = editDialogView.findViewById<EditText>(R.id.etTopicDescription)
+        val btnCancel = editDialogView.findViewById<MaterialButton>(R.id.btnCancel)
+        val btnSave = editDialogView.findViewById<MaterialButton>(R.id.btnSave)
+        
+        // Set current values
+        etTopicName.setText(topic.name)
+        etTopicDescription.setText(topic.description)
+        
+        // Set color indicator
+        val drawable = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 6f * requireContext().resources.displayMetrics.density
+            setColor(topic.color)
+        }
+        colorIndicator.background = drawable
+        
+        btnClose.setOnClickListener {
+            editDialog.dismiss()
+        }
+        
+        btnCancel.setOnClickListener {
+            editDialog.dismiss()
+        }
+        
+        btnSave.setOnClickListener {
+            val newName = etTopicName.text.toString().trim()
+            val newDescription = etTopicDescription.text.toString().trim()
+            
+            if (newName.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.topic_name_empty, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            if (newDescription.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.topic_description_empty, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            // Check if name already exists (excluding current topic)
+            if (topicsList.any { it.id != topic.id && it.name.equals(newName, ignoreCase = true) }) {
+                Toast.makeText(requireContext(), R.string.topic_already_exists, Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            
+            // Update in Firebase
+            lifecycleScope.launch {
+                try {
+                    val result = topicRepository.updateTopic(topic.id, newName, newDescription)
+                    result.onSuccess {
+                        // Update local list
+                        val index = topicsList.indexOfFirst { it.id == topic.id }
+                        if (index != -1) {
+                            topicsList[index] = topic.copy(
+                                name = newName,
+                                description = newDescription
+                            )
+                            (parentDialog.findViewById<RecyclerView>(R.id.rvTopics)?.adapter as? ManageTopicsAdapter)
+                                ?.submitList(topicsList.toList())
+                        }
+                        
+                        Toast.makeText(requireContext(), R.string.topic_updated, Toast.LENGTH_SHORT).show()
+                        
+                        // Refresh the pie chart
+                        refreshPieChart()
+                        editDialog.dismiss()
+                    }.onFailure {
+                        Toast.makeText(requireContext(), R.string.topic_update_failed, Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), R.string.topic_update_failed, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        
+        editDialog.show()
     }
     
     private fun getRandomTopicColor(): Int {
