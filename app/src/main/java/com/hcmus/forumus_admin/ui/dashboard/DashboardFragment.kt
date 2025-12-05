@@ -401,11 +401,17 @@ class DashboardFragment : Fragment() {
             setDrawBorders(false)
             animateY(1000)
             
+            // Disable zooming and scaling for immediate proper view
+            setScaleEnabled(false)
+            setPinchZoom(false)
+            isDoubleTapToZoomEnabled = false
+            
             // Configure X axis
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 granularity = 1f
+                labelCount = 7
                 textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
                 valueFormatter = IndexAxisValueFormatter(dayLabels)
             }
@@ -422,6 +428,10 @@ class DashboardFragment : Fragment() {
             // Disable right Y axis
             axisRight.isEnabled = false
             legend.isEnabled = false
+            
+            // Reset zoom and fit data
+            setVisibleXRangeMaximum(7f)
+            moveViewToX(0f)
             
             invalidate()
         }
@@ -492,11 +502,17 @@ class DashboardFragment : Fragment() {
             setDrawBorders(false)
             animateY(1000)
             
+            // Disable zooming and scaling for immediate proper view
+            setScaleEnabled(false)
+            setPinchZoom(false)
+            isDoubleTapToZoomEnabled = false
+            
             // Configure X axis
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
                 granularity = 1f
+                labelCount = maxWeek
                 textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
                 valueFormatter = IndexAxisValueFormatter(weekLabels)
             }
@@ -513,6 +529,10 @@ class DashboardFragment : Fragment() {
             // Disable right Y axis
             axisRight.isEnabled = false
             legend.isEnabled = false
+            
+            // Reset zoom and fit data
+            setVisibleXRangeMaximum(maxWeek.toFloat())
+            moveViewToX(0f)
             
             invalidate()
         }
@@ -580,6 +600,11 @@ class DashboardFragment : Fragment() {
             setDrawBorders(false)
             animateY(1000)
             
+            // Disable zooming and scaling for immediate proper view
+            setScaleEnabled(false)
+            setPinchZoom(false)
+            isDoubleTapToZoomEnabled = false
+            
             // Configure X axis
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
@@ -603,6 +628,10 @@ class DashboardFragment : Fragment() {
             // Disable right Y axis
             axisRight.isEnabled = false
             legend.isEnabled = false
+            
+            // Reset zoom and fit data
+            setVisibleXRangeMaximum(12f)
+            moveViewToX(0f)
             
             invalidate()
         }
