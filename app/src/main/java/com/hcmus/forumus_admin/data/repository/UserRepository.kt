@@ -76,9 +76,9 @@ class UserRepository {
             val blacklistedUsers = snapshot.documents.mapNotNull { doc ->
                 try {
                     val email = doc.getString("email") ?: ""
-                    val status = doc.getString("status") ?: "normal"
+                    val status = (doc.getString("status") ?: "normal").lowercase()
                     
-                    // Only include users with status: ban, warning, or remind
+                    // Only include users with status: ban, warning, or remind (case-insensitive)
                     if (email.isNotEmpty() && status in listOf("ban", "warning", "remind")) {
                         FirestoreUser(
                             email = email,
@@ -102,6 +102,29 @@ class UserRepository {
         }
     }
 
+    suspend fun updateUserStatus(userId: String, newStatus: UserStatus): Result<Unit> {
+        return try {
+            val statusString = mapEnumToStatus(newStatus)
+            usersCollection.document(userId)
+                .update("status", statusString)
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun removeFromBlacklist(userId: String): Result<Unit> {
+        return try {
+            usersCollection.document(userId)
+                .update("status", "normal")
+                .await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     companion object {
         fun mapStatusToEnum(status: String): UserStatus {
             return when (status.lowercase()) {
@@ -109,6 +132,15 @@ class UserRepository {
                 "warning" -> UserStatus.WARNING
                 "remind" -> UserStatus.REMIND
                 else -> UserStatus.NORMAL
+            }
+        }
+
+        fun mapEnumToStatus(status: UserStatus): String {
+            return when (status) {
+                UserStatus.BAN -> "ban"
+                UserStatus.WARNING -> "warning"
+                UserStatus.REMIND -> "remind"
+                UserStatus.NORMAL -> "normal"
             }
         }
     }

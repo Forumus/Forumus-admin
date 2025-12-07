@@ -20,7 +20,8 @@ data class BlacklistedUser(
     val id: String,
     val name: String,
     val avatarUrl: String?,
-    val status: UserStatus
+    val status: UserStatus,
+    val uid: String = ""  // Firebase document ID
 )
 
 enum class ActionType {
@@ -120,7 +121,8 @@ class BlacklistFragment : Fragment() {
                                     extractIdFromEmail(firestoreUser.email) 
                                 },
                                 avatarUrl = firestoreUser.profilePictureUrl,
-                                status = UserRepository.mapStatusToEnum(firestoreUser.status)
+                                status = UserRepository.mapStatusToEnum(firestoreUser.status),
+                                uid = firestoreUser.uid
                             )
                         }
                         
@@ -218,42 +220,59 @@ class BlacklistFragment : Fragment() {
     }
     
     private fun performAction(user: BlacklistedUser, actionType: ActionType) {
-        // TODO: Implement actual backend call here
-        when (actionType) {
-            ActionType.REMOVE -> {
-                // Remove user from blacklist
-                allUsers = allUsers.filter { it.id != user.id }
-                applySearchFilter(binding.searchInput.query.toString())
-                // Adjust current page if needed
-                if (getCurrentPageUsers().isEmpty() && currentPage > 0) {
-                    currentPage--
+        lifecycleScope.launch {
+            when (actionType) {
+                ActionType.REMOVE -> {
+                    // Remove user from blacklist (set status to normal in Firebase)
+                    val result = userRepository.removeFromBlacklist(user.uid)
+                    result.onSuccess {
+                        allUsers = allUsers.filter { it.id != user.id }
+                        applySearchFilter(binding.searchInput.query.toString())
+                        // Adjust current page if needed
+                        if (getCurrentPageUsers().isEmpty() && currentPage > 0) {
+                            currentPage--
+                        }
+                        updatePaginationUI()
+                        Toast.makeText(requireContext(), "${user.name} removed from blacklist", Toast.LENGTH_SHORT).show()
+                    }.onFailure { exception ->
+                        Toast.makeText(requireContext(), "Failed to remove ${user.name}: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                updatePaginationUI()
-                Toast.makeText(requireContext(), "${user.name} removed from blacklist", Toast.LENGTH_SHORT).show()
-            }
-            ActionType.BAN -> {
-                // Update user status to BAN
-                updateUserStatus(user, UserStatus.BAN)
-                Toast.makeText(requireContext(), "${user.name} has been banned", Toast.LENGTH_SHORT).show()
-            }
-            ActionType.WARNING -> {
-                // Update user status to WARNING
-                updateUserStatus(user, UserStatus.WARNING)
-                Toast.makeText(requireContext(), "Warning sent to ${user.name}", Toast.LENGTH_SHORT).show()
-            }
-            ActionType.REMIND -> {
-                // Update user status to REMIND
-                updateUserStatus(user, UserStatus.REMIND)
-                Toast.makeText(requireContext(), "Reminder sent to ${user.name}", Toast.LENGTH_SHORT).show()
+                ActionType.BAN -> {
+                    // Update user status to BAN
+                    updateUserStatusInFirebase(user, UserStatus.BAN)
+                }
+                ActionType.WARNING -> {
+                    // Update user status to WARNING
+                    updateUserStatusInFirebase(user, UserStatus.WARNING)
+                }
+                ActionType.REMIND -> {
+                    // Update user status to REMIND
+                    updateUserStatusInFirebase(user, UserStatus.REMIND)
+                }
             }
         }
     }
     
-    private fun updateUserStatus(user: BlacklistedUser, newStatus: UserStatus) {
-        allUsers = allUsers.map {
-            if (it.id == user.id) it.copy(status = newStatus) else it
+    private suspend fun updateUserStatusInFirebase(user: BlacklistedUser, newStatus: UserStatus) {
+        val result = userRepository.updateUserStatus(user.uid, newStatus)
+        result.onSuccess {
+            // Update local list
+            allUsers = allUsers.map {
+                if (it.id == user.id) it.copy(status = newStatus) else it
+            }
+            applySearchFilter(binding.searchInput.query.toString())
+            
+            val message = when (newStatus) {
+                UserStatus.BAN -> "${user.name} has been banned"
+                UserStatus.WARNING -> "Warning sent to ${user.name}"
+                UserStatus.REMIND -> "Reminder sent to ${user.name}"
+                UserStatus.NORMAL -> "${user.name} status updated to normal"
+            }
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        }.onFailure { exception ->
+            Toast.makeText(requireContext(), "Failed to update status: ${exception.message}", Toast.LENGTH_SHORT).show()
         }
-        applySearchFilter(binding.searchInput.query.toString())
     }
 
     private fun setupSearchBar() {
@@ -493,53 +512,6 @@ class BlacklistFragment : Fragment() {
         }
     }
     
-    private fun getSampleBlacklistedUsers(): List<BlacklistedUser> {
-        return listOf(
-            // Page 1
-            BlacklistedUser("23120132", "Cao Trọng Khang", null, UserStatus.WARNING),
-            BlacklistedUser("23120143", "Tô Thành Long", null, UserStatus.BAN),
-            BlacklistedUser("23120096", "Nguyễn Viết Toàn", null, UserStatus.REMIND),
-            BlacklistedUser("23120135", "Trần Anh Khoa", null, UserStatus.WARNING),
-            BlacklistedUser("23120097", "Võ Tất Toàn", null, UserStatus.BAN),
-            BlacklistedUser("23120021", "Nguyễn Văn A", null, UserStatus.REMIND),
-            BlacklistedUser("23120045", "Lê Hoàng Nam", null, UserStatus.WARNING),
-            BlacklistedUser("23120078", "Phạm Minh Tuấn", null, UserStatus.BAN),
-            BlacklistedUser("23120089", "Đặng Quốc Huy", null, UserStatus.REMIND),
-            BlacklistedUser("23120101", "Hoàng Văn Đức", null, UserStatus.WARNING),
-            
-            // Page 2
-            BlacklistedUser("23120112", "Nguyễn Thị Mai", null, UserStatus.BAN),
-            BlacklistedUser("23120123", "Trần Văn Bình", null, UserStatus.REMIND),
-            BlacklistedUser("23120134", "Lê Thị Hương", null, UserStatus.WARNING),
-            BlacklistedUser("23120145", "Phạm Văn Cường", null, UserStatus.BAN),
-            BlacklistedUser("23120156", "Vũ Thị Lan", null, UserStatus.REMIND),
-            BlacklistedUser("23120167", "Đỗ Văn Sơn", null, UserStatus.WARNING),
-            BlacklistedUser("23120178", "Bùi Thị Nga", null, UserStatus.BAN),
-            BlacklistedUser("23120189", "Ngô Văn Tài", null, UserStatus.REMIND),
-            BlacklistedUser("23120190", "Dương Thị Thảo", null, UserStatus.WARNING),
-            BlacklistedUser("23120201", "Lý Văn Phúc", null, UserStatus.BAN),
-            
-            // Page 3
-            BlacklistedUser("23120212", "Trịnh Thị Hoa", null, UserStatus.REMIND),
-            BlacklistedUser("23120223", "Võ Văn Hải", null, UserStatus.WARNING),
-            BlacklistedUser("23120234", "Phan Thị Kim", null, UserStatus.BAN),
-            BlacklistedUser("23120245", "Đinh Văn Long", null, UserStatus.REMIND),
-            BlacklistedUser("23120256", "Mai Thị Linh", null, UserStatus.WARNING),
-            BlacklistedUser("23120267", "Tạ Văn Minh", null, UserStatus.BAN),
-            BlacklistedUser("23120278", "Chu Thị Phương", null, UserStatus.REMIND),
-            BlacklistedUser("23120289", "Hồ Văn Quân", null, UserStatus.WARNING),
-            BlacklistedUser("23120290", "Lương Thị Trang", null, UserStatus.BAN),
-            BlacklistedUser("23120301", "Đào Văn Tuấn", null, UserStatus.REMIND),
-            
-            // Page 4
-            BlacklistedUser("23120312", "Trương Thị Uyên", null, UserStatus.WARNING),
-            BlacklistedUser("23120323", "Hà Văn Vinh", null, UserStatus.BAN),
-            BlacklistedUser("23120334", "Cao Thị Xuân", null, UserStatus.REMIND),
-            BlacklistedUser("23120345", "Nguyễn Văn Yên", null, UserStatus.WARNING),
-            BlacklistedUser("23120356", "Lê Thị Zara", null, UserStatus.BAN)
-        )
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
