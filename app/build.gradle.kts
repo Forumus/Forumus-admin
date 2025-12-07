@@ -51,6 +51,12 @@ dependencies {
     // MPAndroidChart for charts
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     
+    // Gson for JSON serialization (caching)
+    implementation("com.google.code.gson:gson:2.10.1")
+    
+    // SwipeRefreshLayout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    
     // Navigation
     implementation(libs.androidx.navigation.fragment)
     implementation(libs.androidx.navigation.ui)

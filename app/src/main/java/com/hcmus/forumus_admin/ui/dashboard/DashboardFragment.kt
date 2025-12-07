@@ -35,6 +35,7 @@ import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import com.hcmus.forumus_admin.data.cache.DashboardCacheManager
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,6 +53,9 @@ class DashboardFragment : Fragment() {
     private val userRepository = UserRepository()
     private val postRepository = PostRepository()
     private val topicRepository = TopicRepository()
+    
+    // Cache manager for efficient data loading
+    private lateinit var cacheManager: DashboardCacheManager
     
     // Threshold for grouping small topics into "Others" (3%)
     private val othersThreshold = 3f
@@ -103,11 +107,45 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // Initialize cache manager
+        cacheManager = DashboardCacheManager.getInstance(requireContext())
+        
         setupStatCards()
+        setupSwipeRefresh()
         setupPostsOverTimeChart()
         setupPieChart()
         setupButtonListeners()
         loadDashboardData()
+    }
+    
+    private fun setupSwipeRefresh() {
+        binding.swipeRefreshLayout.apply {
+            setColorSchemeResources(
+                R.color.primary_blue,
+                R.color.success_green,
+                R.color.warning_orange
+            )
+            setOnRefreshListener {
+                // Invalidate cache and refresh data
+                cacheManager.invalidateCache()
+                refreshAllData()
+            }
+        }
+    }
+    
+    private fun refreshAllData() {
+        lifecycleScope.launch {
+            try {
+                // Refresh stat cards
+                loadDashboardDataFromNetwork(forceRefresh = true)
+                
+                // Refresh charts
+                loadPostsDataFromNetwork(forceRefresh = true)
+                loadTopicsDataFromNetwork(forceRefresh = true)
+            } finally {
+                binding.swipeRefreshLayout.isRefreshing = false
+            }
+        }
     }
 
     private fun setupStatCards() {
@@ -169,13 +207,36 @@ class DashboardFragment : Fragment() {
     }
 
     private fun loadDashboardData() {
+        // Try to load from cache first if valid
+        if (cacheManager.isCacheValid()) {
+            val cachedStats = cacheManager.getDashboardStats()
+            if (cachedStats != null) {
+                // Update UI with cached data
+                updateStatCard(binding.statCardUsers.root, formatNumber(cachedStats.totalUsers))
+                updateStatCard(binding.statCardBlacklisted.root, cachedStats.blacklistedUsers.toString())
+                updateStatCard(binding.statCardPosts.root, formatNumber(cachedStats.totalPosts))
+                updateStatCard(binding.statCardReported.root, cachedStats.reportedPosts.toString())
+                return
+            }
+        }
+        
+        // Cache is invalid or doesn't exist, load from network
+        loadDashboardDataFromNetwork(forceRefresh = false)
+    }
+    
+    private fun loadDashboardDataFromNetwork(forceRefresh: Boolean) {
         lifecycleScope.launch {
             try {
+                var totalUsers = 0
+                var blacklistedUsers = 0
+                var totalPosts = 0
+                var reportedPosts = 0
+                
                 // Load users data
                 val usersResult = userRepository.getAllUsers()
                 usersResult.onSuccess { allUsers ->
-                    val totalUsers = allUsers.size
-                    val blacklistedUsers = allUsers.count { user ->
+                    totalUsers = allUsers.size
+                    blacklistedUsers = allUsers.count { user ->
                         val status = user.status.lowercase()
                         status == "ban" || status == "warning" || status == "remind"
                     }
@@ -187,12 +248,22 @@ class DashboardFragment : Fragment() {
                 // Load posts data
                 val postsResult = postRepository.getAllPosts()
                 postsResult.onSuccess { allPosts ->
-                    val totalPosts = allPosts.size
-                    val reportedPosts = allPosts.count { it.report_count > 0 }
+                    totalPosts = allPosts.size
+                    reportedPosts = allPosts.count { it.report_count > 0 }
                     
                     updateStatCard(binding.statCardPosts.root, formatNumber(totalPosts))
                     updateStatCard(binding.statCardReported.root, reportedPosts.toString())
                 }
+                
+                // Save to cache
+                cacheManager.saveDashboardStats(
+                    DashboardCacheManager.DashboardStats(
+                        totalUsers = totalUsers,
+                        blacklistedUsers = blacklistedUsers,
+                        totalPosts = totalPosts,
+                        reportedPosts = reportedPosts
+                    )
+                )
             } catch (e: Exception) {
                 // Keep loading indicators if error occurs
             }
@@ -244,12 +315,28 @@ class DashboardFragment : Fragment() {
         binding.btnPrevPeriod.setOnClickListener { navigateToPreviousPeriod() }
         binding.btnNextPeriod.setOnClickListener { navigateToNextPeriod() }
         
-        // Load posts from Firebase and setup chart
+        // Try to load from cache first
+        if (cacheManager.isCacheValid()) {
+            val cachedPosts = cacheManager.getPostsData()
+            if (cachedPosts != null) {
+                this.cachedPosts = cachedPosts
+                updateChartWithPeriod(currentChartPeriod)
+                return
+            }
+        }
+        
+        // Load from network
+        loadPostsDataFromNetwork(forceRefresh = false)
+    }
+    
+    private fun loadPostsDataFromNetwork(forceRefresh: Boolean) {
         lifecycleScope.launch {
             try {
                 val result = postRepository.getAllPosts()
                 result.onSuccess { posts ->
                     cachedPosts = posts
+                    // Save to cache
+                    cacheManager.savePostsData(posts)
                     updateChartWithPeriod(currentChartPeriod)
                 }.onFailure {
                     // Use empty data if Firebase fails
@@ -638,17 +725,30 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupPieChart() {
-        // Load real data from Firebase
-        loadTopicsData()
+        // Try to load from cache first
+        if (cacheManager.isCacheValid()) {
+            val cachedTopics = cacheManager.getTopicsData()
+            if (cachedTopics != null) {
+                cachedFirebaseTopics = cachedTopics
+                val topicsData = processTopicsData(cachedTopics)
+                updatePieChart(topicsData)
+                return
+            }
+        }
+        
+        // Load from network
+        loadTopicsDataFromNetwork(forceRefresh = false)
     }
     
-    private fun loadTopicsData() {
+    private fun loadTopicsDataFromNetwork(forceRefresh: Boolean) {
         lifecycleScope.launch {
             try {
                 val topicsResult = topicRepository.getAllTopics()
                 topicsResult.onSuccess { topics ->
                     // Cache topics for use in manage dialog
                     cachedFirebaseTopics = topics
+                    // Save to cache
+                    cacheManager.saveTopicsData(topics)
                     val topicsData = processTopicsData(topics)
                     updatePieChart(topicsData)
                 }.onFailure {
@@ -660,6 +760,10 @@ class DashboardFragment : Fragment() {
                 updatePieChart(getSampleTopicData())
             }
         }
+    }
+    
+    private fun loadTopicsData() {
+        loadTopicsDataFromNetwork(forceRefresh = false)
     }
     
     private fun processTopicsData(topics: List<com.hcmus.forumus_admin.data.repository.FirestoreTopic>): List<TopicData> {
