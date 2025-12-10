@@ -3,26 +3,104 @@ package com.hcmus.forumus_admin.ui.assistant
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.Post
 import com.hcmus.forumus_admin.data.model.Tag
+import com.hcmus.forumus_admin.data.repository.AiModerationRepository
+import kotlinx.coroutines.launch
 
 class AiModerationViewModel : ViewModel() {
     
     private val _state = MutableLiveData(AiModerationState())
     val state: LiveData<AiModerationState> = _state
     
+    private val repository = AiModerationRepository()
+    
     init {
         loadPosts()
     }
     
     private fun loadPosts() {
-        // TODO: Replace with actual data from repository/database
-        val samplePosts = getSamplePosts()
-        _state.value = _state.value?.copy(
-            posts = samplePosts,
-            filteredPosts = samplePosts.filter { it.isAiApproved }
-        )
+        viewModelScope.launch {
+            _state.value = _state.value?.copy(isLoading = true)
+            
+            try {
+                // Get moderation results from repository
+                val result = repository.getAllModerationResults()
+                
+                result.onSuccess { moderationResults ->
+                    // Convert moderation results to Post objects with sample data
+                    val posts = moderationResults.mapNotNull { moderationResult ->
+                        val postInfo = repository.getSamplePostInfo(moderationResult.postId)
+                        if (postInfo != null) {
+                            val (id, title, content) = postInfo
+                            Post(
+                                id = id,
+                                title = title,
+                                author = "Sample Author",
+                                date = formatDate(moderationResult.analyzedAt),
+                                description = content,
+                                tags = getTagsForPost(id),
+                                isAiApproved = moderationResult.isApproved
+                            )
+                        } else {
+                            null
+                        }
+                    }
+                    
+                    _state.value = _state.value?.copy(
+                        posts = posts,
+                        filteredPosts = posts.filter { it.isAiApproved },
+                        isLoading = false
+                    )
+                }.onFailure { error ->
+                    _state.value = _state.value?.copy(
+                        isLoading = false,
+                        error = error.message
+                    )
+                }
+            } catch (e: Exception) {
+                _state.value = _state.value?.copy(
+                    isLoading = false,
+                    error = e.message ?: "Unknown error"
+                )
+            }
+        }
+    }
+    
+    private fun formatDate(timestamp: Long): String {
+        val date = java.util.Date(timestamp)
+        val format = java.text.SimpleDateFormat("MMMM dd, yyyy", java.util.Locale.getDefault())
+        return format.format(date)
+    }
+    
+    private fun getTagsForPost(postId: String): List<Tag> {
+        // Map post IDs to appropriate tags
+        return when (postId) {
+            "1", "4" -> listOf(
+                Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
+                Tag("React", R.color.tag_react_bg, R.color.tag_react_text)
+            )
+            "2", "5" -> listOf(
+                Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
+                Tag("TypeScript", R.color.tag_typescript_bg, R.color.tag_typescript_text)
+            )
+            "3", "6" -> listOf(
+                Tag("Design", R.color.tag_design_bg, R.color.tag_design_text),
+                Tag("CSS", R.color.tag_css_bg, R.color.tag_css_text)
+            )
+            "7" -> listOf(
+                Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text)
+            )
+            "8" -> listOf(
+                Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
+                Tag("Design", R.color.tag_design_bg, R.color.tag_design_text)
+            )
+            else -> listOf(
+                Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text)
+            )
+        }
     }
     
     fun selectTab(tab: TabType) {
@@ -71,117 +149,66 @@ class AiModerationViewModel : ViewModel() {
     }
     
     fun approvePost(postId: String) {
-        // TODO: Implement API call to approve post
-        val currentState = _state.value ?: return
-        val updatedPosts = currentState.posts.map {
-            if (it.id == postId) it.copy(isAiApproved = true) else it
-        }
-        
-        _state.value = currentState.copy(
-            posts = updatedPosts,
-            filteredPosts = updatedPosts.filter {
-                when (currentState.currentTab) {
-                    TabType.AI_APPROVED -> it.isAiApproved
-                    TabType.AI_REJECTED -> !it.isAiApproved
+        viewModelScope.launch {
+            val currentState = _state.value ?: return@launch
+            
+            try {
+                // Call repository to override decision
+                val result = repository.overrideModerationDecision(postId, true)
+                
+                result.onSuccess {
+                    // Update local state
+                    val updatedPosts = currentState.posts.map {
+                        if (it.id == postId) it.copy(isAiApproved = true) else it
+                    }
+                    
+                    _state.value = currentState.copy(
+                        posts = updatedPosts,
+                        filteredPosts = updatedPosts.filter {
+                            when (currentState.currentTab) {
+                                TabType.AI_APPROVED -> it.isAiApproved
+                                TabType.AI_REJECTED -> !it.isAiApproved
+                            }
+                        }
+                    )
+                }.onFailure { error ->
+                    _state.value = currentState.copy(error = error.message)
                 }
+            } catch (e: Exception) {
+                _state.value = currentState.copy(error = e.message)
             }
-        )
+        }
     }
     
     fun rejectPost(postId: String) {
-        // TODO: Implement API call to reject post
-        val currentState = _state.value ?: return
-        val updatedPosts = currentState.posts.map {
-            if (it.id == postId) it.copy(isAiApproved = false) else it
-        }
-        
-        _state.value = currentState.copy(
-            posts = updatedPosts,
-            filteredPosts = updatedPosts.filter {
-                when (currentState.currentTab) {
-                    TabType.AI_APPROVED -> it.isAiApproved
-                    TabType.AI_REJECTED -> !it.isAiApproved
+        viewModelScope.launch {
+            val currentState = _state.value ?: return@launch
+            
+            try {
+                // Call repository to override decision
+                val result = repository.overrideModerationDecision(postId, false)
+                
+                result.onSuccess {
+                    // Update local state
+                    val updatedPosts = currentState.posts.map {
+                        if (it.id == postId) it.copy(isAiApproved = false) else it
+                    }
+                    
+                    _state.value = currentState.copy(
+                        posts = updatedPosts,
+                        filteredPosts = updatedPosts.filter {
+                            when (currentState.currentTab) {
+                                TabType.AI_APPROVED -> it.isAiApproved
+                                TabType.AI_REJECTED -> !it.isAiApproved
+                            }
+                        }
+                    )
+                }.onFailure { error ->
+                    _state.value = currentState.copy(error = error.message)
                 }
+            } catch (e: Exception) {
+                _state.value = currentState.copy(error = e.message)
             }
-        )
-    }
-    
-    private fun getSamplePosts(): List<Post> {
-        return listOf(
-            // AI Approved Posts
-            Post(
-                id = "1",
-                title = "Getting Started with React Hooks",
-                author = "Sarah Johnson",
-                date = "November 17, 2025",
-                description = "A comprehensive guide to understanding and implementing React Hooks in your applications. Learn about useState, useEffect, and custom hooks.",
-                tags = listOf(
-                    Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
-                    Tag("React", R.color.tag_react_bg, R.color.tag_react_text)
-                ),
-                isAiApproved = true
-            ),
-            Post(
-                id = "2",
-                title = "Best Practices for TypeScript",
-                author = "Michael Chen",
-                date = "November 16, 2025",
-                description = "Explore the best practices for writing clean, maintainable TypeScript code. Cover type safety, interfaces, and advanced patterns.",
-                tags = listOf(
-                    Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
-                    Tag("TypeScript", R.color.tag_typescript_bg, R.color.tag_typescript_text)
-                ),
-                isAiApproved = true
-            ),
-            Post(
-                id = "3",
-                title = "Modern CSS Techniques",
-                author = "Emma Davis",
-                date = "November 16, 2025",
-                description = "Discover the latest CSS techniques including Grid, Flexbox, and custom properties to create responsive layouts.",
-                tags = listOf(
-                    Tag("Design", R.color.tag_design_bg, R.color.tag_design_text),
-                    Tag("CSS", R.color.tag_css_bg, R.color.tag_css_text)
-                ),
-                isAiApproved = true
-            ),
-            // AI Rejected Posts
-            Post(
-                id = "4",
-                title = "10 Ways to Get Rich Quick Online",
-                author = "Anonymous User",
-                date = "November 20, 2025",
-                description = "Make money fast with these amazing tricks! No experience needed. Click here to learn the secret methods that gurus don't want you to know!",
-                tags = listOf(
-                    Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
-                    Tag("React", R.color.tag_react_bg, R.color.tag_react_text)
-                ),
-                isAiApproved = false
-            ),
-            Post(
-                id = "5",
-                title = "Why This Framework is GARBAGE",
-                author = "Angry Developer",
-                date = "November 19, 2025",
-                description = "This framework is absolute trash and anyone who uses it is an idiot. I can't believe people actually waste their time with this garbage.",
-                tags = listOf(
-                    Tag("Programming", R.color.tag_programming_bg, R.color.tag_programming_text),
-                    Tag("TypeScript", R.color.tag_typescript_bg, R.color.tag_typescript_text)
-                ),
-                isAiApproved = false
-            ),
-            Post(
-                id = "6",
-                title = "BUY MY COURSE NOW!!! LIMITED OFFER!!!",
-                author = "Marketing Spammer",
-                date = "November 18, 2025",
-                description = "🔥🔥🔥 EXCLUSIVE OFFER!!! Learn web development in 24 hours!!! Buy now for $9999! Limited slots available! Don't miss out! 🚀💰",
-                tags = listOf(
-                    Tag("Design", R.color.tag_design_bg, R.color.tag_design_text),
-                    Tag("CSS", R.color.tag_css_bg, R.color.tag_css_text)
-                ),
-                isAiApproved = false
-            )
-        )
+        }
     }
 }
