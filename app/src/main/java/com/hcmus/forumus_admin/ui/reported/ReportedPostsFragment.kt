@@ -24,7 +24,7 @@ data class ReportedPost(
     val categories: List<String>,
     val description: String,
     val violationCount: Int,
-    val reportCount: Int
+    val reportedCount: Int
 )
 
 class ReportedPostsFragment : Fragment() {
@@ -191,13 +191,13 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun sortByReportsAscending() {
-        filteredPosts = filteredPosts.sortedBy { it.reportCount }
+        filteredPosts = filteredPosts.sortedBy { it.reportedCount }
         adapter.updatePosts(filteredPosts)
         Toast.makeText(requireContext(), getString(R.string.sorted_by_reports_asc), Toast.LENGTH_SHORT).show()
     }
     
     private fun sortByReportsDescending() {
-        filteredPosts = filteredPosts.sortedByDescending { it.reportCount }
+        filteredPosts = filteredPosts.sortedByDescending { it.reportedCount }
         adapter.updatePosts(filteredPosts)
         Toast.makeText(requireContext(), getString(R.string.sorted_by_reports_desc), Toast.LENGTH_SHORT).show()
     }
@@ -309,7 +309,7 @@ class ReportedPostsFragment : Fragment() {
                                     categories = firestorePost.topic,
                                     description = firestorePost.content.take(200),
                                     violationCount = firestorePost.violation_type.size,
-                                    reportCount = firestorePost.report_count.toInt()
+                                    reportedCount = firestorePost.report_count.toInt()
                                 )
                             }
                             
@@ -335,7 +335,7 @@ class ReportedPostsFragment : Fragment() {
                                 categories = firestorePost.topic,
                                 description = firestorePost.content.take(200),
                                 violationCount = firestorePost.violation_type.size,
-                                reportCount = firestorePost.report_count.toInt()
+                                reportedCount = firestorePost.report_count.toInt()
                             )
                         }
                         filteredPosts = allPosts

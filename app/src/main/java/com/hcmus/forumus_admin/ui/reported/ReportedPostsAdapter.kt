@@ -48,7 +48,7 @@ class ReportedPostsAdapter(
         holder.violationBadge.text = violationText
         
         // Set report count
-        val reportText = "${post.reportCount} report${if (post.reportCount != 1) "s" else ""}"
+        val reportText = "${post.reportedCount} report${if (post.reportedCount != 1) "s" else ""}"
         holder.reportBadge.text = reportText
         
         // Handle button clicks
