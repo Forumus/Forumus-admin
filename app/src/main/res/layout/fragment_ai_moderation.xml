@@ -228,6 +228,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Progress Bar (Loading Indicator) -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/postsRecyclerView"
+        app:layout_constraintBottom_toBottomOf="@id/postsRecyclerView"
+        app:layout_constraintStart_toStartOf="@id/postsRecyclerView"
+        app:layout_constraintEnd_toEndOf="@id/postsRecyclerView" />
+
     <!-- Empty State (Initially Hidden) -->
     <LinearLayout
         android:id="@+id/emptyState"

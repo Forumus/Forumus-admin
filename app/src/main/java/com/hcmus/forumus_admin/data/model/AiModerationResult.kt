@@ -4,7 +4,7 @@ package com.hcmus.forumus_admin.data.model
  * Represents the result of AI moderation analysis for a post
  */
 data class AiModerationResult(
-    val postId: String,
+    val postData: FirestorePost,
     val isApproved: Boolean,
     val overallScore: Double, // 0.0 to 1.0, where 1.0 is most toxic/inappropriate
     val violations: List<ViolationType>,

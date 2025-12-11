@@ -105,8 +105,11 @@ class AssistantFragment : Fragment() {
             updateTabSelection(state.currentTab)
             adapter.submitList(state.filteredPosts)
             
+            // Show/hide loading indicator
+//            binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+            
             // Show/hide empty state
-            if (state.filteredPosts.isEmpty()) {
+            if (state.filteredPosts.isEmpty() && !state.isLoading) {
                 binding.emptyState.visibility = View.VISIBLE
                 binding.postsRecyclerView.visibility = View.GONE
             } else {

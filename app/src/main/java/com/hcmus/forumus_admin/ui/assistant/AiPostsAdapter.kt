@@ -7,13 +7,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_admin.databinding.ItemAiPostCardBinding
-import com.hcmus.forumus_admin.data.model.Post
 import com.google.android.material.chip.Chip
+import com.hcmus.forumus_admin.data.model.AiModerationResult
+import com.hcmus.forumus_admin.data.model.FirestorePost
+import com.hcmus.forumus_admin.data.model.Post
+import com.hcmus.forumus_admin.data.model.PostStatus
+import com.hcmus.forumus_admin.data.model.Tag
+import com.hcmus.forumus_admin.data.repository.PostRepository
+import kotlin.text.ifEmpty
 
 class AiPostsAdapter(
     private val onApprove: (String) -> Unit,
     private val onReject: (String) -> Unit
-) : ListAdapter<Post, AiPostsAdapter.PostViewHolder>(PostDiffCallback()) {
+) : ListAdapter<AiModerationResult, AiPostsAdapter.PostViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemAiPostCardBinding.inflate(
@@ -34,34 +40,34 @@ class AiPostsAdapter(
         private val onReject: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(post: Post) {
+        fun bind(post: AiModerationResult) {
             binding.apply {
-                postTitle.text = post.title
-                postAuthor.text = "by ${post.author}"
-                postDate.text = post.date
-                postDescription.text = post.description
+                postTitle.text = post.postData.title
+                postAuthor.text = "by ${post.postData.authorName}"
+                postDate.text = PostRepository.formatFirebaseTimestamp(post.postData.createdAt)
+                postDescription.text = post.postData.content.take(100) + if (post.postData.content.length > 100) "..." else ""
 
                 // Clear previous tags
                 tagsContainer.removeAllViews()
 
                 // Add tags
-                post.tags.forEach { tag ->
-                    val chip = Chip(binding.root.context).apply {
-                        text = tag.name
-                        chipBackgroundColor = ContextCompat.getColorStateList(
-                            context,
-                            tag.backgroundColor
-                        )
-                        setTextColor(ContextCompat.getColor(context, tag.textColor))
-                        isClickable = false
-                        isCheckable = false
-                    }
-                    tagsContainer.addView(chip)
-                }
+//                post.postData.tags.forEach { tag ->
+//                    val chip = Chip(binding.root.context).apply {
+//                        text = tag.name
+//                        chipBackgroundColor = ContextCompat.getColorStateList(
+//                            context,
+//                            tag.backgroundColor
+//                        )
+//                        setTextColor(ContextCompat.getColor(context, tag.textColor))
+//                        isClickable = false
+//                        isCheckable = false
+//                    }
+//                    tagsContainer.addView(chip)
+//                }
 
                 // Update approve button style based on post status
                 // If post is AI rejected (not approved), show blue active style
-                if (!post.isAiApproved) {
+                if (post.postData.status == PostStatus.REJECTED) {
                     approveButton.setBackgroundResource(com.hcmus.forumus_admin.R.drawable.bg_approve_button_active)
                 } else {
                     approveButton.setBackgroundResource(com.hcmus.forumus_admin.R.drawable.bg_approve_button)
@@ -69,22 +75,22 @@ class AiPostsAdapter(
 
                 // Set click listeners
                 approveButton.setOnClickListener {
-                    onApprove(post.id)
+                    onApprove(post.postData.id)
                 }
 
                 rejectButton.setOnClickListener {
-                    onReject(post.id)
+                    onReject(post.postData.id)
                 }
             }
         }
     }
 
-    private class PostDiffCallback : DiffUtil.ItemCallback<Post>() {
-        override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
-            return oldItem.id == newItem.id
+    private class PostDiffCallback : DiffUtil.ItemCallback<AiModerationResult>() {
+        override fun areItemsTheSame(oldItem: AiModerationResult, newItem: AiModerationResult): Boolean {
+            return oldItem.postData.id == newItem.postData.id
         }
 
-        override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+        override fun areContentsTheSame(oldItem: AiModerationResult, newItem: AiModerationResult): Boolean {
             return oldItem == newItem
         }
     }
