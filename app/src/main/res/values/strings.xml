@@ -148,6 +148,7 @@
     <string name="topic_add_failed">Failed to add topic</string>
     <string name="topic_delete_failed">Failed to delete topic</string>
     <string name="loading_topics">Loading topics...</string>
+    <string name="loading">Loading…</string>
     <string name="topic_name_label">Topic: %s</string>
     
     <!-- Edit Topic Dialog -->

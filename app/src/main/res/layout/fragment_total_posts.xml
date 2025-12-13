@@ -273,15 +273,47 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Posts List -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/postsRecyclerView"
+            <!-- Posts List with Loading Indicator -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:paddingBottom="8dp"
-                tools:listitem="@layout/item_post_card" />
+                android:minHeight="200dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/postsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingBottom="8dp"
+                    tools:listitem="@layout/item_post_card" />
+
+                <!-- Loading Indicator -->
+                <LinearLayout
+                    android:id="@+id/loadingIndicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:indeterminate="true"
+                        android:indeterminateTint="@color/primary_blue" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/loading"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </FrameLayout>
 
             <!-- Pagination -->
             <LinearLayout

@@ -134,7 +134,7 @@ class DashboardFragment : Fragment() {
     }
     
     private fun refreshAllData() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 // Refresh stat cards
                 loadDashboardDataFromNetwork(forceRefresh = true)
@@ -143,7 +143,7 @@ class DashboardFragment : Fragment() {
                 loadPostsDataFromNetwork(forceRefresh = true)
                 loadTopicsDataFromNetwork(forceRefresh = true)
             } finally {
-                binding.swipeRefreshLayout.isRefreshing = false
+                _binding?.swipeRefreshLayout?.isRefreshing = false
             }
         }
     }
@@ -225,12 +225,15 @@ class DashboardFragment : Fragment() {
     }
     
     private fun loadDashboardDataFromNetwork(forceRefresh: Boolean) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 var totalUsers = 0
                 var blacklistedUsers = 0
                 var totalPosts = 0
                 var reportedPosts = 0
+                
+                // Check if fragment is still added
+                if (!isAdded || _binding == null) return@launch
                 
                 // Load users data
                 val usersResult = userRepository.getAllUsers()
@@ -241,8 +244,10 @@ class DashboardFragment : Fragment() {
                         status == "ban" || status == "warning" || status == "remind"
                     }
                     
-                    updateStatCard(binding.statCardUsers.root, formatNumber(totalUsers))
-                    updateStatCard(binding.statCardBlacklisted.root, blacklistedUsers.toString())
+                    _binding?.let { binding ->
+                        updateStatCard(binding.statCardUsers.root, formatNumber(totalUsers))
+                        updateStatCard(binding.statCardBlacklisted.root, blacklistedUsers.toString())
+                    }
                 }
                 
                 // Load posts data
@@ -251,8 +256,10 @@ class DashboardFragment : Fragment() {
                     totalPosts = allPosts.size
                     reportedPosts = allPosts.count { it.report_count > 0 }
                     
-                    updateStatCard(binding.statCardPosts.root, formatNumber(totalPosts))
-                    updateStatCard(binding.statCardReported.root, reportedPosts.toString())
+                    _binding?.let { binding ->
+                        updateStatCard(binding.statCardPosts.root, formatNumber(totalPosts))
+                        updateStatCard(binding.statCardReported.root, reportedPosts.toString())
+                    }
                 }
                 
                 // Save to cache
@@ -330,20 +337,29 @@ class DashboardFragment : Fragment() {
     }
     
     private fun loadPostsDataFromNetwork(forceRefresh: Boolean) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // Check if fragment is still added
+                if (!isAdded || _binding == null) return@launch
+                
                 val result = postRepository.getAllPosts()
                 result.onSuccess { posts ->
                     cachedPosts = posts
                     // Save to cache
                     cacheManager.savePostsData(posts)
-                    updateChartWithPeriod(currentChartPeriod)
+                    if (isAdded && _binding != null) {
+                        updateChartWithPeriod(currentChartPeriod)
+                    }
                 }.onFailure {
                     // Use empty data if Firebase fails
-                    updateChartWithPeriod(currentChartPeriod)
+                    if (isAdded && _binding != null) {
+                        updateChartWithPeriod(currentChartPeriod)
+                    }
                 }
             } catch (e: Exception) {
-                updateChartWithPeriod(currentChartPeriod)
+                if (isAdded && _binding != null) {
+                    updateChartWithPeriod(currentChartPeriod)
+                }
             }
         }
     }
@@ -741,23 +757,32 @@ class DashboardFragment : Fragment() {
     }
     
     private fun loadTopicsDataFromNetwork(forceRefresh: Boolean) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                // Check if fragment is still added
+                if (!isAdded || _binding == null) return@launch
+                
                 val topicsResult = topicRepository.getAllTopics()
                 topicsResult.onSuccess { topics ->
                     // Cache topics for use in manage dialog
                     cachedFirebaseTopics = topics
                     // Save to cache
                     cacheManager.saveTopicsData(topics)
-                    val topicsData = processTopicsData(topics)
-                    updatePieChart(topicsData)
+                    if (isAdded && _binding != null) {
+                        val topicsData = processTopicsData(topics)
+                        updatePieChart(topicsData)
+                    }
                 }.onFailure {
                     // Fallback to sample data if Firebase fails
-                    updatePieChart(getSampleTopicData())
+                    if (isAdded && _binding != null) {
+                        updatePieChart(getSampleTopicData())
+                    }
                 }
             } catch (e: Exception) {
                 // Fallback to sample data if error occurs
-                updatePieChart(getSampleTopicData())
+                if (isAdded && _binding != null) {
+                    updatePieChart(getSampleTopicData())
+                }
             }
         }
     }
@@ -1013,13 +1038,13 @@ class DashboardFragment : Fragment() {
         btnAddTopic.setOnClickListener {
             val topicName = etNewTopic.text.toString().trim()
             if (topicName.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.topic_name_empty, Toast.LENGTH_SHORT).show()
+                context?.let { Toast.makeText(it, R.string.topic_name_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
             
             // Check if topic already exists
             if (currentTopics.any { it.name.equals(topicName, ignoreCase = true) }) {
-                Toast.makeText(requireContext(), R.string.topic_already_exists, Toast.LENGTH_SHORT).show()
+                context?.let { Toast.makeText(it, R.string.topic_already_exists, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
             
@@ -1058,37 +1083,43 @@ class DashboardFragment : Fragment() {
         btnSave.setOnClickListener {
             val description = etDescription.text.toString().trim()
             if (description.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.topic_description_empty, Toast.LENGTH_SHORT).show()
+                context?.let { Toast.makeText(it, R.string.topic_description_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
             
             // Save to Firebase
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 try {
+                    if (!isAdded) return@launch
+                    
                     val result = topicRepository.addTopic(topicName, description)
                     result.onSuccess { newFirestoreTopic ->
                         // Add new topic with a color from predefined palette
                         val colorIndex = topicsList.size % topicColors.size
-                        val newTopic = ManageTopicItem(
-                            id = newFirestoreTopic.id,
-                            name = newFirestoreTopic.name,
-                            description = newFirestoreTopic.description,
-                            color = ContextCompat.getColor(requireContext(), topicColors[colorIndex])
-                        )
-                        topicsList.add(newTopic)
-                        adapter.submitList(topicsList.toList())
-                        etNewTopic.text.clear()
-                        
-                        Toast.makeText(requireContext(), R.string.topic_added, Toast.LENGTH_SHORT).show()
-                        
-                        // Refresh the pie chart
-                        refreshPieChart()
-                        descDialog.dismiss()
+                        context?.let { ctx ->
+                            val newTopic = ManageTopicItem(
+                                id = newFirestoreTopic.id,
+                                name = newFirestoreTopic.name,
+                                description = newFirestoreTopic.description,
+                                color = ContextCompat.getColor(ctx, topicColors[colorIndex])
+                            )
+                            topicsList.add(newTopic)
+                            adapter.submitList(topicsList.toList())
+                            etNewTopic.text.clear()
+                            
+                            Toast.makeText(ctx, R.string.topic_added, Toast.LENGTH_SHORT).show()
+                            
+                            // Refresh the pie chart
+                            if (isAdded && _binding != null) {
+                                refreshPieChart()
+                            }
+                            descDialog.dismiss()
+                        }
                     }.onFailure {
-                        Toast.makeText(requireContext(), R.string.topic_add_failed, Toast.LENGTH_SHORT).show()
+                        context?.let { Toast.makeText(it, R.string.topic_add_failed, Toast.LENGTH_SHORT).show() }
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(requireContext(), R.string.topic_add_failed, Toast.LENGTH_SHORT).show()
+                    context?.let { Toast.makeText(it, R.string.topic_add_failed, Toast.LENGTH_SHORT).show() }
                 }
             }
         }
@@ -1098,29 +1129,37 @@ class DashboardFragment : Fragment() {
     
     private fun loadTopicsForDialog(topicsList: MutableList<ManageTopicItem>, adapter: ManageTopicsAdapter) {
         // Load topics from Firebase
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                if (!isAdded) return@launch
+                
                 val result = topicRepository.getAllTopics()
                 result.onSuccess { topics ->
                     topicsList.clear()
-                    topics.forEachIndexed { index, topic ->
-                        val colorIndex = index % topicColors.size
-                        topicsList.add(
-                            ManageTopicItem(
-                                id = topic.id,
-                                name = topic.name,
-                                description = topic.description,
-                                color = ContextCompat.getColor(requireContext(), topicColors[colorIndex])
+                    context?.let { ctx ->
+                        topics.forEachIndexed { index, topic ->
+                            val colorIndex = index % topicColors.size
+                            topicsList.add(
+                                ManageTopicItem(
+                                    id = topic.id,
+                                    name = topic.name,
+                                    description = topic.description,
+                                    color = ContextCompat.getColor(ctx, topicColors[colorIndex])
+                                )
                             )
-                        )
+                        }
+                        adapter.submitList(topicsList.toList())
                     }
-                    adapter.submitList(topicsList.toList())
                 }.onFailure {
                     // Show error or use cached data
-                    loadCachedTopicsForDialog(topicsList, adapter)
+                    if (isAdded) {
+                        loadCachedTopicsForDialog(topicsList, adapter)
+                    }
                 }
             } catch (e: Exception) {
-                loadCachedTopicsForDialog(topicsList, adapter)
+                if (isAdded) {
+                    loadCachedTopicsForDialog(topicsList, adapter)
+                }
             }
         }
     }
@@ -1129,18 +1168,20 @@ class DashboardFragment : Fragment() {
         // Use cached Firebase topics if available
         if (cachedFirebaseTopics.isNotEmpty()) {
             topicsList.clear()
-            cachedFirebaseTopics.forEachIndexed { index, topic ->
-                val colorIndex = index % topicColors.size
-                topicsList.add(
-                    ManageTopicItem(
-                        id = topic.id,
-                        name = topic.name,
-                        description = topic.description,
-                        color = ContextCompat.getColor(requireContext(), topicColors[colorIndex])
+            context?.let { ctx ->
+                cachedFirebaseTopics.forEachIndexed { index, topic ->
+                    val colorIndex = index % topicColors.size
+                    topicsList.add(
+                        ManageTopicItem(
+                            id = topic.id,
+                            name = topic.name,
+                            description = topic.description,
+                            color = ContextCompat.getColor(ctx, topicColors[colorIndex])
+                        )
                     )
-                )
+                }
+                adapter.submitList(topicsList.toList())
             }
-            adapter.submitList(topicsList.toList())
         }
     }
     
@@ -1189,24 +1230,26 @@ class DashboardFragment : Fragment() {
             val newDescription = etTopicDescription.text.toString().trim()
             
             if (newName.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.topic_name_empty, Toast.LENGTH_SHORT).show()
+                context?.let { Toast.makeText(it, R.string.topic_name_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
             
             if (newDescription.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.topic_description_empty, Toast.LENGTH_SHORT).show()
+                context?.let { Toast.makeText(it, R.string.topic_description_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
             
             // Check if name already exists (excluding current topic)
             if (topicsList.any { it.id != topic.id && it.name.equals(newName, ignoreCase = true) }) {
-                Toast.makeText(requireContext(), R.string.topic_already_exists, Toast.LENGTH_SHORT).show()
+                context?.let { Toast.makeText(it, R.string.topic_already_exists, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
             
             // Update in Firebase
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 try {
+                    if (!isAdded) return@launch
+                    
                     val result = topicRepository.updateTopic(topic.id, newName, newDescription)
                     result.onSuccess {
                         // Update local list
@@ -1220,16 +1263,18 @@ class DashboardFragment : Fragment() {
                                 ?.submitList(topicsList.toList())
                         }
                         
-                        Toast.makeText(requireContext(), R.string.topic_updated, Toast.LENGTH_SHORT).show()
+                        context?.let { Toast.makeText(it, R.string.topic_updated, Toast.LENGTH_SHORT).show() }
                         
                         // Refresh the pie chart
-                        refreshPieChart()
+                        if (isAdded && _binding != null) {
+                            refreshPieChart()
+                        }
                         editDialog.dismiss()
                     }.onFailure {
-                        Toast.makeText(requireContext(), R.string.topic_update_failed, Toast.LENGTH_SHORT).show()
+                        context?.let { Toast.makeText(it, R.string.topic_update_failed, Toast.LENGTH_SHORT).show() }
                     }
                 } catch (e: Exception) {
-                    Toast.makeText(requireContext(), R.string.topic_update_failed, Toast.LENGTH_SHORT).show()
+                    context?.let { Toast.makeText(it, R.string.topic_update_failed, Toast.LENGTH_SHORT).show() }
                 }
             }
         }
@@ -1261,23 +1306,27 @@ class DashboardFragment : Fragment() {
             .setMessage(getString(R.string.confirm_delete_topic_message, topic.name))
             .setPositiveButton(R.string.ok) { _, _ ->
                 // Delete from Firebase
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     try {
+                        if (!isAdded) return@launch
+                        
                         val result = topicRepository.deleteTopic(topic.id)
                         result.onSuccess {
                             topicsList.remove(topic)
                             (parentDialog.findViewById<RecyclerView>(R.id.rvTopics)?.adapter as? ManageTopicsAdapter)
                                 ?.submitList(topicsList.toList())
                             
-                            Toast.makeText(requireContext(), R.string.topic_deleted, Toast.LENGTH_SHORT).show()
+                            context?.let { Toast.makeText(it, R.string.topic_deleted, Toast.LENGTH_SHORT).show() }
                             
                             // Refresh the pie chart
-                            refreshPieChart()
+                            if (isAdded && _binding != null) {
+                                refreshPieChart()
+                            }
                         }.onFailure {
-                            Toast.makeText(requireContext(), R.string.topic_delete_failed, Toast.LENGTH_SHORT).show()
+                            context?.let { Toast.makeText(it, R.string.topic_delete_failed, Toast.LENGTH_SHORT).show() }
                         }
                     } catch (e: Exception) {
-                        Toast.makeText(requireContext(), R.string.topic_delete_failed, Toast.LENGTH_SHORT).show()
+                        context?.let { Toast.makeText(it, R.string.topic_delete_failed, Toast.LENGTH_SHORT).show() }
                     }
                 }
             }

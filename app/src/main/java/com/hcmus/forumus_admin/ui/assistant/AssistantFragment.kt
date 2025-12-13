@@ -106,7 +106,7 @@ class AssistantFragment : Fragment() {
             adapter.submitList(state.filteredPosts)
             
             // Show/hide loading indicator
-//            binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+//            _binding?.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
             
             // Show/hide empty state
             if (state.filteredPosts.isEmpty() && !state.isLoading) {

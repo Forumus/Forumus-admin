@@ -243,7 +243,7 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun deletePost(post: ReportedPost) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = postRepository.deletePost(post.id)
                 
@@ -275,10 +275,13 @@ class ReportedPostsFragment : Fragment() {
         isLoading = true
         showLoading(true)
         
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val postsResult = postRepository.getAllPosts()
                 val usersResult = userRepository.getAllUsers()
+                
+                // Check if fragment is still added to activity
+                if (!isAdded || _binding == null) return@launch
                 
                 postsResult.onSuccess { firestorePosts ->
                     usersResult.onSuccess { firestoreUsers ->
@@ -289,11 +292,9 @@ class ReportedPostsFragment : Fragment() {
                         val reportedFirestorePosts = firestorePosts.filter { it.report_count > 0 }
                         
                         if (reportedFirestorePosts.isEmpty()) {
-                            Toast.makeText(
-                                requireContext(),
-                                "No reported posts found",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            context?.let {
+                                Toast.makeText(it, "No reported posts found", Toast.LENGTH_SHORT).show()
+                            }
                             allPosts = emptyList()
                         } else {
                             // Convert Firestore posts to ReportedPost model
@@ -313,15 +314,15 @@ class ReportedPostsFragment : Fragment() {
                                 )
                             }
                             
-                            Toast.makeText(
-                                requireContext(),
-                                "Loaded ${allPosts.size} reported posts",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            context?.let {
+                                Toast.makeText(it, "Loaded ${allPosts.size} reported posts", Toast.LENGTH_SHORT).show()
+                            }
                         }
                         
                         filteredPosts = allPosts
-                        adapter.updatePosts(filteredPosts)
+                        if (isAdded && _binding != null) {
+                            adapter.updatePosts(filteredPosts)
+                        }
                     }.onFailure {
                         // Continue without user names
                         val reportedFirestorePosts = firestorePosts.filter { it.report_count > 0 }
@@ -339,18 +340,20 @@ class ReportedPostsFragment : Fragment() {
                             )
                         }
                         filteredPosts = allPosts
-                        adapter.updatePosts(filteredPosts)
+                        if (isAdded && _binding != null) {
+                            adapter.updatePosts(filteredPosts)
+                        }
                     }
                 }.onFailure { exception ->
-                    Toast.makeText(
-                        requireContext(),
-                        "Error loading posts: ${exception.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    context?.let {
+                        Toast.makeText(it, "Error loading posts: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
                     
                     allPosts = emptyList()
                     filteredPosts = allPosts
-                    adapter.updatePosts(filteredPosts)
+                    if (isAdded && _binding != null) {
+                        adapter.updatePosts(filteredPosts)
+                    }
                 }
             } finally {
                 isLoading = false
@@ -360,7 +363,10 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun showLoading(show: Boolean) {
-        binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+        _binding?.let { binding ->
+            binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+            binding.loadingIndicator.visibility = if (show) View.VISIBLE else View.GONE
+        }
     }
 
     override fun onDestroyView() {

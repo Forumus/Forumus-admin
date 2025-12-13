@@ -163,10 +163,13 @@ class TotalPostsFragment : Fragment() {
         isLoading = true
         showLoading(true)
         
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val postsResult = postRepository.getAllPosts()
                 val usersResult = userRepository.getAllUsers()
+                
+                // Check if fragment is still added to activity
+                if (!isAdded || _binding == null) return@launch
                 
                 postsResult.onSuccess { firestorePosts ->
                     usersResult.onSuccess { firestoreUsers ->
@@ -174,11 +177,9 @@ class TotalPostsFragment : Fragment() {
                         val userMap = firestoreUsers.associateBy { it.uid }
                         
                         if (firestorePosts.isEmpty()) {
-                            Toast.makeText(
-                                requireContext(),
-                                "No posts found in database",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            context?.let {
+                                Toast.makeText(it, "No posts found in database", Toast.LENGTH_SHORT).show()
+                            }
                             allPosts = emptyList()
                         } else {
                             // Convert Firestore posts to Post model
@@ -203,15 +204,15 @@ class TotalPostsFragment : Fragment() {
                                 )
                             }
                             
-                            Toast.makeText(
-                                requireContext(),
-                                "Loaded ${allPosts.size} posts",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            context?.let {
+                                Toast.makeText(it, "Loaded ${allPosts.size} posts", Toast.LENGTH_SHORT).show()
+                            }
                         }
                         
                         filteredPosts = allPosts
-                        applyDateFilter()
+                        if (isAdded && _binding != null) {
+                            applyDateFilter()
+                        }
                     }.onFailure {
                         // Continue without user names
                         allPosts = firestorePosts.map { firestorePost ->
@@ -232,20 +233,22 @@ class TotalPostsFragment : Fragment() {
                             )
                         }
                         filteredPosts = allPosts
-                        applyDateFilter()
+                        if (isAdded && _binding != null) {
+                            applyDateFilter()
+                        }
                     }
                 }.onFailure { exception ->
-                    Toast.makeText(
-                        requireContext(),
-                        "Error loading posts: ${exception.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    context?.let {
+                        Toast.makeText(it, "Error loading posts: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
                     
                     allPosts = emptyList()
                     filteredPosts = allPosts
-                    calculateTotalPages()
-                    updateTotalCount()
-                    updatePage()
+                    if (isAdded && _binding != null) {
+                        calculateTotalPages()
+                        updateTotalCount()
+                        updatePage()
+                    }
                 }
             } finally {
                 isLoading = false
@@ -255,7 +258,10 @@ class TotalPostsFragment : Fragment() {
     }
     
     private fun showLoading(show: Boolean) {
-        binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+        _binding?.let { binding ->
+            binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+            binding.loadingIndicator.visibility = if (show) View.VISIBLE else View.GONE
+        }
     }
 
     private fun applySearchFilter(query: String) {
@@ -280,23 +286,25 @@ class TotalPostsFragment : Fragment() {
         val end = endDate
 
         if (start == null || end == null) {
-            Toast.makeText(requireContext(), "Please select both start and end dates", Toast.LENGTH_SHORT).show()
+            context?.let {
+                Toast.makeText(it, "Please select both start and end dates", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         if (start.after(end)) {
-            Toast.makeText(requireContext(), "Start date must be before end date", Toast.LENGTH_SHORT).show()
+            context?.let {
+                Toast.makeText(it, "Start date must be before end date", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
         // Validate 31-day maximum range
         val daysDifference = calculateDaysDifference(start, end)
         if (daysDifference > maxDaysRange) {
-            Toast.makeText(
-                requireContext(),
-                "Date range cannot exceed $maxDaysRange days. Please select a shorter period.",
-                Toast.LENGTH_LONG
-            ).show()
+            context?.let {
+                Toast.makeText(it, "Date range cannot exceed $maxDaysRange days. Please select a shorter period.", Toast.LENGTH_LONG).show()
+            }
             return
         }
 
@@ -304,9 +312,12 @@ class TotalPostsFragment : Fragment() {
         isLoading = true
         showLoading(true)
         
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = postRepository.getAllPosts()
+                
+                // Check if fragment is still added to activity
+                if (!isAdded || _binding == null) return@launch
                 
                 result.onSuccess { firestorePosts ->
                     val usersResult = userRepository.getAllUsers()
@@ -340,26 +351,24 @@ class TotalPostsFragment : Fragment() {
                     }
                     
                     filteredPosts = allPosts
-                    currentPage = 0
-                    calculateTotalPages()
-                    updateTotalCount()
-                    updatePage()
+                    if (isAdded && _binding != null) {
+                        currentPage = 0
+                        calculateTotalPages()
+                        updateTotalCount()
+                        updatePage()
+                    }
                     
-                    Toast.makeText(
-                        requireContext(),
-                        "Found ${allPosts.size} posts between ${dateFormat.format(start)} and ${dateFormat.format(end)}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    context?.let {
+                        Toast.makeText(it, "Found ${allPosts.size} posts between ${dateFormat.format(start)} and ${dateFormat.format(end)}", Toast.LENGTH_SHORT).show()
+                    }
                 }.onFailure { exception ->
-                    Toast.makeText(
-                        requireContext(),
-                        "Error filtering posts: ${exception.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    context?.let {
+                        Toast.makeText(it, "Error filtering posts: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
                 }
                 
                 // Update date range display
-                binding.dateRangeText.text = "${dateFormat.format(start)} - ${dateFormat.format(end)}"
+                _binding?.dateRangeText?.text = "${dateFormat.format(start)} - ${dateFormat.format(end)}"
             } finally {
                 isLoading = false
                 showLoading(false)

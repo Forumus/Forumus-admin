@@ -119,17 +119,18 @@ class TotalUsersFragment : Fragment() {
         isLoading = true
         showLoading(true)
         
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = userRepository.getAllUsers()
                 
+                // Check if fragment is still added to activity
+                if (!isAdded || _binding == null) return@launch
+                
                 result.onSuccess { firestoreUsers ->
                     if (firestoreUsers.isEmpty()) {
-                        Toast.makeText(
-                            requireContext(),
-                            "No users found in database",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        context?.let {
+                            Toast.makeText(it, "No users found in database", Toast.LENGTH_SHORT).show()
+                        }
                         allUsers = emptyList()
                     } else {
                         // Convert Firestore users to User model
@@ -145,27 +146,27 @@ class TotalUsersFragment : Fragment() {
                             )
                         }
                         
-                        Toast.makeText(
-                            requireContext(),
-                            "Loaded ${allUsers.size} users",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        context?.let {
+                            Toast.makeText(it, "Loaded ${allUsers.size} users", Toast.LENGTH_SHORT).show()
+                        }
                     }
                     
                     filteredUsers = allUsers
-                    calculateTotalPages()
-                    updatePage()
+                    if (isAdded && _binding != null) {
+                        calculateTotalPages()
+                        updatePage()
+                    }
                 }.onFailure { exception ->
-                    Toast.makeText(
-                        requireContext(),
-                        "Error loading users: ${exception.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    context?.let {
+                        Toast.makeText(it, "Error loading users: ${exception.message}", Toast.LENGTH_LONG).show()
+                    }
                     
                     allUsers = emptyList()
                     filteredUsers = allUsers
-                    calculateTotalPages()
-                    updatePage()
+                    if (isAdded && _binding != null) {
+                        calculateTotalPages()
+                        updatePage()
+                    }
                 }
             } finally {
                 isLoading = false
@@ -187,7 +188,10 @@ class TotalUsersFragment : Fragment() {
     }
     
     private fun showLoading(show: Boolean) {
-        binding.usersRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+        _binding?.let { binding ->
+            binding.usersRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
+            binding.loadingIndicator.visibility = if (show) View.VISIBLE else View.GONE
+        }
     }
 
     private fun applySearchFilter(query: String) {
