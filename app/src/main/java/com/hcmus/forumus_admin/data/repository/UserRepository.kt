@@ -78,8 +78,8 @@ class UserRepository {
                     val email = doc.getString("email") ?: ""
                     val status = (doc.getString("status") ?: "normal").lowercase()
                     
-                    // Only include users with status: ban, warning, or remind (case-insensitive)
-                    if (email.isNotEmpty() && status in listOf("ban", "warning", "remind")) {
+                    // Only include users with status: banned, warned, or reminded (case-insensitive)
+                    if (email.isNotEmpty() && status in listOf("banned", "warned", "reminded")) {
                         FirestoreUser(
                             email = email,
                             fullName = doc.getString("fullName") ?: email.substringBefore("@"),
@@ -128,18 +128,18 @@ class UserRepository {
     companion object {
         fun mapStatusToEnum(status: String): UserStatus {
             return when (status.lowercase()) {
-                "ban" -> UserStatus.BAN
-                "warning" -> UserStatus.WARNING
-                "remind" -> UserStatus.REMIND
+                "banned" -> UserStatus.BANNED
+                "warned" -> UserStatus.WARNED
+                "reminded" -> UserStatus.REMINDED
                 else -> UserStatus.NORMAL
             }
         }
 
         fun mapEnumToStatus(status: UserStatus): String {
             return when (status) {
-                UserStatus.BAN -> "ban"
-                UserStatus.WARNING -> "warning"
-                UserStatus.REMIND -> "remind"
+                UserStatus.BANNED -> "banned"
+                UserStatus.WARNED -> "warned"
+                UserStatus.REMINDED -> "reminded"
                 UserStatus.NORMAL -> "normal"
             }
         }

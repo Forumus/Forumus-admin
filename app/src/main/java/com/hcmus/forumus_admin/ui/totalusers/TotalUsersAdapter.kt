@@ -46,21 +46,21 @@ class TotalUsersAdapter(
 
             // Set status badge
             when (user.status) {
-                UserStatus.BAN -> {
+                UserStatus.BANNED -> {
                     userStatus.text = itemView.context.getString(R.string.ban)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_ban)
                     userStatus.setTextColor(
                         ContextCompat.getColor(itemView.context, R.color.danger_red)
                     )
                 }
-                UserStatus.WARNING -> {
+                UserStatus.WARNED -> {
                     userStatus.text = itemView.context.getString(R.string.warning)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_warning)
                     userStatus.setTextColor(
                         ContextCompat.getColor(itemView.context, R.color.warning_orange)
                     )
                 }
-                UserStatus.REMIND -> {
+                UserStatus.REMINDED -> {
                     userStatus.text = itemView.context.getString(R.string.remind)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_remind)
                     userStatus.setTextColor(

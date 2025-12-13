@@ -10,8 +10,8 @@ data class User(
 )
 
 enum class UserStatus {
-    BAN,
-    WARNING,
-    REMIND,
+    BANNED,
+    WARNED,
+    REMINDED,
     NORMAL
 }

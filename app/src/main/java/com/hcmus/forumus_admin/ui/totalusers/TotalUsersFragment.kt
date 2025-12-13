@@ -283,9 +283,9 @@ class TotalUsersFragment : Fragment() {
         
         // Initialize UI based on current selections
         updateFilterButtonState(normalButton, normalCheckmark, UserStatus.NORMAL in tempSelectedStatuses)
-        updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMIND in tempSelectedStatuses)
-        updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNING in tempSelectedStatuses)
-        updateFilterButtonState(banButton, banCheckmark, UserStatus.BAN in tempSelectedStatuses)
+        updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMINDED in tempSelectedStatuses)
+        updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNED in tempSelectedStatuses)
+        updateFilterButtonState(banButton, banCheckmark, UserStatus.BANNED in tempSelectedStatuses)
         updateRoleButtonState(teacherButton, teacherCheckmark, "Teacher" in tempSelectedRoles)
         updateRoleButtonState(studentButton, studentCheckmark, "Student" in tempSelectedRoles)
         
@@ -319,33 +319,33 @@ class TotalUsersFragment : Fragment() {
         
         // Remind button
         remindButton.setOnClickListener {
-            val isSelected = UserStatus.REMIND in tempSelectedStatuses
+            val isSelected = UserStatus.REMINDED in tempSelectedStatuses
             if (isSelected) {
-                tempSelectedStatuses.remove(UserStatus.REMIND)
+                tempSelectedStatuses.remove(UserStatus.REMINDED)
             } else {
-                tempSelectedStatuses.add(UserStatus.REMIND)
+                tempSelectedStatuses.add(UserStatus.REMINDED)
             }
             updateFilterButtonState(remindButton, remindCheckmark, !isSelected)
         }
         
         // Warning button
         warningButton.setOnClickListener {
-            val isSelected = UserStatus.WARNING in tempSelectedStatuses
+            val isSelected = UserStatus.WARNED in tempSelectedStatuses
             if (isSelected) {
-                tempSelectedStatuses.remove(UserStatus.WARNING)
+                tempSelectedStatuses.remove(UserStatus.WARNED)
             } else {
-                tempSelectedStatuses.add(UserStatus.WARNING)
+                tempSelectedStatuses.add(UserStatus.WARNED)
             }
             updateFilterButtonState(warningButton, warningCheckmark, !isSelected)
         }
         
         // Ban button
         banButton.setOnClickListener {
-            val isSelected = UserStatus.BAN in tempSelectedStatuses
+            val isSelected = UserStatus.BANNED in tempSelectedStatuses
             if (isSelected) {
-                tempSelectedStatuses.remove(UserStatus.BAN)
+                tempSelectedStatuses.remove(UserStatus.BANNED)
             } else {
-                tempSelectedStatuses.add(UserStatus.BAN)
+                tempSelectedStatuses.add(UserStatus.BANNED)
             }
             updateFilterButtonState(banButton, banCheckmark, !isSelected)
         }
@@ -478,17 +478,17 @@ class TotalUsersFragment : Fragment() {
         
         // Set status badge
         when (user.status) {
-            UserStatus.BAN -> {
+            UserStatus.BANNED -> {
                 userStatus.text = getString(R.string.ban)
                 userStatus.setBackgroundResource(R.drawable.bg_badge_ban)
                 userStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.danger_red))
             }
-            UserStatus.WARNING -> {
+            UserStatus.WARNED -> {
                 userStatus.text = getString(R.string.warning)
                 userStatus.setBackgroundResource(R.drawable.bg_badge_warning)
                 userStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.warning_orange))
             }
-            UserStatus.REMIND -> {
+            UserStatus.REMINDED -> {
                 userStatus.text = getString(R.string.remind)
                 userStatus.setBackgroundResource(R.drawable.bg_badge_remind)
                 userStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.primary_blue))

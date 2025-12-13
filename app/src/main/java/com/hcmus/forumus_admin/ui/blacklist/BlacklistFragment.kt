@@ -25,10 +25,10 @@ data class BlacklistedUser(
 )
 
 enum class ActionType {
-    REMOVE,
-    BAN,
-    WARNING,
-    REMIND
+    REMOVED,
+    BANNED,
+    WARNED,
+    REMINDED
 }
 
 class BlacklistFragment : Fragment() {
@@ -80,7 +80,7 @@ class BlacklistFragment : Fragment() {
         // Set up RecyclerView
         adapter = BlacklistAdapter(
             users = emptyList(),
-            onRemoveClick = { user -> showConfirmationDialog(user, ActionType.REMOVE) },
+            onRemoveClick = { user -> showConfirmationDialog(user, ActionType.REMOVED) },
             onStatusClick = { user -> showStatusActionMenu(user) }
         )
         
@@ -182,9 +182,9 @@ class BlacklistFragment : Fragment() {
             .setTitle(getString(R.string.change_status))
             .setItems(options) { _, which ->
                 when (which) {
-                    0 -> showConfirmationDialog(user, ActionType.BAN)
-                    1 -> showConfirmationDialog(user, ActionType.WARNING)
-                    2 -> showConfirmationDialog(user, ActionType.REMIND)
+                    0 -> showConfirmationDialog(user, ActionType.BANNED)
+                    1 -> showConfirmationDialog(user, ActionType.WARNED)
+                    2 -> showConfirmationDialog(user, ActionType.REMINDED)
                 }
             }
             .setNegativeButton(getString(R.string.cancel), null)
@@ -193,19 +193,19 @@ class BlacklistFragment : Fragment() {
     
     private fun showConfirmationDialog(user: BlacklistedUser, actionType: ActionType) {
         val (title, message) = when (actionType) {
-            ActionType.REMOVE -> Pair(
+            ActionType.REMOVED -> Pair(
                 getString(R.string.confirm_remove_title),
                 getString(R.string.confirm_remove_message, user.name)
             )
-            ActionType.BAN -> Pair(
+            ActionType.BANNED -> Pair(
                 getString(R.string.confirm_ban_title),
                 getString(R.string.confirm_ban_message, user.name)
             )
-            ActionType.WARNING -> Pair(
+            ActionType.WARNED -> Pair(
                 getString(R.string.confirm_warning_title),
                 getString(R.string.confirm_warning_message, user.name)
             )
-            ActionType.REMIND -> Pair(
+            ActionType.REMINDED -> Pair(
                 getString(R.string.confirm_remind_title),
                 getString(R.string.confirm_remind_message, user.name)
             )
@@ -224,7 +224,7 @@ class BlacklistFragment : Fragment() {
     private fun performAction(user: BlacklistedUser, actionType: ActionType) {
         viewLifecycleOwner.lifecycleScope.launch {
             when (actionType) {
-                ActionType.REMOVE -> {
+                ActionType.REMOVED -> {
                     // Remove user from blacklist (set status to normal in Firebase)
                     val result = userRepository.removeFromBlacklist(user.uid)
                     result.onSuccess {
@@ -240,17 +240,17 @@ class BlacklistFragment : Fragment() {
                         Toast.makeText(requireContext(), "Failed to remove ${user.name}: ${exception.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
-                ActionType.BAN -> {
-                    // Update user status to BAN
-                    updateUserStatusInFirebase(user, UserStatus.BAN)
+                ActionType.BANNED -> {
+                    // Update user status to BANNED
+                    updateUserStatusInFirebase(user, UserStatus.BANNED)
                 }
-                ActionType.WARNING -> {
-                    // Update user status to WARNING
-                    updateUserStatusInFirebase(user, UserStatus.WARNING)
+                ActionType.WARNED -> {
+                    // Update user status to WARNED
+                    updateUserStatusInFirebase(user, UserStatus.WARNED)
                 }
-                ActionType.REMIND -> {
-                    // Update user status to REMIND
-                    updateUserStatusInFirebase(user, UserStatus.REMIND)
+                ActionType.REMINDED -> {
+                    // Update user status to REMINDED
+                    updateUserStatusInFirebase(user, UserStatus.REMINDED)
                 }
             }
         }
@@ -266,9 +266,9 @@ class BlacklistFragment : Fragment() {
             applySearchFilter(binding.searchInput.query.toString())
             
             val message = when (newStatus) {
-                UserStatus.BAN -> "${user.name} has been banned"
-                UserStatus.WARNING -> "Warning sent to ${user.name}"
-                UserStatus.REMIND -> "Reminder sent to ${user.name}"
+                UserStatus.BANNED -> "${user.name} has been banned"
+                UserStatus.WARNED -> "Warning sent to ${user.name}"
+                UserStatus.REMINDED -> "Reminder sent to ${user.name}"
                 UserStatus.NORMAL -> "${user.name} status updated to normal"
             }
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
@@ -349,9 +349,9 @@ class BlacklistFragment : Fragment() {
         val applyButton = dialogView.findViewById<View>(R.id.applyButton)
         
         // Initialize UI based on current selections
-        updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMIND in tempSelectedStatuses)
-        updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNING in tempSelectedStatuses)
-        updateFilterButtonState(banButton, banCheckmark, UserStatus.BAN in tempSelectedStatuses)
+        updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMINDED in tempSelectedStatuses)
+        updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNED in tempSelectedStatuses)
+        updateFilterButtonState(banButton, banCheckmark, UserStatus.BANNED in tempSelectedStatuses)
         
         // Close button
         closeButton.setOnClickListener {
@@ -368,33 +368,33 @@ class BlacklistFragment : Fragment() {
         
         // Remind button
         remindButton.setOnClickListener {
-            val isSelected = UserStatus.REMIND in tempSelectedStatuses
+            val isSelected = UserStatus.REMINDED in tempSelectedStatuses
             if (isSelected) {
-                tempSelectedStatuses.remove(UserStatus.REMIND)
+                tempSelectedStatuses.remove(UserStatus.REMINDED)
             } else {
-                tempSelectedStatuses.add(UserStatus.REMIND)
+                tempSelectedStatuses.add(UserStatus.REMINDED)
             }
             updateFilterButtonState(remindButton, remindCheckmark, !isSelected)
         }
         
         // Warning button
         warningButton.setOnClickListener {
-            val isSelected = UserStatus.WARNING in tempSelectedStatuses
+            val isSelected = UserStatus.WARNED in tempSelectedStatuses
             if (isSelected) {
-                tempSelectedStatuses.remove(UserStatus.WARNING)
+                tempSelectedStatuses.remove(UserStatus.WARNED)
             } else {
-                tempSelectedStatuses.add(UserStatus.WARNING)
+                tempSelectedStatuses.add(UserStatus.WARNED)
             }
             updateFilterButtonState(warningButton, warningCheckmark, !isSelected)
         }
         
         // Ban button
         banButton.setOnClickListener {
-            val isSelected = UserStatus.BAN in tempSelectedStatuses
+            val isSelected = UserStatus.BANNED in tempSelectedStatuses
             if (isSelected) {
-                tempSelectedStatuses.remove(UserStatus.BAN)
+                tempSelectedStatuses.remove(UserStatus.BANNED)
             } else {
-                tempSelectedStatuses.add(UserStatus.BAN)
+                tempSelectedStatuses.add(UserStatus.BANNED)
             }
             updateFilterButtonState(banButton, banCheckmark, !isSelected)
         }

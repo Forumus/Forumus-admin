@@ -241,7 +241,7 @@ class DashboardFragment : Fragment() {
                     totalUsers = allUsers.size
                     blacklistedUsers = allUsers.count { user ->
                         val status = user.status.lowercase()
-                        status == "ban" || status == "warning" || status == "remind"
+                        status == "banned" || status == "warned" || status == "reminded"
                     }
                     
                     _binding?.let { binding ->
