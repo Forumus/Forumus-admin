@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_dialog_rounded">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/filter_by_violation"
+            android:textColor="#0A0A0A"
+            android:textSize="18sp"
+            android:textStyle="normal" />
+
+        <ImageButton
+            android:id="@+id/closeButton"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_close"
+            android:contentDescription="@string/close" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:background="#1A000000" />
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="20dp">
+
+        <!-- Header with Clear All -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/select_violation_types"
+                android:textColor="#4A5565"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/clearAllButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear_all"
+                android:textColor="#155DFC"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp" />
+        </LinearLayout>
+
+        <!-- Scrollable Filter Options -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxHeight="300dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Toxicity Option -->
+                <LinearLayout
+                    android:id="@+id/toxicityButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/toxicityText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/toxicity"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/toxicityCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/toxicity" />
+                </LinearLayout>
+
+                <!-- Severe Toxicity Option -->
+                <LinearLayout
+                    android:id="@+id/severeToxicityButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/severeToxicityText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/severe_toxicity"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/severeToxicityCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/severe_toxicity" />
+                </LinearLayout>
+
+                <!-- Identity Attack Option -->
+                <LinearLayout
+                    android:id="@+id/identityAttackButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/identityAttackText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/identity_attack"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/identityAttackCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/identity_attack" />
+                </LinearLayout>
+
+                <!-- Insult Option -->
+                <LinearLayout
+                    android:id="@+id/insultButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/insultText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/insult"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/insultCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/insult" />
+                </LinearLayout>
+
+                <!-- Profanity Option -->
+                <LinearLayout
+                    android:id="@+id/profanityButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/profanityText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/profanity"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/profanityCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/profanity" />
+                </LinearLayout>
+
+                <!-- Threat Option -->
+                <LinearLayout
+                    android:id="@+id/threatButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/threatText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/threat"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/threatCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/threat" />
+                </LinearLayout>
+
+                <!-- Spam Option -->
+                <LinearLayout
+                    android:id="@+id/spamButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/spamText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/spam"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/spamCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/spam" />
+                </LinearLayout>
+
+                <!-- Sexually Explicit Option -->
+                <LinearLayout
+                    android:id="@+id/sexuallyExplicitButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/sexuallyExplicitText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/sexually_explicit"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/sexuallyExplicitCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/sexually_explicit" />
+                </LinearLayout>
+
+                <!-- Misinformation Option -->
+                <LinearLayout
+                    android:id="@+id/misinformationButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_filter_option_unselected"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:id="@+id/misinformationText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/misinformation"
+                        android:textColor="#364153"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:id="@+id/misinformationCheckmark"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_checkmark"
+                        android:visibility="gone"
+                        android:contentDescription="@string/misinformation" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.8dp"
+        android:background="#1A000000" />
+
+    <!-- Footer with Apply Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <Button
+            android:id="@+id/applyButton"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="@string/apply"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_primary"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+</LinearLayout>

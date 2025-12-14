@@ -32,12 +32,19 @@ class AiModerationRepository(
                 .await()
                 .documents
                 .mapNotNull { doc ->
-                    AiModerationResult(
-                        postData = doc.toObject(FirestorePost::class.java)!!.copy(id = doc.id),
-                        isApproved = true,
-                        overallScore = 0.0,
-                        violations = emptyList()
-                    )
+                    val post = doc.toObject(FirestorePost::class.java)?.copy(id = doc.id)
+                    if (post != null) {
+                        // Parse violation types from document
+                        val violationTypeStrings = (doc.get("violation_type") as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+                        val violations = parseViolationTypes(violationTypeStrings)
+                        
+                        AiModerationResult(
+                            postData = post,
+                            isApproved = true,
+                            overallScore = 0.0,
+                            violations = violations
+                        )
+                    } else null
                 }
 
             Log.d("AiModerationRepository", "Fetched ${approvedPosts.size} approved posts")
@@ -64,17 +71,39 @@ class AiModerationRepository(
                 .await()
                 .documents
                 .mapNotNull { doc ->
-                    AiModerationResult(
-                        postData = doc.toObject(FirestorePost::class.java)!!.copy(id = doc.id),
-                        isApproved = false,
-                        overallScore = 0.0,
-                        violations = emptyList()
-                    )
+                    val post = doc.toObject(FirestorePost::class.java)?.copy(id = doc.id)
+                    if (post != null) {
+                        // Parse violation types from document
+                        val violationTypeStrings = (doc.get("violation_type") as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+                        val violations = parseViolationTypes(violationTypeStrings)
+                        
+                        AiModerationResult(
+                            postData = post,
+                            isApproved = false,
+                            overallScore = 0.0,
+                            violations = violations
+                        )
+                    } else null
                 }
 
             Result.success(rejectedPosts)
         } catch (e: Exception) {
             return Result.failure(e)
+        }
+    }
+    
+    /**
+     * Parse violation type strings from Firebase to ViolationType objects
+     */
+    private fun parseViolationTypes(violationStrings: List<String>): List<ViolationType> {
+        return violationStrings.mapNotNull { typeString ->
+            ViolationCategory.fromString(typeString)?.let { category ->
+                ViolationType(
+                    type = category,
+                    score = 0.8, // Default score since Firebase may not have this
+                    description = category.displayName
+                )
+            }
         }
     }
     
@@ -121,12 +150,18 @@ class AiModerationRepository(
                 .await()
                 .documents
                 .mapNotNull { doc ->
-                    AiModerationResult(
-                        postData = doc.toObject(FirestorePost::class.java)!!.copy(id = doc.id),
-                        isApproved = doc.getString("status") == PostStatus.APPROVED.name,
-                        overallScore = 0.0,
-                        violations = emptyList()
-                    )
+                    val post = doc.toObject(FirestorePost::class.java)?.copy(id = doc.id)
+                    if (post != null) {
+                        val violationTypeStrings = (doc.get("violation_type") as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+                        val violations = parseViolationTypes(violationTypeStrings)
+                        
+                        AiModerationResult(
+                            postData = post,
+                            isApproved = doc.getString("status") == PostStatus.APPROVED.name,
+                            overallScore = 0.0,
+                            violations = violations
+                        )
+                    } else null
                 }
 
             val filteredResults = allResults.filter { result ->

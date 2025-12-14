@@ -24,6 +24,8 @@ data class FirestorePost (
     var reportedUsers: MutableList<String> = mutableListOf(),
 
     var status: PostStatus = PostStatus.PENDING,
+    
+    var violationTypes: MutableList<String> = mutableListOf(),
 
     @get:Exclude
     @set:Exclude
