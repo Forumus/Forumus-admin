@@ -1,12 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/suggestionText"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="12dp"
-    android:textColor="@color/text_primary"
-    android:textSize="14sp"
-    android:fontFamily="sans-serif"
-    android:background="?attr/selectableItemBackground"
-    android:ellipsize="end"
-    android:maxLines="1" />
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp"
+    android:background="?attr/selectableItemBackground">
+
+    <!-- Search Icon -->
+    <ImageView
+        android:id="@+id/suggestionIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/ic_search"
+        android:contentDescription="@string/search_icon"
+        app:tint="#9CA3AF" />
+
+    <!-- Suggestion Text Container -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
+
+        <!-- Primary Text (Name with highlighted match) -->
+        <TextView
+            android:id="@+id/suggestionPrimaryText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#1F2937"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <!-- Secondary Text (ID) -->
+        <TextView
+            android:id="@+id/suggestionSecondaryText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="#9CA3AF"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- Arrow icon for selecting suggestion -->
+    <ImageView
+        android:id="@+id/suggestionArrow"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="12dp"
+        android:src="@drawable/ic_arrow_upward_left"
+        android:contentDescription="@string/filter"
+        android:visibility="gone"
+        app:tint="#9CA3AF" />
+
+</LinearLayout>

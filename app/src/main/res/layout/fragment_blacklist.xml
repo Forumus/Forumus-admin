@@ -109,7 +109,8 @@
                     android:inputType="text"
                     android:completionThreshold="1"
                     android:dropDownWidth="match_parent"
-                    android:popupBackground="@android:color/white" />
+                    android:dropDownVerticalOffset="8dp"
+                    android:popupBackground="@drawable/bg_autocomplete_dropdown" />
 
                 <ImageView
                     android:id="@+id/clearSearchButton"
