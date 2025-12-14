@@ -74,18 +74,54 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <!-- Search Bar -->
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/searchInput"
+            <!-- Search Bar with AutoComplete -->
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/bg_search_bar"
-                app:queryHint="@string/search_blacklisted_users_hint"
-                app:iconifiedByDefault="false"
-                app:queryBackground="@android:color/transparent"
-                app:searchIcon="@drawable/ic_search" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_search"
+                    android:contentDescription="@string/search_icon"
+                    app:tint="@color/text_secondary" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/searchInput"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/search_blacklisted_users_hint"
+                    android:textColorHint="@color/text_secondary"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:completionThreshold="1"
+                    android:dropDownWidth="match_parent"
+                    android:popupBackground="@android:color/white" />
+
+                <ImageView
+                    android:id="@+id/clearSearchButton"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_close"
+                    android:contentDescription="@string/close"
+                    android:visibility="gone"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="@color/text_secondary" />
+
+            </LinearLayout>
 
             <!-- Filter Button -->
             <ImageButton

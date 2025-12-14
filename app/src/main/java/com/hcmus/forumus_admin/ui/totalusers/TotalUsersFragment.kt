@@ -1,9 +1,13 @@
 package com.hcmus.forumus_admin.ui.totalusers
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -20,6 +24,8 @@ import com.hcmus.forumus_admin.data.model.User
 import com.hcmus.forumus_admin.data.model.UserStatus
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.databinding.FragmentTotalUsersBinding
+import com.hcmus.forumus_admin.ui.common.UserAutoCompleteAdapter
+import com.hcmus.forumus_admin.ui.common.UserSuggestion
 import kotlinx.coroutines.launch
 
 class TotalUsersFragment : Fragment() {
@@ -28,6 +34,7 @@ class TotalUsersFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: TotalUsersAdapter
+    private lateinit var autoCompleteAdapter: UserAutoCompleteAdapter
     private val userRepository = UserRepository()
     private var allUsers: List<User> = emptyList()
     private var filteredUsers: List<User> = emptyList()
@@ -82,21 +89,66 @@ class TotalUsersFragment : Fragment() {
     }
 
     private fun setupSearchBar() {
-        binding.searchInput.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { applySearchFilter(it) }
-                return true
+        // Initialize autocomplete adapter
+        autoCompleteAdapter = UserAutoCompleteAdapter(requireContext())
+        binding.searchInput.setAdapter(autoCompleteAdapter)
+        
+        // Handle text changes for filtering
+        binding.searchInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s?.toString() ?: ""
+                applySearchFilter(query)
+                
+                // Show/hide clear button
+                binding.clearSearchButton.visibility = if (query.isNotEmpty()) View.VISIBLE else View.GONE
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let { applySearchFilter(it) }
-                return true
-            }
+            
+            override fun afterTextChanged(s: Editable?) {}
         })
+        
+        // Handle item selection from autocomplete dropdown
+        binding.searchInput.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val suggestion = autoCompleteAdapter.getItem(position)
+            suggestion?.let {
+                // Set the selected text and filter
+                binding.searchInput.setText(it.name)
+                binding.searchInput.setSelection(it.name.length)
+                applySearchFilter(it.name)
+            }
+        }
+        
+        // Handle keyboard search action
+        binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                applySearchFilter(binding.searchInput.text.toString())
+                binding.searchInput.dismissDropDown()
+                true
+            } else false
+        }
+        
+        // Clear button click
+        binding.clearSearchButton.setOnClickListener {
+            binding.searchInput.setText("")
+            applySearchFilter("")
+            binding.clearSearchButton.visibility = View.GONE
+        }
 
         binding.filterButton.setOnClickListener {
             showFilterDialog()
         }
+    }
+    
+    private fun updateAutocompleteSuggestions() {
+        val suggestions = allUsers.map { user ->
+            UserSuggestion(
+                id = user.id,
+                name = user.name,
+                displayText = "${user.name} (${user.id})"
+            )
+        }
+        autoCompleteAdapter.updateSuggestions(suggestions)
     }
 
     private fun setupPagination() {
@@ -155,6 +207,7 @@ class TotalUsersFragment : Fragment() {
                     
                     filteredUsers = allUsers
                     if (isAdded && _binding != null) {
+                        updateAutocompleteSuggestions()
                         calculateTotalPages()
                         updatePage()
                     }
@@ -380,7 +433,7 @@ class TotalUsersFragment : Fragment() {
             selectedStatuses.addAll(tempSelectedStatuses)
             selectedRoles.clear()
             selectedRoles.addAll(tempSelectedRoles)
-            applySearchFilter(binding.searchInput.query.toString())
+            applySearchFilter(binding.searchInput.text.toString())
             
             val filterParts = mutableListOf<String>()
             if (selectedStatuses.isNotEmpty()) {
