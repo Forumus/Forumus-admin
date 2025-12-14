@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.UserStatus
 
@@ -79,8 +81,17 @@ class BlacklistAdapter(
             onStatusClick(user)
         }
         
-        // TODO: Load avatar image from URL using Glide or similar image loading library
-        // For now, using default avatar
+        // Load avatar using Glide
+        if (!user.avatarUrl.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .load(user.avatarUrl)
+                .transform(CircleCrop())
+                .placeholder(R.drawable.ic_default_avatar)
+                .error(R.drawable.ic_default_avatar)
+                .into(holder.userAvatar)
+        } else {
+            holder.userAvatar.setImageResource(R.drawable.ic_default_avatar)
+        }
     }
 
     override fun getItemCount() = users.size
@@ -90,3 +101,4 @@ class BlacklistAdapter(
         notifyDataSetChanged()
     }
 }
+

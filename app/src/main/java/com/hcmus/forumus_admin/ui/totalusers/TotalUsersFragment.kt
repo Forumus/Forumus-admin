@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.User
 import com.hcmus.forumus_admin.data.model.UserStatus
@@ -471,8 +473,15 @@ class TotalUsersFragment : Fragment() {
         userRole.text = user.role
         userCreatedAt.text = user.createdAt
         
-        // Set avatar
-        if (user.avatarUrl.isNullOrEmpty()) {
+        // Load avatar using Glide
+        if (!user.avatarUrl.isNullOrEmpty()) {
+            Glide.with(requireContext())
+                .load(user.avatarUrl)
+                .transform(CircleCrop())
+                .placeholder(R.drawable.ic_default_avatar)
+                .error(R.drawable.ic_default_avatar)
+                .into(userAvatar)
+        } else {
             userAvatar.setImageResource(R.drawable.ic_default_avatar)
         }
         

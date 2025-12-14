@@ -9,6 +9,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.User
 import com.hcmus.forumus_admin.data.model.UserStatus
@@ -76,9 +78,15 @@ class TotalUsersAdapter(
                 }
             }
 
-            // Load avatar if URL is provided
-            // TODO: Use an image loading library like Glide or Coil in the future
-            if (user.avatarUrl.isNullOrEmpty()) {
+            // Load avatar using Glide
+            if (!user.avatarUrl.isNullOrEmpty()) {
+                Glide.with(itemView.context)
+                    .load(user.avatarUrl)
+                    .transform(CircleCrop())
+                    .placeholder(R.drawable.ic_default_avatar)
+                    .error(R.drawable.ic_default_avatar)
+                    .into(userAvatar)
+            } else {
                 userAvatar.setImageResource(R.drawable.ic_default_avatar)
             }
 
@@ -99,3 +107,4 @@ class TotalUsersAdapter(
         }
     }
 }
+
