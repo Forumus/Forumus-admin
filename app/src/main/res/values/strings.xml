@@ -26,7 +26,8 @@
     <!-- Blacklist Screen & Total Users Screen -->
     <string name="back">Back</string>
     <string name="more_options">More Options</string>
-    <string name="search_violated_posts">Search violated posts...</string>
+    <string name="search_blacklisted_users_hint">Search blacklisted users...</string>
+    <string name="search_reported_posts_hint">Search reported posts...</string>
     <string name="filter">Filter</string>
     <string name="filter_by_status">Filter by Status</string>
     <string name="select_status_to_filter">Select status to filter</string>
@@ -44,7 +45,7 @@
     <string name="user_avatar">User Avatar</string>
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
-    <string name="search_users_hint">Search users by name or ID...</string>
+    <string name="search_users_hint">Search by name or id...</string>
     <string name="user_details">User Details</string>
     <string name="close">Close</string>
     <string name="user_id">User ID</string>
@@ -117,6 +118,7 @@
     <string name="filter_icon">Filter Icon</string>
     <string name="reject_icon">Reject Icon</string>
     <string name="approve_icon">Approve Icon</string>
+    <string name="search_ai_moderation_hint">Search posts by title...</string>
     <string name="sort_by_time">Sort by Time</string>
     <string name="newest_first">Newest First</string>
     <string name="oldest_first">Oldest First</string>
@@ -148,7 +150,7 @@
     <string name="select_start_date">Select start date</string>
     <string name="select_end_date">Select end date</string>
     <string name="apply_filter">Apply Filter</string>
-    <string name="search_posts_hint">Search posts by title or author...</string>
+    <string name="search_posts_hint">Search by title or content...</string>
     
     <!-- Manage Topics Dialog -->
     <string name="manage_topics">Manage Topics</string>

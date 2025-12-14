@@ -165,7 +165,7 @@
                 android:id="@+id/searchField"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:hint="@string/search_violated_posts"
+                android:hint="@string/search_ai_moderation_hint"
                 android:textColorHint="@color/search_hint"
                 android:textSize="@dimen/text_size_normal"
                 android:background="@android:color/transparent"

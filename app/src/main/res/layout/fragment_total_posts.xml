@@ -265,7 +265,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="50dp"
                         android:background="@drawable/bg_search_bar"
-                        android:queryHint="@string/search_posts_hint"
+                        app:queryHint="@string/search_posts_hint"
                         app:iconifiedByDefault="false"
                         app:queryBackground="@android:color/transparent"
                         app:searchIcon="@drawable/ic_search" />
