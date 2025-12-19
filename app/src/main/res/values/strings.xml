@@ -37,11 +37,11 @@
     <string name="id">Id</string>
     <string name="status">Status</string>
     <string name="warning">Warning</string>
-    <string name="ban">Ban</string>
-    <string name="warn">Warn</string>
-    <string name="remind">Remind</string>
+    <string name="ban">Banned</string>
+    <string name="warn">Warned</string>
+    <string name="remind">Reminded</string>
     <string name="normal">Normal</string>
-    <string name="remove">Remove</string>
+    <string name="remove">Removed</string>
     <string name="user_avatar">User Avatar</string>
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
