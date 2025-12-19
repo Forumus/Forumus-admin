@@ -9,6 +9,7 @@ import com.hcmus.forumus_admin.R
 
 class ReportedPostsAdapter(
     private var posts: List<ReportedPost>,
+    private val onItemClick: (ReportedPost) -> Unit,
     private val onDismissClick: (ReportedPost) -> Unit,
     private val onDeleteClick: (ReportedPost) -> Unit
 ) : RecyclerView.Adapter<ReportedPostsAdapter.ViewHolder>() {
@@ -48,8 +49,13 @@ class ReportedPostsAdapter(
         holder.violationBadge.text = violationText
         
         // Set report count
-        val reportText = "${post.reportedCount} report${if (post.reportedCount != 1) "s" else ""}"
+        val reportText = "${post.reportCount} report${if (post.reportCount != 1) "s" else ""}"
         holder.reportBadge.text = reportText
+        
+        // Handle item click
+        holder.itemView.setOnClickListener {
+            onItemClick(post)
+        }
         
         // Handle button clicks
         holder.dismissButton.setOnClickListener {

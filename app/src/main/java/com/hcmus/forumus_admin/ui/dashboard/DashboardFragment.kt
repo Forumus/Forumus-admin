@@ -254,7 +254,7 @@ class DashboardFragment : Fragment() {
                 val postsResult = postRepository.getAllPosts()
                 postsResult.onSuccess { allPosts ->
                     totalPosts = allPosts.size
-                    reportedPosts = allPosts.count { it.report_count > 0 }
+                    reportedPosts = allPosts.count { it.reportCount > 0 }
                     
                     _binding?.let { binding ->
                         updateStatCard(binding.statCardPosts.root, formatNumber(totalPosts))

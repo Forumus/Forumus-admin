@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -12,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.repository.PostRepository
+import com.hcmus.forumus_admin.data.repository.ReportRepository
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.databinding.FragmentReportedPostsBinding
 import kotlinx.coroutines.launch
@@ -24,7 +28,7 @@ data class ReportedPost(
     val categories: List<String>,
     val description: String,
     val violationCount: Int,
-    val reportedCount: Int
+    val reportCount: Int
 )
 
 class ReportedPostsFragment : Fragment() {
@@ -34,6 +38,7 @@ class ReportedPostsFragment : Fragment() {
     
     private lateinit var adapter: ReportedPostsAdapter
     private val postRepository = PostRepository()
+    private val reportRepository = ReportRepository()
     private val userRepository = UserRepository()
     private var allPosts: List<ReportedPost> = emptyList()
     private var filteredPosts: List<ReportedPost> = emptyList()
@@ -65,6 +70,7 @@ class ReportedPostsFragment : Fragment() {
     private fun setupPostsList() {
         adapter = ReportedPostsAdapter(
             posts = emptyList(),
+            onItemClick = { post -> showReportDetailsDialog(post) },
             onDismissClick = { post -> showDismissConfirmation(post) },
             onDeleteClick = { post -> showDeleteConfirmation(post) }
         )
@@ -191,13 +197,13 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun sortByReportsAscending() {
-        filteredPosts = filteredPosts.sortedBy { it.reportedCount }
+        filteredPosts = filteredPosts.sortedBy { it.reportCount }
         adapter.updatePosts(filteredPosts)
         Toast.makeText(requireContext(), getString(R.string.sorted_by_reports_asc), Toast.LENGTH_SHORT).show()
     }
     
     private fun sortByReportsDescending() {
-        filteredPosts = filteredPosts.sortedByDescending { it.reportedCount }
+        filteredPosts = filteredPosts.sortedByDescending { it.reportCount }
         adapter.updatePosts(filteredPosts)
         Toast.makeText(requireContext(), getString(R.string.sorted_by_reports_desc), Toast.LENGTH_SHORT).show()
     }
@@ -288,8 +294,8 @@ class ReportedPostsFragment : Fragment() {
                         // Create a map of uid to user for quick lookup
                         val userMap = firestoreUsers.associateBy { it.uid }
                         
-                        // Filter posts with report_count > 0
-                        val reportedFirestorePosts = firestorePosts.filter { it.report_count > 0 }
+                        // Filter posts with reportCount > 0
+                        val reportedFirestorePosts = firestorePosts.filter { it.reportCount > 0 }
                         
                         if (reportedFirestorePosts.isEmpty()) {
                             context?.let {
@@ -310,7 +316,7 @@ class ReportedPostsFragment : Fragment() {
                                     categories = firestorePost.topic,
                                     description = firestorePost.content.take(200),
                                     violationCount = firestorePost.violation_type.size,
-                                    reportedCount = firestorePost.report_count.toInt()
+                                    reportCount = firestorePost.reportCount.toInt()
                                 )
                             }
                             
@@ -325,7 +331,7 @@ class ReportedPostsFragment : Fragment() {
                         }
                     }.onFailure {
                         // Continue without user names
-                        val reportedFirestorePosts = firestorePosts.filter { it.report_count > 0 }
+                        val reportedFirestorePosts = firestorePosts.filter { it.reportCount > 0 }
                         
                         allPosts = reportedFirestorePosts.map { firestorePost ->
                             ReportedPost(
@@ -336,7 +342,7 @@ class ReportedPostsFragment : Fragment() {
                                 categories = firestorePost.topic,
                                 description = firestorePost.content.take(200),
                                 violationCount = firestorePost.violation_type.size,
-                                reportedCount = firestorePost.report_count.toInt()
+                                reportCount = firestorePost.reportCount.toInt()
                             )
                         }
                         filteredPosts = allPosts
@@ -366,6 +372,204 @@ class ReportedPostsFragment : Fragment() {
         _binding?.let { binding ->
             binding.postsRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
             binding.loadingIndicator.visibility = if (show) View.VISIBLE else View.GONE
+        }
+    }
+    
+    private fun showReportDetailsDialog(post: ReportedPost) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_report_details, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        // Make dialog background transparent for rounded corners
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // Get views
+        val closeButton = dialogView.findViewById<View>(R.id.closeButton)
+        val loadingIndicator = dialogView.findViewById<ProgressBar>(R.id.loadingIndicator)
+        val contentContainer = dialogView.findViewById<View>(R.id.contentContainer)
+        val errorText = dialogView.findViewById<TextView>(R.id.errorText)
+        val userReportText = dialogView.findViewById<TextView>(R.id.userReportText)
+        val violationsContainer = dialogView.findViewById<LinearLayout>(R.id.violationsContainer)
+        
+        // Close button
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Show loading state
+        loadingIndicator.visibility = View.VISIBLE
+        contentContainer.visibility = View.GONE
+        errorText.visibility = View.GONE
+        
+        // Show dialog first
+        dialog.show()
+        
+        // Load report data from Firebase
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val reportsResult = reportRepository.getReportsForPost(post.id)
+                val usersResult = userRepository.getAllUsers()
+                
+                reportsResult.onSuccess { reports ->
+                    usersResult.onSuccess { users ->
+                        // Create a map of uid to user for quick lookup
+                        val userMap = users.associateBy { it.uid }
+                        
+                        if (reports.isEmpty()) {
+                            // No reports found
+                            loadingIndicator.visibility = View.GONE
+                            contentContainer.visibility = View.GONE
+                            errorText.visibility = View.VISIBLE
+                            errorText.text = "No reports found for this post"
+                        } else {
+                            // Build report summary
+                            val reportCount = reports.size
+                            val reportText = StringBuilder("This post was reported by $reportCount user${if (reportCount != 1) "s" else ""}:\n\n")
+                            
+                            // Clear and populate violations container with user-specific reports
+                            violationsContainer.removeAllViews()
+                            
+                            reports.forEachIndexed { index, report ->
+                                val userName = userMap[report.authorId]?.fullName ?: report.authorId
+                                val violationName = report.descriptionViolation.name.ifEmpty { report.nameViolation }
+                                val violationDescription = report.descriptionViolation.description
+                                
+                                // Create a card-like view for each report
+                                val reportCard = LinearLayout(requireContext()).apply {
+                                    orientation = LinearLayout.VERTICAL
+                                    setPadding(16, 12, 16, 12)
+                                    setBackgroundResource(R.drawable.bg_sort_option_unselected)
+                                    layoutParams = LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                    ).apply {
+                                        if (index > 0) topMargin = 12
+                                    }
+                                }
+                                
+                                // User name
+                                val userText = TextView(requireContext()).apply {
+                                    text = "• $userName"
+                                    setTextColor(resources.getColor(R.color.text_primary, null))
+                                    textSize = 14f
+                                    setTypeface(null, android.graphics.Typeface.BOLD)
+                                    setPadding(0, 0, 0, 8)
+                                }
+                                reportCard.addView(userText)
+                                
+                                // Violation name
+                                if (violationName.isNotEmpty()) {
+                                    val violationNameText = TextView(requireContext()).apply {
+                                        text = "Violation: $violationName"
+                                        setTextColor(resources.getColor(R.color.danger_red, null))
+                                        textSize = 13f
+                                        setTypeface(null, android.graphics.Typeface.BOLD)
+                                        setPadding(0, 0, 0, 4)
+                                    }
+                                    reportCard.addView(violationNameText)
+                                }
+                                
+                                // Violation description
+                                if (violationDescription.isNotEmpty()) {
+                                    val violationDescText = TextView(requireContext()).apply {
+                                        text = violationDescription
+                                        setTextColor(resources.getColor(R.color.text_secondary, null))
+                                        textSize = 12f
+                                    }
+                                    reportCard.addView(violationDescText)
+                                }
+                                
+                                violationsContainer.addView(reportCard)
+                            }
+                            
+                            userReportText.text = "This post was reported by $reportCount user${if (reportCount != 1) "s" else ""}"
+                            
+                            // Show content
+                            loadingIndicator.visibility = View.GONE
+                            contentContainer.visibility = View.VISIBLE
+                            errorText.visibility = View.GONE
+                        }
+                    }.onFailure {
+                        // Continue without user names
+                        val reportCount = reports.size
+                        userReportText.text = "$reportCount user${if (reportCount != 1) "s" else ""} reported this post"
+                        
+                        // Clear and populate violations container
+                        violationsContainer.removeAllViews()
+                        
+                        reports.forEachIndexed { index, report ->
+                            val userName = report.authorId
+                            val violationName = report.descriptionViolation.name.ifEmpty { report.nameViolation }
+                            val violationDescription = report.descriptionViolation.description
+                            
+                            // Create a card-like view for each report
+                            val reportCard = LinearLayout(requireContext()).apply {
+                                orientation = LinearLayout.VERTICAL
+                                setPadding(16, 12, 16, 12)
+                                setBackgroundResource(R.drawable.bg_sort_option_unselected)
+                                layoutParams = LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                ).apply {
+                                    if (index > 0) topMargin = 12
+                                }
+                            }
+                            
+                            // User ID
+                            val userText = TextView(requireContext()).apply {
+                                text = "• User: $userName"
+                                setTextColor(resources.getColor(R.color.text_primary, null))
+                                textSize = 14f
+                                setTypeface(null, android.graphics.Typeface.BOLD)
+                                setPadding(0, 0, 0, 8)
+                            }
+                            reportCard.addView(userText)
+                            
+                            // Violation name
+                            if (violationName.isNotEmpty()) {
+                                val violationNameText = TextView(requireContext()).apply {
+                                    text = "Violation: $violationName"
+                                    setTextColor(resources.getColor(R.color.danger_red, null))
+                                    textSize = 13f
+                                    setTypeface(null, android.graphics.Typeface.BOLD)
+                                    setPadding(0, 0, 0, 4)
+                                }
+                                reportCard.addView(violationNameText)
+                            }
+                            
+                            // Violation description
+                            if (violationDescription.isNotEmpty()) {
+                                val violationDescText = TextView(requireContext()).apply {
+                                    text = violationDescription
+                                    setTextColor(resources.getColor(R.color.text_secondary, null))
+                                    textSize = 12f
+                                }
+                                reportCard.addView(violationDescText)
+                            }
+                            
+                            violationsContainer.addView(reportCard)
+                        }
+                        
+                        // Show content
+                        loadingIndicator.visibility = View.GONE
+                        contentContainer.visibility = View.VISIBLE
+                        errorText.visibility = View.GONE
+                    }
+                }.onFailure { exception ->
+                    // Show error
+                    loadingIndicator.visibility = View.GONE
+                    contentContainer.visibility = View.GONE
+                    errorText.visibility = View.VISIBLE
+                    errorText.text = "Failed to load report details: ${exception.message}"
+                }
+            } catch (e: Exception) {
+                // Show error
+                loadingIndicator.visibility = View.GONE
+                contentContainer.visibility = View.GONE
+                errorText.visibility = View.VISIBLE
+                errorText.text = "Error: ${e.message}"
+            }
         }
     }
 
