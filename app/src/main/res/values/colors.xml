@@ -26,6 +26,7 @@
     <color name="chart_blue_gray">#607D8B</color>
     <color name="text_secondary">#666666</color>
     <color name="text_primary">#212121</color>
+    <color name="text_hint">#9E9E9E</color>
     <color name="border_gray">#e0e0e0</color>
     <color name="background_gray">#F5F5F5</color>
     <color name="card_background">#FFFFFF</color>

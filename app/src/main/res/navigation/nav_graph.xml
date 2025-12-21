@@ -56,7 +56,18 @@
         android:id="@+id/totalPostsFragment"
         android:name="com.hcmus.forumus_admin.ui.totalposts.TotalPostsFragment"
         android:label="Total Posts"
-        tools:layout="@layout/fragment_total_posts" />
+        tools:layout="@layout/fragment_total_posts">
+        
+        <action
+            android:id="@+id/action_totalPostsFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/postDetailFragment"
+        android:name="com.hcmus.forumus_admin.ui.postdetail.PostDetailFragment"
+        android:label="Post Details"
+        tools:layout="@layout/fragment_post_detail" />
 
     <fragment
         android:id="@+id/totalUsersFragment"

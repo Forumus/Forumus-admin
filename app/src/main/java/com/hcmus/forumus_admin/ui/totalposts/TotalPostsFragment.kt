@@ -84,8 +84,8 @@ class TotalPostsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = TotalPostsAdapter { post ->
-            // Handle post click - navigate to post details or show info
-            Toast.makeText(requireContext(), "Clicked: ${post.title}", Toast.LENGTH_SHORT).show()
+            // Navigate to post detail fragment
+            findNavController().navigate(R.id.action_totalPostsFragment_to_postDetailFragment)
         }
 
         binding.postsRecyclerView.apply {
