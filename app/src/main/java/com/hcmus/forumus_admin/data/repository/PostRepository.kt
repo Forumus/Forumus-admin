@@ -80,6 +80,45 @@ class PostRepository {
             Result.failure(e)
         }
     }
+    
+    /**
+     * Update post to clear all report-related fields.
+     * Sets reportCount to 0 and clears reportedUsers array.
+     * This is internal - use ReportRepository.dismissReportsForPost for the complete atomic operation.
+     */
+    internal suspend fun updatePostReportStatus(postId: String, batch: com.google.firebase.firestore.WriteBatch? = null): Result<Unit> {
+        return try {
+            // Find the document with matching post_id field
+            val snapshot = postsCollection
+                .whereEqualTo("post_id", postId)
+                .get()
+                .await()
+            
+            if (snapshot.documents.isEmpty()) {
+                return Result.failure(Exception("Post not found: $postId"))
+            }
+            
+            val docRef = snapshot.documents.first().reference
+            
+            // Prepare the update data
+            val updates = hashMapOf<String, Any>(
+                "reportCount" to 0,
+                "reportedUsers" to emptyList<String>()
+            )
+            
+            if (batch != null) {
+                // If batch is provided, add to batch (for atomic operations)
+                batch.update(docRef, updates)
+                Result.success(Unit)
+            } else {
+                // Otherwise, execute immediately
+                docRef.update(updates).await()
+                Result.success(Unit)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     companion object {
         fun formatFirebaseTimestamp(timestamp: Any?): String {

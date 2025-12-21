@@ -243,9 +243,35 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun dismissPost(post: ReportedPost) {
-        allPosts = allPosts.filter { it.id != post.id }
-        applySearchFilter(binding.searchInput.query.toString())
-        Toast.makeText(requireContext(), getString(R.string.report_dismissed), Toast.LENGTH_SHORT).show()
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                // Use atomic batch operation to dismiss all reports
+                val result = reportRepository.dismissReportsForPost(post.id)
+                
+                result.onSuccess {
+                    // Remove from local list only after successful Firebase operation
+                    allPosts = allPosts.filter { it.id != post.id }
+                    applySearchFilter(binding.searchInput.query.toString())
+                    Toast.makeText(
+                        requireContext(), 
+                        getString(R.string.report_dismissed), 
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }.onFailure { exception ->
+                    Toast.makeText(
+                        requireContext(), 
+                        "Failed to dismiss reports: ${exception.message}", 
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(), 
+                    "Error dismissing reports: ${e.message}", 
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
     
     private fun deletePost(post: ReportedPost) {
@@ -302,52 +328,118 @@ class ReportedPostsFragment : Fragment() {
                                 Toast.makeText(it, "No reported posts found", Toast.LENGTH_SHORT).show()
                             }
                             allPosts = emptyList()
+                            filteredPosts = allPosts
+                            if (isAdded && _binding != null) {
+                                adapter.updatePosts(filteredPosts)
+                            }
                         } else {
-                            // Convert Firestore posts to ReportedPost model
-                            allPosts = reportedFirestorePosts.map { firestorePost ->
-                                val author = userMap[firestorePost.authorId]?.fullName 
-                                    ?: firestorePost.authorId
-                                
-                                ReportedPost(
-                                    id = firestorePost.post_id,
-                                    title = firestorePost.title.ifEmpty { "Untitled Post" },
-                                    author = author,
-                                    date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
-                                    categories = firestorePost.topic,
-                                    description = firestorePost.content.take(200),
-                                    violationCount = firestorePost.violation_type.size,
-                                    reportCount = firestorePost.reportCount.toInt()
-                                )
-                            }
+                            // Get violation counts for all reported posts in one batch query
+                            val postIds = reportedFirestorePosts.map { it.post_id }
+                            val violationCountsResult = reportRepository.getViolationCountsForPosts(postIds)
                             
-                            context?.let {
-                                Toast.makeText(it, "Loaded ${allPosts.size} reported posts", Toast.LENGTH_SHORT).show()
+                            violationCountsResult.onSuccess { violationCounts ->
+                                // Convert Firestore posts to ReportedPost model with accurate violation counts
+                                allPosts = reportedFirestorePosts.map { firestorePost ->
+                                    val author = userMap[firestorePost.authorId]?.fullName 
+                                        ?: firestorePost.authorId
+                                    
+                                    ReportedPost(
+                                        id = firestorePost.post_id,
+                                        title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                        author = author,
+                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                        categories = firestorePost.topic,
+                                        description = firestorePost.content.take(200),
+                                        violationCount = violationCounts[firestorePost.post_id] ?: 0,
+                                        reportCount = firestorePost.reportCount.toInt()
+                                    )
+                                }
+                                
+                                context?.let {
+                                    Toast.makeText(it, "Loaded ${allPosts.size} reported posts", Toast.LENGTH_SHORT).show()
+                                }
+                                
+                                filteredPosts = allPosts
+                                if (isAdded && _binding != null) {
+                                    adapter.updatePosts(filteredPosts)
+                                }
+                            }.onFailure {
+                                // Fallback to 0 violation count if query fails
+                                allPosts = reportedFirestorePosts.map { firestorePost ->
+                                    val author = userMap[firestorePost.authorId]?.fullName 
+                                        ?: firestorePost.authorId
+                                    
+                                    ReportedPost(
+                                        id = firestorePost.post_id,
+                                        title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                        author = author,
+                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                        categories = firestorePost.topic,
+                                        description = firestorePost.content.take(200),
+                                        violationCount = 0,
+                                        reportCount = firestorePost.reportCount.toInt()
+                                    )
+                                }
+                                
+                                filteredPosts = allPosts
+                                if (isAdded && _binding != null) {
+                                    adapter.updatePosts(filteredPosts)
+                                }
                             }
-                        }
-                        
-                        filteredPosts = allPosts
-                        if (isAdded && _binding != null) {
-                            adapter.updatePosts(filteredPosts)
                         }
                     }.onFailure {
                         // Continue without user names
                         val reportedFirestorePosts = firestorePosts.filter { it.reportCount > 0 }
                         
-                        allPosts = reportedFirestorePosts.map { firestorePost ->
-                            ReportedPost(
-                                id = firestorePost.post_id,
-                                title = firestorePost.title.ifEmpty { "Untitled Post" },
-                                author = firestorePost.authorId,
-                                date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
-                                categories = firestorePost.topic,
-                                description = firestorePost.content.take(200),
-                                violationCount = firestorePost.violation_type.size,
-                                reportCount = firestorePost.reportCount.toInt()
-                            )
-                        }
-                        filteredPosts = allPosts
-                        if (isAdded && _binding != null) {
-                            adapter.updatePosts(filteredPosts)
+                        if (reportedFirestorePosts.isEmpty()) {
+                            allPosts = emptyList()
+                            filteredPosts = allPosts
+                            if (isAdded && _binding != null) {
+                                adapter.updatePosts(filteredPosts)
+                            }
+                        } else {
+                            // Get violation counts
+                            val postIds = reportedFirestorePosts.map { it.post_id }
+                            val violationCountsResult = reportRepository.getViolationCountsForPosts(postIds)
+                            
+                            violationCountsResult.onSuccess { violationCounts ->
+                                allPosts = reportedFirestorePosts.map { firestorePost ->
+                                    ReportedPost(
+                                        id = firestorePost.post_id,
+                                        title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                        author = firestorePost.authorId,
+                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                        categories = firestorePost.topic,
+                                        description = firestorePost.content.take(200),
+                                        violationCount = violationCounts[firestorePost.post_id] ?: 0,
+                                        reportCount = firestorePost.reportCount.toInt()
+                                    )
+                                }
+                                
+                                filteredPosts = allPosts
+                                if (isAdded && _binding != null) {
+                                    adapter.updatePosts(filteredPosts)
+                                }
+                            }.onFailure {
+                                // Fallback to 0 violation count
+                                allPosts = reportedFirestorePosts.map { firestorePost ->
+                                    ReportedPost(
+                                        id = firestorePost.post_id,
+                                        title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                        author = firestorePost.authorId,
+                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                        categories = firestorePost.topic,
+                                        description = firestorePost.content.take(200),
+                                        violationCount = 0,
+                                        reportCount = firestorePost.reportCount.toInt()
+                                    )
+                                }
+                                
+                                filteredPosts = allPosts
+                                if (isAdded && _binding != null) {
+                                    adapter.updatePosts(filteredPosts)
+                                }
+                            }
                         }
                     }
                 }.onFailure { exception ->
