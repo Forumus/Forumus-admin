@@ -13,11 +13,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hcmus.forumus_admin.MainActivity
 import com.hcmus.forumus_admin.R
-import com.hcmus.forumus_admin.data.model.ViolationCategory
+import com.hcmus.forumus_admin.data.model.Violation
+import com.hcmus.forumus_admin.data.repository.ViolationRepository
 import com.hcmus.forumus_admin.databinding.FragmentAiModerationBinding
+import kotlinx.coroutines.launch
 
 class AssistantFragment : Fragment() {
 
@@ -26,10 +29,12 @@ class AssistantFragment : Fragment() {
     
     private val viewModel: AiModerationViewModel by viewModels()
     private lateinit var adapter: AiPostsAdapter
+    private val violationRepository = ViolationRepository()
     
     // Current filter state for dialogs
     private var currentSortOrder = SortOrder.NEWEST_FIRST
-    private val selectedViolationTypes = mutableSetOf<ViolationCategory>()
+    private val selectedViolationIds = mutableSetOf<String>()  // Changed to store violation IDs
+    private var availableViolations: List<Violation> = emptyList()  // Store all available violations
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +53,26 @@ class AssistantFragment : Fragment() {
         setupSearchField()
         setupToolbar()
         observeViewModel()
+        loadViolationTypes()
+    }
+    
+    private fun loadViolationTypes() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = violationRepository.getAllViolations()
+                result.onSuccess { violations ->
+                    availableViolations = violations
+                }.onFailure { exception ->
+                    context?.let {
+                        Toast.makeText(it, "Failed to load violation types: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                context?.let {
+                    Toast.makeText(it, "Error loading violations: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
     
     private fun setupRecyclerView() {
@@ -171,6 +196,11 @@ class AssistantFragment : Fragment() {
     }
     
     private fun showFilterDialog() {
+        if (availableViolations.isEmpty()) {
+            Toast.makeText(requireContext(), "Loading violation types...", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_filter_violation, null)
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -180,95 +210,166 @@ class AssistantFragment : Fragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         
         // Temp selection (copy of current selection)
-        val tempSelectedTypes = selectedViolationTypes.toMutableSet()
+        val tempSelectedIds = selectedViolationIds.toMutableSet()
         
         // Get views
         val closeButton = dialogView.findViewById<View>(R.id.closeButton)
         val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
         val applyButton = dialogView.findViewById<View>(R.id.applyButton)
+        val optionsContainer = dialogView.findViewById<android.widget.LinearLayout>(R.id.violationOptionsContainer)
         
-        // Define violation type buttons
-        val violationButtons = mapOf(
-            ViolationCategory.TOXICITY to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.toxicityButton),
-                dialogView.findViewById<ImageView>(R.id.toxicityCheckmark)
-            ),
-            ViolationCategory.SEVERE_TOXICITY to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.severeToxicityButton),
-                dialogView.findViewById<ImageView>(R.id.severeToxicityCheckmark)
-            ),
-            ViolationCategory.IDENTITY_ATTACK to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.identityAttackButton),
-                dialogView.findViewById<ImageView>(R.id.identityAttackCheckmark)
-            ),
-            ViolationCategory.INSULT to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.insultButton),
-                dialogView.findViewById<ImageView>(R.id.insultCheckmark)
-            ),
-            ViolationCategory.PROFANITY to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.profanityButton),
-                dialogView.findViewById<ImageView>(R.id.profanityCheckmark)
-            ),
-            ViolationCategory.THREAT to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.threatButton),
-                dialogView.findViewById<ImageView>(R.id.threatCheckmark)
-            ),
-            ViolationCategory.SPAM to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.spamButton),
-                dialogView.findViewById<ImageView>(R.id.spamCheckmark)
-            ),
-            ViolationCategory.SEXUALLY_EXPLICIT to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.sexuallyExplicitButton),
-                dialogView.findViewById<ImageView>(R.id.sexuallyExplicitCheckmark)
-            ),
-            ViolationCategory.MISINFORMATION to Pair(
-                dialogView.findViewById<LinearLayout>(R.id.misinformationButton),
-                dialogView.findViewById<ImageView>(R.id.misinformationCheckmark)
-            )
-        )
-        
-        // Initialize UI based on current selections
-        violationButtons.forEach { (category, views) ->
-            updateFilterButtonState(views.first, views.second, category in tempSelectedTypes)
+        if (optionsContainer != null) {
+            // Clear existing static options
+            optionsContainer.removeAllViews()
+            
+            // Create dynamic violation buttons from Firebase data
+            val violationButtons = mutableMapOf<String, Pair<LinearLayout, ImageView>>()
+            
+            availableViolations.forEach { violation ->
+                val buttonLayout = LayoutInflater.from(requireContext()).inflate(
+                    R.layout.item_violation_filter_option, 
+                    optionsContainer, 
+                    false
+                ) as? LinearLayout
+                
+                if (buttonLayout != null) {
+                    val textView = buttonLayout.findViewById<android.widget.TextView>(R.id.violationText)
+                    val checkmark = buttonLayout.findViewById<ImageView>(R.id.violationCheckmark)
+                    
+                    textView?.text = violation.name
+                    
+                    // Initialize selection state
+                    updateFilterButtonState(buttonLayout, checkmark, violation.violation in tempSelectedIds)
+                    
+                    // Add click listener
+                    buttonLayout.setOnClickListener {
+                        val isSelected = violation.violation in tempSelectedIds
+                        if (isSelected) {
+                            tempSelectedIds.remove(violation.violation)
+                        } else {
+                            tempSelectedIds.add(violation.violation)
+                        }
+                        updateFilterButtonState(buttonLayout, checkmark, !isSelected)
+                    }
+                    
+                    optionsContainer.addView(buttonLayout)
+                    violationButtons[violation.violation] = Pair(buttonLayout, checkmark)
+                }
+            }
+            
+            closeButton.setOnClickListener { dialog.dismiss() }
+            
+            clearAllButton.setOnClickListener {
+                tempSelectedIds.clear()
+                violationButtons.forEach { (_, views) ->
+                    updateFilterButtonState(views.first, views.second, false)
+                }
+            }
+            
+            applyButton.setOnClickListener {
+                selectedViolationIds.clear()
+                selectedViolationIds.addAll(tempSelectedIds)
+                viewModel.setViolationFilter(selectedViolationIds)
+                
+                val message = if (tempSelectedIds.isEmpty()) {
+                    getString(R.string.filter_cleared)
+                } else {
+                    val selectedNames = availableViolations
+                        .filter { it.violation in tempSelectedIds }
+                        .joinToString(", ") { it.name }
+                    "Filtered by: $selectedNames"
+                }
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }
+        } else {
+            // Fallback: Use existing static buttons if container not found
+            setupStaticFilterButtons(dialogView, tempSelectedIds, dialog)
         }
         
-        // Set click listeners for each violation type
-        violationButtons.forEach { (category, views) ->
-            views.first.setOnClickListener {
-                val isSelected = category in tempSelectedTypes
-                if (isSelected) {
-                    tempSelectedTypes.remove(category)
-                } else {
-                    tempSelectedTypes.add(category)
+        dialog.show()
+    }
+    
+    private fun setupStaticFilterButtons(
+        dialogView: View,
+        tempSelectedIds: MutableSet<String>,
+        dialog: AlertDialog
+    ) {
+        // Fallback implementation using static buttons
+        val closeButton = dialogView.findViewById<View>(R.id.closeButton)
+        val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
+        val applyButton = dialogView.findViewById<View>(R.id.applyButton)
+        
+        // Map static button IDs to violation IDs (based on common violation codes)
+        val buttonMapping = mapOf(
+            R.id.toxicityButton to "vio_001",
+            R.id.severeToxicityButton to "vio_002",
+            R.id.identityAttackButton to "vio_003",
+            R.id.insultButton to "vio_004",
+            R.id.profanityButton to "vio_005",
+            R.id.threatButton to "vio_006",
+            R.id.spamButton to "vio_007",
+            R.id.sexuallyExplicitButton to "vio_008",
+            R.id.misinformationButton to "vio_009"
+        )
+        
+        val violationButtons = mutableMapOf<String, Pair<LinearLayout, ImageView>>()
+        buttonMapping.forEach { (buttonId, violationId) ->
+            val button = dialogView.findViewById<LinearLayout>(buttonId)
+            val checkmarkId = when(buttonId) {
+                R.id.toxicityButton -> R.id.toxicityCheckmark
+                R.id.severeToxicityButton -> R.id.severeToxicityCheckmark
+                R.id.identityAttackButton -> R.id.identityAttackCheckmark
+                R.id.insultButton -> R.id.insultCheckmark
+                R.id.profanityButton -> R.id.profanityCheckmark
+                R.id.threatButton -> R.id.threatCheckmark
+                R.id.spamButton -> R.id.spamCheckmark
+                R.id.sexuallyExplicitButton -> R.id.sexuallyExplicitCheckmark
+                R.id.misinformationButton -> R.id.misinformationCheckmark
+                else -> 0
+            }
+            val checkmark = dialogView.findViewById<ImageView>(checkmarkId)
+            
+            if (button != null && checkmark != null) {
+                updateFilterButtonState(button, checkmark, violationId in tempSelectedIds)
+                button.setOnClickListener {
+                    val isSelected = violationId in tempSelectedIds
+                    if (isSelected) {
+                        tempSelectedIds.remove(violationId)
+                    } else {
+                        tempSelectedIds.add(violationId)
+                    }
+                    updateFilterButtonState(button, checkmark, !isSelected)
                 }
-                updateFilterButtonState(views.first, views.second, !isSelected)
+                violationButtons[violationId] = Pair(button, checkmark)
             }
         }
         
         closeButton.setOnClickListener { dialog.dismiss() }
         
         clearAllButton.setOnClickListener {
-            tempSelectedTypes.clear()
+            tempSelectedIds.clear()
             violationButtons.forEach { (_, views) ->
                 updateFilterButtonState(views.first, views.second, false)
             }
         }
         
         applyButton.setOnClickListener {
-            selectedViolationTypes.clear()
-            selectedViolationTypes.addAll(tempSelectedTypes)
-            viewModel.setViolationFilter(selectedViolationTypes)
+            selectedViolationIds.clear()
+            selectedViolationIds.addAll(tempSelectedIds)
+            viewModel.setViolationFilter(selectedViolationIds)
             
-            val message = if (tempSelectedTypes.isEmpty()) {
+            val message = if (tempSelectedIds.isEmpty()) {
                 getString(R.string.filter_cleared)
             } else {
-                getString(R.string.filter_applied, tempSelectedTypes.joinToString(", ") { it.displayName })
+                val selectedNames = availableViolations
+                    .filter { it.violation in tempSelectedIds }
+                    .joinToString(", ") { it.name }
+                "Filtered by: $selectedNames"
             }
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
-        
-        dialog.show()
     }
     
     private fun updateFilterButtonState(button: View, checkmark: ImageView, isSelected: Boolean) {
@@ -288,8 +389,8 @@ class AssistantFragment : Fragment() {
             
             // Update sort/filter state from ViewModel
             currentSortOrder = state.sortOrder
-            selectedViolationTypes.clear()
-            selectedViolationTypes.addAll(state.selectedViolationTypes)
+            selectedViolationIds.clear()
+            selectedViolationIds.addAll(state.selectedViolationIds)
             
             // Show/hide loading indicator
             binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE

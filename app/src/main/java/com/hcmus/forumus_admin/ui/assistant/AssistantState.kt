@@ -2,7 +2,6 @@ package com.hcmus.forumus_admin.ui.assistant
 
 import com.hcmus.forumus_admin.data.model.AiModerationResult
 import com.hcmus.forumus_admin.data.model.Post
-import com.hcmus.forumus_admin.data.model.ViolationCategory
 
 data class AiModerationState(
     val filteredPosts: List<AiModerationResult> = emptyList(),
@@ -12,7 +11,7 @@ data class AiModerationState(
     val currentTab: TabType = TabType.AI_APPROVED,
     val searchQuery: String = "",
     val sortOrder: SortOrder = SortOrder.NEWEST_FIRST,
-    val selectedViolationTypes: Set<ViolationCategory> = emptySet()
+    val selectedViolationIds: Set<String> = emptySet()  // Changed from ViolationCategory to String
 )
 
 enum class TabType {

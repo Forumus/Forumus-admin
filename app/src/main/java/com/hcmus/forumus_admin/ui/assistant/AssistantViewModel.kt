@@ -9,7 +9,6 @@ import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.AiModerationResult
 import com.hcmus.forumus_admin.data.model.Post
 import com.hcmus.forumus_admin.data.model.Tag
-import com.hcmus.forumus_admin.data.model.ViolationCategory
 import com.hcmus.forumus_admin.data.repository.AiModerationRepository
 import kotlinx.coroutines.launch
 
@@ -38,7 +37,7 @@ class AiModerationViewModel : ViewModel() {
             
             _state.value = currentState.copy(
                 allPosts = posts,
-                filteredPosts = applyFiltersAndSort(posts, currentState.searchQuery, currentState.sortOrder, currentState.selectedViolationTypes),
+                filteredPosts = applyFiltersAndSort(posts, currentState.searchQuery, currentState.sortOrder, currentState.selectedViolationIds),
                 isLoading = false
             )
         }
@@ -59,7 +58,7 @@ class AiModerationViewModel : ViewModel() {
             _state.value = currentState.copy(
                 currentTab = tab,
                 allPosts = posts,
-                filteredPosts = applyFiltersAndSort(posts, currentState.searchQuery, currentState.sortOrder, currentState.selectedViolationTypes),
+                filteredPosts = applyFiltersAndSort(posts, currentState.searchQuery, currentState.sortOrder, currentState.selectedViolationIds),
                 isLoading = false
             )
         }
@@ -70,7 +69,7 @@ class AiModerationViewModel : ViewModel() {
         
         _state.value = currentState.copy(
             searchQuery = query,
-            filteredPosts = applyFiltersAndSort(currentState.allPosts, query, currentState.sortOrder, currentState.selectedViolationTypes)
+            filteredPosts = applyFiltersAndSort(currentState.allPosts, query, currentState.sortOrder, currentState.selectedViolationIds)
         )
     }
     
@@ -79,16 +78,16 @@ class AiModerationViewModel : ViewModel() {
         
         _state.value = currentState.copy(
             sortOrder = order,
-            filteredPosts = applyFiltersAndSort(currentState.allPosts, currentState.searchQuery, order, currentState.selectedViolationTypes)
+            filteredPosts = applyFiltersAndSort(currentState.allPosts, currentState.searchQuery, order, currentState.selectedViolationIds)
         )
     }
     
-    fun setViolationFilter(violationTypes: Set<ViolationCategory>) {
+    fun setViolationFilter(violationIds: Set<String>) {
         val currentState = _state.value ?: return
         
         _state.value = currentState.copy(
-            selectedViolationTypes = violationTypes,
-            filteredPosts = applyFiltersAndSort(currentState.allPosts, currentState.searchQuery, currentState.sortOrder, violationTypes)
+            selectedViolationIds = violationIds,
+            filteredPosts = applyFiltersAndSort(currentState.allPosts, currentState.searchQuery, currentState.sortOrder, violationIds)
         )
     }
     
@@ -96,7 +95,7 @@ class AiModerationViewModel : ViewModel() {
         posts: List<AiModerationResult>,
         searchQuery: String,
         sortOrder: SortOrder,
-        violationTypes: Set<ViolationCategory>
+        violationIds: Set<String>
     ): List<AiModerationResult> {
         var result = posts
         
@@ -108,17 +107,29 @@ class AiModerationViewModel : ViewModel() {
             }
         }
         
-        // Apply violation type filter
-        if (violationTypes.isNotEmpty()) {
+        // Apply violation type filter - check if post's violationTypes array contains any of the selected IDs
+        if (violationIds.isNotEmpty()) {
             result = result.filter { post ->
-                post.violations.any { violation -> violation.type in violationTypes }
+                post.postData.violationTypes.any { violationType -> violationType in violationIds }
             }
         }
         
         // Apply sort
         result = when (sortOrder) {
-            SortOrder.NEWEST_FIRST -> result.sortedByDescending { it.postData.createdAt?.seconds ?: 0L }
-            SortOrder.OLDEST_FIRST -> result.sortedBy { it.postData.createdAt?.seconds ?: 0L }
+            SortOrder.NEWEST_FIRST -> result.sortedByDescending { 
+                when (val timestamp = it.postData.createdAt) {
+                    is com.google.firebase.Timestamp -> timestamp.seconds
+                    is Long -> timestamp / 1000
+                    else -> 0L
+                }
+            }
+            SortOrder.OLDEST_FIRST -> result.sortedBy { 
+                when (val timestamp = it.postData.createdAt) {
+                    is com.google.firebase.Timestamp -> timestamp.seconds
+                    is Long -> timestamp / 1000
+                    else -> 0L
+                }
+            }
         }
         
         return result

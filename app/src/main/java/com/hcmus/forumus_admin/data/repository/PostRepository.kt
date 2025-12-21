@@ -136,6 +136,62 @@ class PostRepository {
     }
     
     /**
+     * Get posts filtered by violation types with pagination
+     * @param violationTypes List of violation type IDs to filter by (e.g., ["vio_001", "vio_007"])
+     * @param limit Number of posts to load
+     * @param startAfterDoc Last document from previous page (null for first page)
+     * @return Pair of posts list and last document for next page
+     */
+    suspend fun getPostsByViolationTypes(
+        violationTypes: List<String>,
+        limit: Long = 20,
+        startAfterDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+    ): Result<Pair<List<FirestorePost>, com.google.firebase.firestore.DocumentSnapshot?>> {
+        if (violationTypes.isEmpty()) {
+            return getPaginatedPosts(limit, startAfterDoc)
+        }
+        
+        return try {
+            // Firestore doesn't support array-contains-any with pagination directly
+            // So we fetch all matching posts and handle pagination in memory
+            var query = postsCollection
+                .whereArrayContainsAny("violation_type", violationTypes)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            
+            val snapshot = query.get().await()
+            val allMatchingPosts = snapshot.documents.mapNotNull { doc ->
+                try {
+                    FirestorePost(
+                        authorId = doc.getString("authorId") ?: "",
+                        authorName = doc.getString("authorName") ?: "",
+                        comment_count = doc.getLong("comment_count") ?: 0,
+                        content = doc.getString("content") ?: "",
+                        createdAt = doc.get("createdAt"),
+                        downvote_count = doc.getLong("downvote_count") ?: 0,
+                        image_link = (doc.get("image_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                        post_id = doc.getString("post_id") ?: doc.id,
+                        reportCount = doc.getLong("reportCount") ?: doc.getLong("reportedCount") ?: doc.getLong("report_count") ?: 0,
+                        status = doc.getString("status") ?: "pending",
+                        title = doc.getString("title") ?: "",
+                        topic = (doc.get("topic") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                        uid = doc.getString("uid") ?: doc.id,
+                        upvote_count = doc.getLong("upvote_count") ?: 0,
+                        video_link = (doc.get("video_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                        violation_type = (doc.get("violation_type") as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            
+            // Return all matching posts (pagination will be handled by the fragment)
+            Result.success(Pair(allMatchingPosts, null))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    /**
      * Clear cached posts - call this when data changes
      */
     fun clearCache() {
