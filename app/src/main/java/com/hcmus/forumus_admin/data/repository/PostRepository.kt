@@ -7,6 +7,7 @@ import java.util.*
 
 data class FirestorePost(
     val authorId: String = "",
+    val authorName: String = "",
     val comment_count: Long = 0,
     val content: String = "",
     val createdAt: Any? = null,
@@ -26,14 +27,26 @@ data class FirestorePost(
 class PostRepository {
     private val db = FirebaseFirestore.getInstance()
     private val postsCollection = db.collection("posts")
+    
+    // Cache for posts
+    private var cachedPosts: List<FirestorePost>? = null
+    private var cacheTimestamp: Long = 0
+    private val cacheExpirationMs = 5 * 60 * 1000L // 5 minutes
 
     suspend fun getAllPosts(): Result<List<FirestorePost>> {
+        // Check cache first
+        val currentTime = System.currentTimeMillis()
+        if (cachedPosts != null && (currentTime - cacheTimestamp) < cacheExpirationMs) {
+            return Result.success(cachedPosts!!)
+        }
+        
         return try {
             val snapshot = postsCollection.get().await()
             val posts = snapshot.documents.mapNotNull { doc ->
                 try {
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
+                        authorName = doc.getString("authorName") ?: "",
                         comment_count = doc.getLong("comment_count") ?: 0,
                         content = doc.getString("content") ?: "",
                         createdAt = doc.get("createdAt"),
@@ -53,10 +66,81 @@ class PostRepository {
                     null
                 }
             }
+            
+            // Update cache
+            cachedPosts = posts
+            cacheTimestamp = currentTime
+            
             Result.success(posts)
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+    
+    /**
+     * Get paginated posts with efficient loading
+     * @param limit Number of posts to load
+     * @param startAfterDoc Last document from previous page (null for first page)
+     * @return Pair of posts list and last document for next page
+     */
+    suspend fun getPaginatedPosts(
+        limit: Long = 20,
+        startAfterDoc: com.google.firebase.firestore.DocumentSnapshot? = null
+    ): Result<Pair<List<FirestorePost>, com.google.firebase.firestore.DocumentSnapshot?>> {
+        return try {
+            var query = postsCollection
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(limit)
+            
+            // If there's a starting point, start after that document
+            if (startAfterDoc != null) {
+                query = query.startAfter(startAfterDoc)
+            }
+            
+            val snapshot = query.get().await()
+            val posts = snapshot.documents.mapNotNull { doc ->
+                try {
+                    FirestorePost(
+                        authorId = doc.getString("authorId") ?: "",
+                        authorName = doc.getString("authorName") ?: "",
+                        comment_count = doc.getLong("comment_count") ?: 0,
+                        content = doc.getString("content") ?: "",
+                        createdAt = doc.get("createdAt"),
+                        downvote_count = doc.getLong("downvote_count") ?: 0,
+                        image_link = (doc.get("image_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                        post_id = doc.getString("post_id") ?: doc.id,
+                        reportCount = doc.getLong("reportCount") ?: doc.getLong("reportedCount") ?: doc.getLong("report_count") ?: 0,
+                        status = doc.getString("status") ?: "pending",
+                        title = doc.getString("title") ?: "",
+                        topic = (doc.get("topic") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                        uid = doc.getString("uid") ?: doc.id,
+                        upvote_count = doc.getLong("upvote_count") ?: 0,
+                        video_link = (doc.get("video_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
+                        violation_type = (doc.get("violation_type") as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            
+            val lastDoc = if (snapshot.documents.isNotEmpty()) {
+                snapshot.documents.last()
+            } else {
+                null
+            }
+            
+            Result.success(Pair(posts, lastDoc))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Clear cached posts - call this when data changes
+     */
+    fun clearCache() {
+        cachedPosts = null
+        cacheTimestamp = 0
     }
 
     suspend fun deletePost(postId: String): Result<Unit> {
@@ -70,10 +154,12 @@ class PostRepository {
             if (snapshot.documents.isNotEmpty()) {
                 // Delete the first matching document
                 snapshot.documents.first().reference.delete().await()
+                clearCache() // Clear cache after deletion
                 Result.success(Unit)
             } else {
                 // If no document found with post_id field, try using postId as document ID
                 postsCollection.document(postId).delete().await()
+                clearCache() // Clear cache after deletion
                 Result.success(Unit)
             }
         } catch (e: Exception) {

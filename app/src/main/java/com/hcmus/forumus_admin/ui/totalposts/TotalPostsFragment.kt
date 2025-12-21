@@ -14,7 +14,6 @@ import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.Post
 import com.hcmus.forumus_admin.data.model.Tag
 import com.hcmus.forumus_admin.data.repository.PostRepository
-import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.databinding.FragmentTotalPostsBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -27,7 +26,6 @@ class TotalPostsFragment : Fragment() {
 
     private lateinit var adapter: TotalPostsAdapter
     private val postRepository = PostRepository()
-    private val userRepository = UserRepository()
     private var allPosts: List<Post> = emptyList()
     private var filteredPosts: List<Post> = emptyList()
     private var currentPage = 0
@@ -166,60 +164,23 @@ class TotalPostsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val postsResult = postRepository.getAllPosts()
-                val usersResult = userRepository.getAllUsers()
                 
                 // Check if fragment is still added to activity
                 if (!isAdded || _binding == null) return@launch
                 
                 postsResult.onSuccess { firestorePosts ->
-                    usersResult.onSuccess { firestoreUsers ->
-                        // Create a map of uid to user for quick lookup
-                        val userMap = firestoreUsers.associateBy { it.uid }
-                        
-                        if (firestorePosts.isEmpty()) {
-                            context?.let {
-                                Toast.makeText(it, "No posts found in database", Toast.LENGTH_SHORT).show()
-                            }
-                            allPosts = emptyList()
-                        } else {
-                            // Convert Firestore posts to Post model
-                            allPosts = firestorePosts.map { firestorePost ->
-                                val author = userMap[firestorePost.authorId]?.fullName 
-                                    ?: firestorePost.authorId
-                                
-                                Post(
-                                    id = firestorePost.post_id,
-                                    title = firestorePost.title.ifEmpty { "Untitled Post" },
-                                    author = author,
-                                    date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
-                                    description = firestorePost.content.take(200),
-                                    tags = firestorePost.topic.map { topicName ->
-                                        Tag(
-                                            name = topicName,
-                                            backgroundColor = 0xFFE3F2FD.toInt(),
-                                            textColor = 0xFF1976D2.toInt()
-                                        )
-                                    },
-                                    isAiApproved = firestorePost.status == "approved"
-                                )
-                            }
-                            
-                            context?.let {
-                                Toast.makeText(it, "Loaded ${allPosts.size} posts", Toast.LENGTH_SHORT).show()
-                            }
+                    if (firestorePosts.isEmpty()) {
+                        context?.let {
+                            Toast.makeText(it, "No posts found in database", Toast.LENGTH_SHORT).show()
                         }
-                        
-                        filteredPosts = allPosts
-                        if (isAdded && _binding != null) {
-                            applyDateFilter()
-                        }
-                    }.onFailure {
-                        // Continue without user names
+                        allPosts = emptyList()
+                    } else {
+                        // Convert Firestore posts to Post model - use authorName directly from Firebase
                         allPosts = firestorePosts.map { firestorePost ->
                             Post(
                                 id = firestorePost.post_id,
                                 title = firestorePost.title.ifEmpty { "Untitled Post" },
-                                author = firestorePost.authorId,
+                                author = firestorePost.authorName.ifEmpty { "Unknown Author" },
                                 date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                 description = firestorePost.content.take(200),
                                 tags = firestorePost.topic.map { topicName ->
@@ -232,10 +193,15 @@ class TotalPostsFragment : Fragment() {
                                 isAiApproved = firestorePost.status == "approved"
                             )
                         }
-                        filteredPosts = allPosts
-                        if (isAdded && _binding != null) {
-                            applyDateFilter()
+                        
+                        context?.let {
+                            Toast.makeText(it, "Loaded ${allPosts.size} posts", Toast.LENGTH_SHORT).show()
                         }
+                    }
+                    
+                    filteredPosts = allPosts
+                    if (isAdded && _binding != null) {
+                        applyDateFilter()
                     }
                 }.onFailure { exception ->
                     context?.let {
@@ -320,23 +286,18 @@ class TotalPostsFragment : Fragment() {
                 if (!isAdded || _binding == null) return@launch
                 
                 result.onSuccess { firestorePosts ->
-                    val usersResult = userRepository.getAllUsers()
-                    val userMap = usersResult.getOrNull()?.associateBy { it.uid } ?: emptyMap()
-                    
                     // Filter posts by date range
                     val filteredFirestorePosts = firestorePosts.filter { post ->
                         val postDate = PostRepository.getFirebaseTimestampAsDate(post.createdAt)
                         postDate != null && !postDate.before(start) && !postDate.after(end)
                     }
                     
+                    // Use authorName directly from Firebase
                     allPosts = filteredFirestorePosts.map { firestorePost ->
-                        val author = userMap[firestorePost.authorId]?.fullName 
-                            ?: firestorePost.authorId
-                        
                         Post(
                             id = firestorePost.post_id,
                             title = firestorePost.title.ifEmpty { "Untitled Post" },
-                            author = author,
+                            author = firestorePost.authorName.ifEmpty { "Unknown Author" },
                             date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                             description = firestorePost.content.take(200),
                             tags = firestorePost.topic.map { topicName ->
