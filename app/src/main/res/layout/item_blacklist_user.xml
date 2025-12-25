@@ -53,7 +53,7 @@
     <!-- Status Badge -->
     <TextView
         android:id="@+id/statusBadge"
-        android:layout_width="60dp"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:background="@drawable/bg_badge_warning"

@@ -544,6 +544,9 @@ class BlacklistFragment : Fragment() {
     }
     
     private fun updatePaginationUI() {
+        // Update page indicator text
+        binding.pageIndicatorText.text = "${currentPage + 1} / $totalPages"
+        
         // Update previous button state
         binding.prevPageButton.apply {
             isEnabled = currentPage > 0
