@@ -185,4 +185,14 @@
     <string name="save_changes">Save Changes</string>
     <string name="topic_updated">Topic updated successfully</string>
     <string name="topic_update_failed">Failed to update topic</string>
+    
+    <!-- Status Escalation Messages -->
+    <string name="status_escalated">User status escalated</string>
+    <string name="status_escalation_message">User status changed from %1$s to %2$s</string>
+    <string name="user_now_banned">User has been banned due to multiple violations</string>
+    <string name="user_now_warned">User has been warned due to content violation</string>
+    <string name="user_now_reminded">User has been reminded about community guidelines</string>
+    <string name="user_already_banned">User is already banned</string>
+    <string name="status_escalation_failed">Failed to escalate user status</string>
+    <string name="banned_user_cannot_post">This user is banned and cannot create new posts</string>
 </resources>

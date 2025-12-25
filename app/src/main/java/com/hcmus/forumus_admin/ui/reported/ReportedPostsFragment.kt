@@ -17,6 +17,7 @@ import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.repository.PostRepository
 import com.hcmus.forumus_admin.data.repository.ReportRepository
 import com.hcmus.forumus_admin.data.repository.UserRepository
+import com.hcmus.forumus_admin.data.service.UserStatusEscalationService
 import com.hcmus.forumus_admin.databinding.FragmentReportedPostsBinding
 import kotlinx.coroutines.launch
 
@@ -24,11 +25,13 @@ data class ReportedPost(
     val id: String,
     val title: String,
     val author: String,
+    val authorId: String, // Added for status escalation
     val date: String,
     val categories: List<String>,
     val description: String,
     val violationCount: Int,
-    val reportCount: Int
+    val reportCount: Int,
+    val violationTypes: List<String> = emptyList() // Added for status escalation audit
 )
 
 class ReportedPostsFragment : Fragment() {
@@ -40,6 +43,7 @@ class ReportedPostsFragment : Fragment() {
     private val postRepository = PostRepository()
     private val reportRepository = ReportRepository()
     private val userRepository = UserRepository()
+    private val statusEscalationService = UserStatusEscalationService.getInstance()
     private var allPosts: List<ReportedPost> = emptyList()
     private var filteredPosts: List<ReportedPost> = emptyList()
     private var isLoading = false
@@ -280,10 +284,25 @@ class ReportedPostsFragment : Fragment() {
                 val result = postRepository.deletePost(post.id)
                 
                 result.onSuccess {
+                    // Escalate user status after post deletion
+                    if (post.authorId.isNotEmpty()) {
+                        val escalationResult = statusEscalationService.escalateUserStatus(post.authorId)
+                        
+                        if (escalationResult.success && escalationResult.wasEscalated) {
+                            // Show notification about status escalation
+                            val message = getString(R.string.post_deleted) + "\n" +
+                                "User status: ${escalationResult.previousStatus.displayName} → ${escalationResult.newStatus.displayName}"
+                            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+                        } else {
+                            Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
+                    }
+                    
                     // Remove from local list
                     allPosts = allPosts.filter { it.id != post.id }
                     applySearchFilter(binding.searchInput.query.toString())
-                    Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
                 }.onFailure { exception ->
                     Toast.makeText(
                         requireContext(), 
@@ -347,11 +366,13 @@ class ReportedPostsFragment : Fragment() {
                                         id = firestorePost.post_id,
                                         title = firestorePost.title.ifEmpty { "Untitled Post" },
                                         author = author,
+                                        authorId = firestorePost.authorId,
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
                                         violationCount = violationCounts[firestorePost.post_id] ?: 0,
-                                        reportCount = firestorePost.reportCount.toInt()
+                                        reportCount = firestorePost.reportCount.toInt(),
+                                        violationTypes = firestorePost.violation_type
                                     )
                                 }
                                 
@@ -373,11 +394,13 @@ class ReportedPostsFragment : Fragment() {
                                         id = firestorePost.post_id,
                                         title = firestorePost.title.ifEmpty { "Untitled Post" },
                                         author = author,
+                                        authorId = firestorePost.authorId,
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
                                         violationCount = 0,
-                                        reportCount = firestorePost.reportCount.toInt()
+                                        reportCount = firestorePost.reportCount.toInt(),
+                                        violationTypes = firestorePost.violation_type
                                     )
                                 }
                                 
@@ -408,11 +431,13 @@ class ReportedPostsFragment : Fragment() {
                                         id = firestorePost.post_id,
                                         title = firestorePost.title.ifEmpty { "Untitled Post" },
                                         author = firestorePost.authorId,
+                                        authorId = firestorePost.authorId,
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
                                         violationCount = violationCounts[firestorePost.post_id] ?: 0,
-                                        reportCount = firestorePost.reportCount.toInt()
+                                        reportCount = firestorePost.reportCount.toInt(),
+                                        violationTypes = firestorePost.violation_type
                                     )
                                 }
                                 
@@ -427,11 +452,13 @@ class ReportedPostsFragment : Fragment() {
                                         id = firestorePost.post_id,
                                         title = firestorePost.title.ifEmpty { "Untitled Post" },
                                         author = firestorePost.authorId,
+                                        authorId = firestorePost.authorId,
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
                                         violationCount = 0,
-                                        reportCount = firestorePost.reportCount.toInt()
+                                        reportCount = firestorePost.reportCount.toInt(),
+                                        violationTypes = firestorePost.violation_type
                                     )
                                 }
                                 

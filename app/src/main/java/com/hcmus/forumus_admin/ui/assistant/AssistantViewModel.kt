@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.data.model.AiModerationResult
+import com.hcmus.forumus_admin.data.model.FirestorePost
 import com.hcmus.forumus_admin.data.model.Post
+import com.hcmus.forumus_admin.data.model.StatusEscalationResult
 import com.hcmus.forumus_admin.data.model.Tag
 import com.hcmus.forumus_admin.data.repository.AiModerationRepository
 import kotlinx.coroutines.launch
@@ -16,6 +18,10 @@ class AiModerationViewModel : ViewModel() {
     
     private val _state = MutableLiveData(AiModerationState())
     val state: LiveData<AiModerationState> = _state
+    
+    // LiveData for status escalation events (for UI notification)
+    private val _statusEscalationEvent = MutableLiveData<StatusEscalationResult?>()
+    val statusEscalationEvent: LiveData<StatusEscalationResult?> = _statusEscalationEvent
     
     private val repository = AiModerationRepository()
 
@@ -143,8 +149,11 @@ class AiModerationViewModel : ViewModel() {
             _state.value = currentState.copy(isLoading = true)
             
             try {
-                // Call repository to override decision
-                val result = repository.overrideModerationDecision(postId, true)
+                // Call repository to override decision (approval doesn't trigger escalation)
+                val result = repository.overrideModerationDecision(
+                    postId = postId,
+                    isApproved = true
+                )
                 
                 result.onSuccess {
                     Log.d("AiModerationViewModel", "Approved post: $postId")
@@ -159,19 +168,41 @@ class AiModerationViewModel : ViewModel() {
         }
     }
     
+    /**
+     * Reject a post and escalate the author's status.
+     * This will trigger the status escalation workflow.
+     */
     fun rejectPost(postId: String) {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
+            
+            // Find the post to get author information
+            val post = currentState.allPosts.find { it.postData.id == postId }?.postData
             
             // Show loading
             _state.value = currentState.copy(isLoading = true)
             
             try {
-                // Call repository to override decision
-                val result = repository.overrideModerationDecision(postId, false)
+                // Call repository to override decision with author info for escalation
+                val result = if (post != null) {
+                    repository.overrideModerationDecisionWithPost(post, false)
+                } else {
+                    // Fallback if post not found in current state
+                    repository.overrideModerationDecision(postId, false)
+                }
                 
-                result.onSuccess {
+                result.onSuccess { decisionResult ->
                     Log.d("AiModerationViewModel", "Rejected post: $postId")
+                    
+                    // Notify UI about status escalation if it happened
+                    decisionResult.escalationResult?.let { escalation ->
+                        if (escalation.wasEscalated) {
+                            Log.d("AiModerationViewModel", 
+                                "User status escalated: ${escalation.previousStatus.value} -> ${escalation.newStatus.value}")
+                            _statusEscalationEvent.value = escalation
+                        }
+                    }
+                    
                     // Reload posts after rejection
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
@@ -181,6 +212,50 @@ class AiModerationViewModel : ViewModel() {
                 _state.value = currentState.copy(error = e.message, isLoading = false)
             }
         }
+    }
+    
+    /**
+     * Reject a post with full post data (preferred method).
+     * This ensures proper status escalation with all author information.
+     */
+    fun rejectPostWithData(post: FirestorePost) {
+        viewModelScope.launch {
+            val currentState = _state.value ?: return@launch
+            
+            // Show loading
+            _state.value = currentState.copy(isLoading = true)
+            
+            try {
+                val result = repository.overrideModerationDecisionWithPost(post, false)
+                
+                result.onSuccess { decisionResult ->
+                    Log.d("AiModerationViewModel", "Rejected post: ${post.id}")
+                    
+                    // Notify UI about status escalation if it happened
+                    decisionResult.escalationResult?.let { escalation ->
+                        if (escalation.wasEscalated) {
+                            Log.d("AiModerationViewModel", 
+                                "User status escalated: ${escalation.previousStatus.value} -> ${escalation.newStatus.value}")
+                            _statusEscalationEvent.value = escalation
+                        }
+                    }
+                    
+                    // Reload posts after rejection
+                    loadPosts(currentState.currentTab == TabType.AI_APPROVED)
+                }.onFailure { error ->
+                    _state.value = currentState.copy(error = error.message, isLoading = false)
+                }
+            } catch (e: Exception) {
+                _state.value = currentState.copy(error = e.message, isLoading = false)
+            }
+        }
+    }
+    
+    /**
+     * Clear the status escalation event after it's been handled by the UI.
+     */
+    fun clearStatusEscalationEvent() {
+        _statusEscalationEvent.value = null
     }
 }
 

@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_admin.data.model.*
 import com.hcmus.forumus_admin.data.model.FirestorePost
 import com.hcmus.forumus_admin.data.service.AiModerationService
+import com.hcmus.forumus_admin.data.service.UserStatusEscalationService
 import kotlinx.coroutines.tasks.await
 
 /**
@@ -13,6 +14,7 @@ import kotlinx.coroutines.tasks.await
  */
 class AiModerationRepository(
 //    private val service: AiModerationService = AiModerationService()
+    private val statusEscalationService: UserStatusEscalationService = UserStatusEscalationService.getInstance()
 ) {
     private val firestore = FirebaseFirestore.getInstance()
     private val postsCollection = firestore.collection("posts")
@@ -108,23 +110,78 @@ class AiModerationRepository(
     }
     
     /**
-     * Override AI decision manually
+     * Override AI decision manually.
+     * When rejecting a post (isApproved = false), this will also escalate the author's status.
+     * 
+     * @param postId The ID of the post to update
+     * @param isApproved Whether the post is approved (true) or rejected/deleted (false)
+     * @param authorId Optional author ID for status escalation (required when rejecting)
+     * @param postTitle Optional post title for audit purposes
+     * @param violationTypes List of violation types for audit purposes
+     * @return Result containing success status and optional escalation result
      */
     suspend fun overrideModerationDecision(
         postId: String,
-        isApproved: Boolean
-    ): Result<Boolean> {
+        isApproved: Boolean,
+        authorId: String? = null,
+        postTitle: String? = null,
+        violationTypes: List<String> = emptyList()
+    ): Result<ModerationDecisionResult> {
         return try {
             // Update post status in Firestore
             val newStatus = if (isApproved) PostStatus.APPROVED else PostStatus.DELETED
             postsCollection.document(postId)
                 .update("status", newStatus)
                 .await()
+            
+            var escalationResult: StatusEscalationResult? = null
+            
+            // If post is being rejected/deleted and we have author info, escalate user status
+            if (!isApproved && authorId != null && authorId.isNotEmpty()) {
+                Log.d("AiModerationRepository", "Post rejected, escalating status for author: $authorId")
+                escalationResult = statusEscalationService.escalateUserStatus(authorId)
+                
+                if (escalationResult.success && escalationResult.wasEscalated) {
+                    Log.d("AiModerationRepository", 
+                        "Status escalated: ${escalationResult.previousStatus.value} -> ${escalationResult.newStatus.value}")
+                } else if (!escalationResult.wasEscalated) {
+                    Log.d("AiModerationRepository", "User already at maximum status (BANNED)")
+                } else {
+                    Log.w("AiModerationRepository", 
+                        "Failed to escalate status: ${escalationResult.error}")
+                }
+            }
 
-            Result.success(true)
+            Result.success(ModerationDecisionResult(
+                success = true,
+                postId = postId,
+                newStatus = newStatus,
+                escalationResult = escalationResult
+            ))
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+    
+    /**
+     * Override AI decision with full post data.
+     * This version automatically extracts author info from the post.
+     * 
+     * @param post The FirestorePost to update
+     * @param isApproved Whether the post is approved (true) or rejected/deleted (false)
+     * @return Result containing success status and optional escalation result
+     */
+    suspend fun overrideModerationDecisionWithPost(
+        post: FirestorePost,
+        isApproved: Boolean
+    ): Result<ModerationDecisionResult> {
+        return overrideModerationDecision(
+            postId = post.id,
+            isApproved = isApproved,
+            authorId = post.authorId,
+            postTitle = post.title,
+            violationTypes = post.violationTypes
+        )
     }
     
     /**

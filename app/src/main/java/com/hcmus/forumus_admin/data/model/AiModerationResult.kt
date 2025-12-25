@@ -60,3 +60,15 @@ data class AiModerationResponse(
     val result: AiModerationResult?,
     val error: String? = null
 )
+
+/**
+ * Result of a moderation decision override.
+ * Contains information about the post status change and optional user status escalation.
+ */
+data class ModerationDecisionResult(
+    val success: Boolean,
+    val postId: String,
+    val newStatus: PostStatus,
+    val escalationResult: StatusEscalationResult? = null,
+    val error: String? = null
+)
