@@ -55,24 +55,14 @@
             android:textColor="@color/text_primary"
             android:textSize="20sp" />
 
-        <FrameLayout
-            android:layout_width="36dp"
-            android:layout_height="36dp">
-
-            <ImageView
-                android:id="@+id/avatarImage"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_avatar_circle"
-                android:contentDescription="User Avatar"
-                android:scaleType="centerCrop" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_avatar_border" />
-
-        </FrameLayout>
+        <TextView
+            android:id="@+id/adminLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:fontFamily="serif" />
 
     </LinearLayout>
 
