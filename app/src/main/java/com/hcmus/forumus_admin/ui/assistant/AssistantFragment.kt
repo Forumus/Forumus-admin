@@ -125,10 +125,6 @@ class AssistantFragment : Fragment() {
         binding.sortButton.setOnClickListener {
             showSortDialog()
         }
-        
-        binding.filterButton.setOnClickListener {
-            showFilterDialog()
-        }
     }
     
     private fun showSortDialog() {

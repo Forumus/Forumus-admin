@@ -184,7 +184,6 @@
             android:id="@+id/sortButton"
             android:layout_width="@dimen/action_button_size"
             android:layout_height="@dimen/action_button_size"
-            android:layout_marginEnd="@dimen/spacing_small"
             android:background="@drawable/bg_action_button"
             android:clickable="true"
             android:focusable="true">
@@ -194,23 +193,6 @@
                 android:layout_height="20dp"
                 android:src="@drawable/ic_sort"
                 android:contentDescription="@string/sort_icon"
-                android:layout_gravity="center" />
-        </FrameLayout>
-
-        <!-- Filter Button -->
-        <FrameLayout
-            android:id="@+id/filterButton"
-            android:layout_width="@dimen/action_button_size"
-            android:layout_height="@dimen/action_button_size"
-            android:background="@drawable/bg_action_button"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_filter"
-                android:contentDescription="@string/filter_icon"
                 android:layout_gravity="center" />
         </FrameLayout>
     </LinearLayout>
