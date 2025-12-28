@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Development configuration: Allow cleartext (HTTP) for local development -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- Android emulator localhost -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <!-- Standard localhost addresses -->
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <!-- Production server (if using HTTP for development) -->
+        <domain includeSubdomains="true">3.105.149.245</domain>
+    </domain-config>
+    
+    <!-- Base configuration for all other domains (HTTPS only) -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -5,6 +5,7 @@ import com.hcmus.forumus_admin.data.model.StatusEscalationResult
 import com.hcmus.forumus_admin.data.model.UserStatus
 import com.hcmus.forumus_admin.data.model.UserStatusLevel
 import com.hcmus.forumus_admin.data.repository.UserRepository
+import com.hcmus.forumus_admin.data.model.email.ReportedPost
 
 /**
  * Service for handling user status escalation when posts are deleted.
@@ -17,7 +18,8 @@ import com.hcmus.forumus_admin.data.repository.UserRepository
  * - Admin deletion after report (reported post feature)
  */
 class UserStatusEscalationService(
-    private val userRepository: UserRepository = UserRepository()
+    private val userRepository: UserRepository = UserRepository(),
+    private val emailNotificationService: EmailNotificationService = EmailNotificationService.getInstance()
 ) {
     companion object {
         private const val TAG = "UserStatusEscalation"
@@ -105,6 +107,26 @@ class UserStatusEscalationService(
                     wasEscalated = false,
                     error = "Failed to update user status: ${updateResult.exceptionOrNull()?.message}"
                 )
+            }
+            
+            // Step 5: Send email notification to user about status change
+            try {
+                val emailResult = emailNotificationService.sendEscalationEmail(
+                    userEmail = user.email,
+                    userName = user.fullName,
+                    newStatus = newUserStatus,
+                    reportedPosts = null // Can be extended to include specific posts
+                )
+                
+                if (emailResult.isSuccess) {
+                    Log.d(TAG, "Email notification sent successfully to ${user.email}")
+                } else {
+                    Log.w(TAG, "Failed to send email notification: ${emailResult.exceptionOrNull()?.message}")
+                    // Continue even if email fails - don't block status escalation
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Error sending email notification (non-blocking)", e)
+                // Continue even if email fails
             }
             
             Log.d(TAG, "Status escalation completed successfully for user: $userId")

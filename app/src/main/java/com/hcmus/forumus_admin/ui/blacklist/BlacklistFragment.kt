@@ -18,6 +18,7 @@ import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.databinding.FragmentBlacklistBinding
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.data.model.UserStatus
+import com.hcmus.forumus_admin.data.service.EmailNotificationService
 import com.hcmus.forumus_admin.ui.common.UserAutoCompleteAdapter
 import com.hcmus.forumus_admin.ui.common.UserSuggestion
 import kotlinx.coroutines.launch
@@ -45,6 +46,7 @@ class BlacklistFragment : Fragment() {
     private lateinit var adapter: BlacklistAdapter
     private lateinit var autoCompleteAdapter: UserAutoCompleteAdapter
     private val userRepository = UserRepository()
+    private val emailNotificationService = EmailNotificationService.getInstance()
     private var allUsers: List<BlacklistedUser> = emptyList()
     private var filteredUsers: List<BlacklistedUser> = emptyList()
     private var currentPage = 0
@@ -233,20 +235,19 @@ class BlacklistFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             when (actionType) {
                 ActionType.REMOVED -> {
-                    // Remove user from blacklist (set status to normal in Firebase)
-                    val result = userRepository.removeFromBlacklist(user.uid)
-                    result.onSuccess {
-                        allUsers = allUsers.filter { it.id != user.id }
-                        applySearchFilter(binding.searchInput.text.toString())
-                        // Adjust current page if needed
-                        if (getCurrentPageUsers().isEmpty() && currentPage > 0) {
-                            currentPage--
-                        }
-                        updatePaginationUI()
-                        Toast.makeText(requireContext(), "${user.name} removed from blacklist", Toast.LENGTH_SHORT).show()
-                    }.onFailure { exception ->
-                        Toast.makeText(requireContext(), "Failed to remove ${user.name}: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    // Remove user from blacklist (set status to NORMAL)
+                    // This will also send congratulatory email
+                    updateUserStatusInFirebase(user, UserStatus.NORMAL)
+                    
+                    // Remove from local list after successful update
+                    allUsers = allUsers.filter { it.id != user.id }
+                    applySearchFilter(binding.searchInput.text.toString())
+                    
+                    // Adjust current page if needed
+                    if (getCurrentPageUsers().isEmpty() && currentPage > 0) {
+                        currentPage--
                     }
+                    updatePaginationUI()
                 }
                 ActionType.BANNED -> {
                     // Update user status to BANNED
@@ -267,6 +268,36 @@ class BlacklistFragment : Fragment() {
     private suspend fun updateUserStatusInFirebase(user: BlacklistedUser, newStatus: UserStatus) {
         val result = userRepository.updateUserStatus(user.uid, newStatus)
         result.onSuccess {
+            // Send email notification to user
+            try {
+                val oldStatus = user.status
+                val emailResult = if (isStatusIncreasing(oldStatus, newStatus)) {
+                    // Status escalated - send warning/reminder email
+                    emailNotificationService.sendEscalationEmail(
+                        userEmail = getUserEmail(user),
+                        userName = user.name,
+                        newStatus = newStatus,
+                        reportedPosts = null
+                    )
+                } else {
+                    // Status de-escalated - send congratulatory email
+                    emailNotificationService.sendDeEscalationEmail(
+                        userEmail = getUserEmail(user),
+                        userName = user.name,
+                        oldStatus = oldStatus,
+                        newStatus = newStatus
+                    )
+                }
+                
+                if (emailResult.isSuccess) {
+                    android.util.Log.d("BlacklistFragment", "Email notification sent to ${user.name}")
+                } else {
+                    android.util.Log.w("BlacklistFragment", "Failed to send email: ${emailResult.exceptionOrNull()?.message}")
+                }
+            } catch (e: Exception) {
+                android.util.Log.w("BlacklistFragment", "Error sending email (non-blocking)", e)
+            }
+            
             // Update local list
             allUsers = allUsers.map {
                 if (it.id == user.id) it.copy(status = newStatus) else it
@@ -277,12 +308,33 @@ class BlacklistFragment : Fragment() {
                 UserStatus.BANNED -> "${user.name} has been banned"
                 UserStatus.WARNED -> "Warning sent to ${user.name}"
                 UserStatus.REMINDED -> "Reminder sent to ${user.name}"
-                UserStatus.NORMAL -> "${user.name} status updated to normal"
+                UserStatus.NORMAL -> "${user.name} removed from blacklist"
             }
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }.onFailure { exception ->
             Toast.makeText(requireContext(), "Failed to update status: ${exception.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+    
+    /**
+     * Check if status is increasing in severity (escalation).
+     * Order: NORMAL < REMINDED < WARNED < BANNED
+     */
+    private fun isStatusIncreasing(oldStatus: UserStatus, newStatus: UserStatus): Boolean {
+        val statusOrder = listOf(UserStatus.NORMAL, UserStatus.REMINDED, UserStatus.WARNED, UserStatus.BANNED)
+        val oldIndex = statusOrder.indexOf(oldStatus)
+        val newIndex = statusOrder.indexOf(newStatus)
+        return newIndex > oldIndex
+    }
+    
+    /**
+     * Get user email from user object.
+     * This is a helper method - adjust based on how email is stored in your data model.
+     */
+    private suspend fun getUserEmail(user: BlacklistedUser): String {
+        // Try to get full user info from repository to get email
+        val userResult = userRepository.getUserById(user.uid)
+        return userResult.getOrNull()?.email ?: "${user.id}@example.com"
     }
 
     private fun setupSearchBar() {
