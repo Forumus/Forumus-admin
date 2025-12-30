@@ -18,6 +18,7 @@ import com.hcmus.forumus_admin.data.repository.PostRepository
 import com.hcmus.forumus_admin.data.repository.ReportRepository
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.data.service.UserStatusEscalationService
+import com.hcmus.forumus_admin.data.service.PushNotificationService
 import com.hcmus.forumus_admin.databinding.FragmentReportedPostsBinding
 import kotlinx.coroutines.launch
 
@@ -44,6 +45,7 @@ class ReportedPostsFragment : Fragment() {
     private val reportRepository = ReportRepository()
     private val userRepository = UserRepository()
     private val statusEscalationService = UserStatusEscalationService.getInstance()
+    private val pushNotificationService = PushNotificationService.getInstance()
     private var allPosts: List<ReportedPost> = emptyList()
     private var filteredPosts: List<ReportedPost> = emptyList()
     private var isLoading = false
@@ -284,6 +286,19 @@ class ReportedPostsFragment : Fragment() {
                 val result = postRepository.deletePost(post.id)
                 
                 result.onSuccess {
+                    // Send push notification about post deletion
+                    try {
+                        pushNotificationService.sendPostDeletedNotification(
+                            postId = post.id,
+                            postAuthorId = post.authorId,
+                            postTitle = post.title,
+                            reason = "Reported by community members",
+                            isAiDeleted = false
+                        )
+                    } catch (e: Exception) {
+                        android.util.Log.w("ReportedPostsFragment", "Failed to send notification (non-blocking)", e)
+                    }
+                    
                     // Escalate user status after post deletion
                     if (post.authorId.isNotEmpty()) {
                         val escalationResult = statusEscalationService.escalateUserStatus(post.authorId)

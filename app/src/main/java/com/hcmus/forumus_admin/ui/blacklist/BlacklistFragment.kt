@@ -19,6 +19,7 @@ import com.hcmus.forumus_admin.databinding.FragmentBlacklistBinding
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.data.model.UserStatus
 import com.hcmus.forumus_admin.data.service.EmailNotificationService
+import com.hcmus.forumus_admin.data.service.PushNotificationService
 import com.hcmus.forumus_admin.ui.common.UserAutoCompleteAdapter
 import com.hcmus.forumus_admin.ui.common.UserSuggestion
 import kotlinx.coroutines.launch
@@ -47,6 +48,7 @@ class BlacklistFragment : Fragment() {
     private lateinit var autoCompleteAdapter: UserAutoCompleteAdapter
     private val userRepository = UserRepository()
     private val emailNotificationService = EmailNotificationService.getInstance()
+    private val pushNotificationService = PushNotificationService.getInstance()
     private var allUsers: List<BlacklistedUser> = emptyList()
     private var filteredUsers: List<BlacklistedUser> = emptyList()
     private var currentPage = 0
@@ -268,9 +270,10 @@ class BlacklistFragment : Fragment() {
     private suspend fun updateUserStatusInFirebase(user: BlacklistedUser, newStatus: UserStatus) {
         val result = userRepository.updateUserStatus(user.uid, newStatus)
         result.onSuccess {
+            val oldStatus = user.status
+            
             // Send email notification to user
             try {
-                val oldStatus = user.status
                 val emailResult = if (isStatusIncreasing(oldStatus, newStatus)) {
                     // Status escalated - send warning/reminder email
                     emailNotificationService.sendEscalationEmail(
@@ -296,6 +299,17 @@ class BlacklistFragment : Fragment() {
                 }
             } catch (e: Exception) {
                 android.util.Log.w("BlacklistFragment", "Error sending email (non-blocking)", e)
+            }
+            
+            // Send push notification about status change
+            try {
+                pushNotificationService.sendStatusChangedNotification(
+                    userId = user.uid,
+                    oldStatus = oldStatus.name,
+                    newStatus = newStatus.name
+                )
+            } catch (e: Exception) {
+                android.util.Log.w("BlacklistFragment", "Failed to send push notification (non-blocking)", e)
             }
             
             // Update local list

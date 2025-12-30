@@ -12,6 +12,7 @@ import com.hcmus.forumus_admin.data.model.Post
 import com.hcmus.forumus_admin.data.model.StatusEscalationResult
 import com.hcmus.forumus_admin.data.model.Tag
 import com.hcmus.forumus_admin.data.repository.AiModerationRepository
+import com.hcmus.forumus_admin.data.service.PushNotificationService
 import kotlinx.coroutines.launch
 
 class AiModerationViewModel : ViewModel() {
@@ -24,6 +25,7 @@ class AiModerationViewModel : ViewModel() {
     val statusEscalationEvent: LiveData<StatusEscalationResult?> = _statusEscalationEvent
     
     private val repository = AiModerationRepository()
+    private val pushNotificationService = PushNotificationService.getInstance()
 
     init {
         loadPosts(true)
@@ -123,18 +125,10 @@ class AiModerationViewModel : ViewModel() {
         // Apply sort
         result = when (sortOrder) {
             SortOrder.NEWEST_FIRST -> result.sortedByDescending { 
-                when (val timestamp = it.postData.createdAt) {
-                    is com.google.firebase.Timestamp -> timestamp.seconds
-                    is Long -> timestamp / 1000
-                    else -> 0L
-                }
+                it.postData.createdAt?.seconds ?: 0L
             }
             SortOrder.OLDEST_FIRST -> result.sortedBy { 
-                when (val timestamp = it.postData.createdAt) {
-                    is com.google.firebase.Timestamp -> timestamp.seconds
-                    is Long -> timestamp / 1000
-                    else -> 0L
-                }
+                it.postData.createdAt?.seconds ?: 0L
             }
         }
         
@@ -157,6 +151,22 @@ class AiModerationViewModel : ViewModel() {
                 
                 result.onSuccess {
                     Log.d("AiModerationViewModel", "Approved post: $postId")
+                    
+                    // Send push notification about post approval
+                    val post = currentState.allPosts.find { it.postData.id == postId }?.postData
+                    if (post != null) {
+                        try {
+                            pushNotificationService.sendPostApprovedNotification(
+                                postId = post.id,
+                                postAuthorId = post.authorId,
+                                postTitle = post.title,
+                                isAiApproved = false // Admin approved
+                            )
+                        } catch (e: Exception) {
+                            Log.w("AiModerationViewModel", "Failed to send notification (non-blocking)", e)
+                        }
+                    }
+                    
                     // Reload posts after approval
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->

@@ -19,7 +19,8 @@ import com.hcmus.forumus_admin.data.model.email.ReportedPost
  */
 class UserStatusEscalationService(
     private val userRepository: UserRepository = UserRepository(),
-    private val emailNotificationService: EmailNotificationService = EmailNotificationService.getInstance()
+    private val emailNotificationService: EmailNotificationService = EmailNotificationService.getInstance(),
+    private val pushNotificationService: PushNotificationService = PushNotificationService.getInstance()
 ) {
     companion object {
         private const val TAG = "UserStatusEscalation"
@@ -127,6 +128,25 @@ class UserStatusEscalationService(
             } catch (e: Exception) {
                 Log.w(TAG, "Error sending email notification (non-blocking)", e)
                 // Continue even if email fails
+            }
+            
+            // Step 6: Send push notification to user about status change
+            try {
+                val pushResult = pushNotificationService.sendStatusChangedNotification(
+                    userId = userId,
+                    oldStatus = currentStatusLevel.value,
+                    newStatus = nextStatusLevel.value
+                )
+                
+                if (pushResult.isSuccess) {
+                    Log.d(TAG, "Push notification sent successfully to user $userId")
+                } else {
+                    Log.w(TAG, "Failed to send push notification: ${pushResult.exceptionOrNull()?.message}")
+                    // Continue even if push notification fails
+                }
+            } catch (e: Exception) {
+                Log.w(TAG, "Error sending push notification (non-blocking)", e)
+                // Continue even if push notification fails
             }
             
             Log.d(TAG, "Status escalation completed successfully for user: $userId")
