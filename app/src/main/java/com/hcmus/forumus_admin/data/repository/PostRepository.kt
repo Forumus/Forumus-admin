@@ -44,6 +44,12 @@ class PostRepository {
             val snapshot = postsCollection.get().await()
             val posts = snapshot.documents.mapNotNull { doc ->
                 try {
+                    val status = doc.getString("status") ?: "pending"
+                    // Filter out deleted posts
+                    if (status.equals("DELETED", ignoreCase = true)) {
+                        return@mapNotNull null
+                    }
+                    
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
                         authorName = doc.getString("authorName") ?: "",
@@ -54,7 +60,7 @@ class PostRepository {
                         image_link = (doc.get("image_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
                         post_id = doc.getString("post_id") ?: doc.id,
                         reportCount = doc.getLong("reportCount") ?: doc.getLong("reportedCount") ?: doc.getLong("report_count") ?: 0,
-                        status = doc.getString("status") ?: "pending",
+                        status = status,
                         title = doc.getString("title") ?: "",
                         topic = (doc.get("topic") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
                         uid = doc.getString("uid") ?: doc.id,
@@ -100,6 +106,12 @@ class PostRepository {
             val snapshot = query.get().await()
             val posts = snapshot.documents.mapNotNull { doc ->
                 try {
+                    val status = doc.getString("status") ?: "pending"
+                    // Filter out deleted posts
+                    if (status.equals("DELETED", ignoreCase = true)) {
+                        return@mapNotNull null
+                    }
+                    
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
                         authorName = doc.getString("authorName") ?: "",
@@ -110,7 +122,7 @@ class PostRepository {
                         image_link = (doc.get("image_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
                         post_id = doc.getString("post_id") ?: doc.id,
                         reportCount = doc.getLong("reportCount") ?: doc.getLong("reportedCount") ?: doc.getLong("report_count") ?: 0,
-                        status = doc.getString("status") ?: "pending",
+                        status = status,
                         title = doc.getString("title") ?: "",
                         topic = (doc.get("topic") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
                         uid = doc.getString("uid") ?: doc.id,
@@ -161,6 +173,12 @@ class PostRepository {
             val snapshot = query.get().await()
             val allMatchingPosts = snapshot.documents.mapNotNull { doc ->
                 try {
+                    val status = doc.getString("status") ?: "pending"
+                    // Filter out deleted posts
+                    if (status.equals("DELETED", ignoreCase = true)) {
+                        return@mapNotNull null
+                    }
+                    
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
                         authorName = doc.getString("authorName") ?: "",
@@ -171,7 +189,7 @@ class PostRepository {
                         image_link = (doc.get("image_link") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
                         post_id = doc.getString("post_id") ?: doc.id,
                         reportCount = doc.getLong("reportCount") ?: doc.getLong("reportedCount") ?: doc.getLong("report_count") ?: 0,
-                        status = doc.getString("status") ?: "pending",
+                        status = status,
                         title = doc.getString("title") ?: "",
                         topic = (doc.get("topic") as? List<*>)?.mapNotNull { it as? String } ?: emptyList(),
                         uid = doc.getString("uid") ?: doc.id,
