@@ -10,7 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#F8FAFC"
-        android:padding="24dp">
+        android:paddingStart="24dp"
+        android:paddingTop="40dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
 
         <!-- Header Section -->
         <LinearLayout
@@ -105,21 +108,26 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_settings_card"
                 android:elevation="2dp"
-                android:padding="20dp">
+                android:paddingStart="21dp"
+                android:paddingTop="21dp"
+                android:paddingEnd="21dp"
+                android:paddingBottom="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="96dp"
                     android:orientation="horizontal"
-                    android:weightSum="3">
+                    android:baselineAligned="false">
 
                     <!-- Light Theme Button -->
                     <FrameLayout
                         android:id="@+id/lightThemeButton"
                         android:layout_width="0dp"
-                        android:layout_height="96dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:background="@drawable/bg_theme_button">
 
                         <LinearLayout
@@ -130,19 +138,23 @@
                             android:padding="16dp">
 
                             <FrameLayout
+                                android:id="@+id/lightThemeIconContainer"
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:background="@drawable/bg_theme_icon">
 
                                 <ImageView
+                                    android:id="@+id/lightThemeIcon"
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/theme_icon"
-                                    android:src="@drawable/ic_sun" />
+                                    android:src="@drawable/ic_sun"
+                                    app:tint="@color/settings_text_primary" />
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/lightThemeText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -160,11 +172,14 @@
                             android:layout_marginTop="-4dp"
                             android:layout_marginEnd="-4dp"
                             android:background="@drawable/bg_selection_indicator"
-                            android:elevation="2dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:elevation="4dp"
                             android:visibility="gone"
                             tools:visibility="visible">
 
                             <View
+                                android:id="@+id/lightThemeIndicatorDot"
                                 android:layout_width="8dp"
                                 android:layout_height="8dp"
                                 android:layout_gravity="center"
@@ -176,10 +191,12 @@
                     <FrameLayout
                         android:id="@+id/darkThemeButton"
                         android:layout_width="0dp"
-                        android:layout_height="96dp"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="0dp"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:background="@drawable/bg_theme_button">
 
                         <LinearLayout
@@ -190,19 +207,23 @@
                             android:padding="16dp">
 
                             <FrameLayout
+                                android:id="@+id/darkThemeIconContainer"
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:background="@drawable/bg_theme_icon">
 
                                 <ImageView
+                                    android:id="@+id/darkThemeIcon"
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/theme_icon"
-                                    android:src="@drawable/ic_moon" />
+                                    android:src="@drawable/ic_moon"
+                                    app:tint="@color/settings_text_primary" />
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/darkThemeText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -220,10 +241,13 @@
                             android:layout_marginTop="-4dp"
                             android:layout_marginEnd="-4dp"
                             android:background="@drawable/bg_selection_indicator"
-                            android:elevation="2dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:elevation="4dp"
                             android:visibility="gone">
 
                             <View
+                                android:id="@+id/darkThemeIndicatorDot"
                                 android:layout_width="8dp"
                                 android:layout_height="8dp"
                                 android:layout_gravity="center"
@@ -235,9 +259,11 @@
                     <FrameLayout
                         android:id="@+id/autoThemeButton"
                         android:layout_width="0dp"
-                        android:layout_height="96dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="0dp"
                         android:layout_weight="1"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:background="@drawable/bg_theme_button">
 
                         <LinearLayout
@@ -248,19 +274,23 @@
                             android:padding="16dp">
 
                             <FrameLayout
+                                android:id="@+id/autoThemeIconContainer"
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:background="@drawable/bg_theme_icon">
 
                                 <ImageView
+                                    android:id="@+id/autoThemeIcon"
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:layout_gravity="center"
                                     android:contentDescription="@string/theme_icon"
-                                    android:src="@drawable/ic_auto_theme" />
+                                    android:src="@drawable/ic_auto_theme"
+                                    app:tint="@color/settings_text_primary" />
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/autoThemeText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
@@ -278,10 +308,13 @@
                             android:layout_marginTop="-4dp"
                             android:layout_marginEnd="-4dp"
                             android:background="@drawable/bg_selection_indicator"
-                            android:elevation="2dp"
+                            android:clickable="false"
+                            android:focusable="false"
+                            android:elevation="4dp"
                             android:visibility="gone">
 
                             <View
+                                android:id="@+id/autoThemeIndicatorDot"
                                 android:layout_width="8dp"
                                 android:layout_height="8dp"
                                 android:layout_gravity="center"
@@ -396,6 +429,8 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:background="@drawable/bg_selection_indicator"
+                            android:clickable="false"
+                            android:focusable="false"
                             android:elevation="2dp"
                             android:visibility="gone"
                             tools:visibility="visible">
@@ -471,6 +506,8 @@
                             android:layout_width="32dp"
                             android:layout_height="32dp"
                             android:background="@drawable/bg_selection_indicator"
+                            android:clickable="false"
+                            android:focusable="false"
                             android:elevation="2dp"
                             android:visibility="gone">
 

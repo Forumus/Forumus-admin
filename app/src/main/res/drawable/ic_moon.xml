@@ -4,7 +4,7 @@
     android:height="20dp"
     android:viewportWidth="20"
     android:viewportHeight="20">
-    
+
     <!-- Moon crescent -->
     <path
         android:fillColor="#FFFFFF"

@@ -74,6 +74,10 @@
     <color name="settings_button_bg">#F8FAFC</color>
     <color name="settings_button_icon_bg">#FFFFFF</color>
     <color name="settings_button_icon_bg_semi">#33FFFFFF</color>
+    <color name="settings_button_icon_bg_selected_light">#4DFFFFFF</color>
+    <color name="settings_button_icon_bg_selected_dark">#1AFFFFFF</color>
     <color name="settings_button_selected_indicator">#FFFFFF</color>
+    <color name="settings_indicator_dot_orange">#FF6900</color>
+    <color name="settings_indicator_dot_dark">#314158</color>
     <color name="settings_gradient_accent">#155DFC</color>
 </resources>
