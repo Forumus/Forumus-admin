@@ -8,6 +8,7 @@ import java.util.*
 data class FirestorePost(
     val authorId: String = "",
     val authorName: String = "",
+    val author_avatar_url: String? = "",
     val comment_count: Long = 0,
     val content: String = "",
     val createdAt: Any? = null,
@@ -53,6 +54,7 @@ class PostRepository {
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
                         authorName = doc.getString("authorName") ?: "",
+                        author_avatar_url = doc.getString("authorAvatarUrl") ?: doc.getString("author_avatar_url") ?: "",
                         comment_count = doc.getLong("comment_count") ?: 0,
                         content = doc.getString("content") ?: "",
                         createdAt = doc.get("createdAt"),
@@ -115,6 +117,7 @@ class PostRepository {
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
                         authorName = doc.getString("authorName") ?: "",
+                        author_avatar_url = doc.getString("authorAvatarUrl") ?: doc.getString("author_avatar_url") ?: "",
                         comment_count = doc.getLong("comment_count") ?: 0,
                         content = doc.getString("content") ?: "",
                         createdAt = doc.get("createdAt"),
@@ -182,6 +185,7 @@ class PostRepository {
                     FirestorePost(
                         authorId = doc.getString("authorId") ?: "",
                         authorName = doc.getString("authorName") ?: "",
+                        author_avatar_url = doc.getString("authorAvatarUrl") ?: doc.getString("author_avatar_url") ?: "",
                         comment_count = doc.getLong("comment_count") ?: 0,
                         content = doc.getString("content") ?: "",
                         createdAt = doc.get("createdAt"),

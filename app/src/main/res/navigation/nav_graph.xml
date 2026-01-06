@@ -38,7 +38,12 @@
         android:id="@+id/reportedPostsFragment"
         android:name="com.hcmus.forumus_admin.ui.reported.ReportedPostsFragment"
         android:label="Reported Posts"
-        tools:layout="@layout/fragment_reported_posts" />
+        tools:layout="@layout/fragment_reported_posts">
+        
+        <action
+            android:id="@+id/action_reportedPostsFragment_to_postDetailFragment"
+            app:destination="@id/postDetailFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/assistantFragment"
@@ -67,7 +72,14 @@
         android:id="@+id/postDetailFragment"
         android:name="com.hcmus.forumus_admin.ui.postdetail.PostDetailFragment"
         android:label="Post Details"
-        tools:layout="@layout/fragment_post_detail" />
+        tools:layout="@layout/fragment_post_detail">
+        
+        <argument
+            android:name="postId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
 
     <fragment
         android:id="@+id/totalUsersFragment"

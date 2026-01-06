@@ -76,7 +76,16 @@ class ReportedPostsFragment : Fragment() {
     private fun setupPostsList() {
         adapter = ReportedPostsAdapter(
             posts = emptyList(),
-            onItemClick = { post -> showReportDetailsDialog(post) },
+            onItemClick = { post -> 
+                // Navigate to post detail fragment with post ID
+                val bundle = Bundle().apply {
+                    putString("postId", post.id)
+                }
+                findNavController().navigate(
+                    R.id.action_reportedPostsFragment_to_postDetailFragment,
+                    bundle
+                )
+            },
             onDismissClick = { post -> showDismissConfirmation(post) },
             onDeleteClick = { post -> showDeleteConfirmation(post) }
         )

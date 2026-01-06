@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_gray">
@@ -39,7 +40,7 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif"
             android:gravity="center"
-            android:text="Details Post"
+            android:text="Post Details"
             android:textColor="@color/text_primary"
             android:textSize="20sp" />
 
@@ -50,8 +51,20 @@
 
     </LinearLayout>
 
+    <!-- Loading Indicator -->
+    <ProgressBar
+        android:id="@+id/loadingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
+
     <!-- Content Area -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -64,7 +77,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Placeholder Card -->
+            <!-- Post Content Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,26 +90,431 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="48dp">
+                    android:padding="18dp">
+
+                    <!-- Post Title -->
+                    <TextView
+                        android:id="@+id/postTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_title"
+                        android:textSize="20sp"
+                        android:lineSpacingExtra="4dp"
+                        tools:text="How to implement authentication in React Native?" />
+
+                    <!-- Author and Date Section -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <!-- Avatar -->
+                        <ImageView
+                            android:id="@+id/authorAvatar"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_avatar_circle"
+                            android:contentDescription="@string/user_avatar"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_default_avatar" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <!-- Author Name -->
+                            <TextView
+                                android:id="@+id/authorName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp"
+                                tools:text="John Doe" />
+
+                            <!-- Date -->
+                            <TextView
+                                android:id="@+id/postDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="sans-serif"
+                                android:textColor="@color/text_meta"
+                                android:textSize="12sp"
+                                tools:text="November 18, 2025" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Categories/Topics -->
+                    <TextView
+                        android:id="@+id/postCategories"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="sans-serif"
+                        android:textColor="@color/text_body"
+                        android:textSize="12sp"
+                        tools:text="Technology › Programming › Mobile Development" />
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/border_gray" />
+
+                    <!-- Post Content -->
+                    <TextView
+                        android:id="@+id/postContent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif"
+                        android:lineSpacingExtra="6dp"
+                        android:textColor="@color/text_body"
+                        android:textSize="15sp"
+                        tools:text="I'm building a React Native app and need to implement user authentication. What's the best approach for handling JWT tokens and secure storage?" />
+
+                    <!-- Images Container -->
+                    <LinearLayout
+                        android:id="@+id/imagesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="vertical"
+                        android:visibility="gone" />
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@color/border_gray" />
+
+                    <!-- Post Stats -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- Upvotes -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_upward_left"
+                                app:tint="@color/success_green" />
+
+                            <TextView
+                                android:id="@+id/upvoteCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/text_body"
+                                android:textSize="14sp"
+                                tools:text="42" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="sans-serif"
+                                android:text="upvotes"
+                                android:textColor="@color/text_meta"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                        <!-- Downvotes -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:rotation="180"
+                                android:src="@drawable/ic_arrow_upward_left"
+                                app:tint="@color/danger_red" />
+
+                            <TextView
+                                android:id="@+id/downvoteCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/text_body"
+                                android:textSize="14sp"
+                                tools:text="3" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="sans-serif"
+                                android:text="downvotes"
+                                android:textColor="@color/text_meta"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                        <!-- Comments -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_assistant"
+                                app:tint="@color/primary_blue" />
+
+                            <TextView
+                                android:id="@+id/commentCount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="sans-serif-medium"
+                                android:textColor="@color/text_body"
+                                android:textSize="14sp"
+                                tools:text="12" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="sans-serif"
+                                android:text="comments"
+                                android:textColor="@color/text_meta"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Status Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/statusCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_gray"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif"
-                        android:text="Post details will be displayed here"
-                        android:textColor="@color/text_secondary"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Status Information"
+                        android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
+                    <!-- Status -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:text="Status:"
+                            android:textColor="@color/text_meta"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/postStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            tools:text="PENDING" />
+
+                    </LinearLayout>
+
+                    <!-- Report Count -->
+                    <LinearLayout
+                        android:id="@+id/reportCountLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:text="Reports:"
+                            android:textColor="@color/text_meta"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/reportCount"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/danger_red"
+                            android:textSize="14sp"
+                            tools:text="5 reports" />
+
+                    </LinearLayout>
+
+                    <!-- Violation Types -->
+                    <LinearLayout
+                        android:id="@+id/violationTypesLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:text="Violations:"
+                            android:textColor="@color/text_meta"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/violationTypes"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            tools:text="Spam, Harassment" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Author Information Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/border_gray"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="18dp">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Author Information"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp" />
+
+                    <!-- Author ID -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:text="Author ID:"
+                            android:textColor="@color/text_meta"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/authorId"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-mono"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textIsSelectable="true"
+                            tools:text="user_123456789" />
+
+                    </LinearLayout>
+
+                    <!-- Post ID -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:fontFamily="sans-serif"
-                        android:text="Content coming soon..."
-                        android:textColor="@color/text_hint"
-                        android:textSize="14sp" />
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif"
+                            android:text="Post ID:"
+                            android:textColor="@color/text_meta"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/postId"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-mono"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:textIsSelectable="true"
+                            tools:text="post_987654321" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

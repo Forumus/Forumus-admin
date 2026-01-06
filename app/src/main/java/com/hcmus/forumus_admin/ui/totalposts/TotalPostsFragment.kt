@@ -82,8 +82,14 @@ class TotalPostsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = TotalPostsAdapter { post ->
-            // Navigate to post detail fragment
-            findNavController().navigate(R.id.action_totalPostsFragment_to_postDetailFragment)
+            // Navigate to post detail fragment with post ID
+            val bundle = Bundle().apply {
+                putString("postId", post.id)
+            }
+            findNavController().navigate(
+                R.id.action_totalPostsFragment_to_postDetailFragment,
+                bundle
+            )
         }
 
         binding.postsRecyclerView.apply {
