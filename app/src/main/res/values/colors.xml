@@ -56,4 +56,24 @@
     <color name="tag_design_text">#c2185b</color>
     <color name="tag_css_bg">#fff3e0</color>
     <color name="tag_css_text">#e65100</color>
+    
+    <!-- Settings Page Colors -->
+    <color name="settings_gradient_start">#9810FA</color>
+    <color name="settings_gradient_end">#155DFC</color>
+    <color name="settings_purple">#AD46FF</color>
+    <color name="settings_blue">#2B7FFF</color>
+    <color name="settings_orange_start">#FFB900</color>
+    <color name="settings_orange_end">#FF6900</color>
+    <color name="settings_dark_start">#314158</color>
+    <color name="settings_dark_end">#0F172B</color>
+    <color name="settings_text_primary">#314158</color>
+    <color name="settings_text_secondary">#62748E</color>
+    <color name="settings_text_title">#1D293D</color>
+    <color name="settings_text_light">#F3E8FF</color>
+    <color name="settings_card_bg">#B3FFFFFF</color>
+    <color name="settings_button_bg">#F8FAFC</color>
+    <color name="settings_button_icon_bg">#FFFFFF</color>
+    <color name="settings_button_icon_bg_semi">#33FFFFFF</color>
+    <color name="settings_button_selected_indicator">#FFFFFF</color>
+    <color name="settings_gradient_accent">#155DFC</color>
 </resources>
