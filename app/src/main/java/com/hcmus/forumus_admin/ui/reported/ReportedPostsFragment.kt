@@ -30,6 +30,7 @@ data class ReportedPost(
     val date: String,
     val categories: List<String>,
     val description: String,
+    val fullContent: String, // Added for notification
     val violationCount: Int,
     val reportCount: Int,
     val violationTypes: List<String> = emptyList() // Added for status escalation audit
@@ -301,6 +302,7 @@ class ReportedPostsFragment : Fragment() {
                             postId = post.id,
                             postAuthorId = post.authorId,
                             postTitle = post.title,
+                            postContent = post.fullContent,
                             reason = "Reported by community members",
                             isAiDeleted = false
                         )
@@ -394,6 +396,7 @@ class ReportedPostsFragment : Fragment() {
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
+                                        fullContent = firestorePost.content,
                                         violationCount = violationCounts[firestorePost.post_id] ?: 0,
                                         reportCount = firestorePost.reportCount.toInt(),
                                         violationTypes = firestorePost.violation_type
@@ -422,6 +425,7 @@ class ReportedPostsFragment : Fragment() {
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
+                                        fullContent = firestorePost.content,
                                         violationCount = 0,
                                         reportCount = firestorePost.reportCount.toInt(),
                                         violationTypes = firestorePost.violation_type
@@ -459,6 +463,7 @@ class ReportedPostsFragment : Fragment() {
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
+                                        fullContent = firestorePost.content,
                                         violationCount = violationCounts[firestorePost.post_id] ?: 0,
                                         reportCount = firestorePost.reportCount.toInt(),
                                         violationTypes = firestorePost.violation_type
@@ -480,6 +485,7 @@ class ReportedPostsFragment : Fragment() {
                                         date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
+                                        fullContent = firestorePost.content,
                                         violationCount = 0,
                                         reportCount = firestorePost.reportCount.toInt(),
                                         violationTypes = firestorePost.violation_type

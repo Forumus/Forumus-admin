@@ -47,6 +47,7 @@ class PushNotificationService {
         postId: String,
         postAuthorId: String,
         postTitle: String,
+        postContent: String,
         reason: String = "Community guidelines violation",
         isAiDeleted: Boolean = false
     ): Result<Unit> {
@@ -62,7 +63,9 @@ class PushNotificationService {
                 actorName = actorName,
                 targetId = postId,
                 targetUserId = postAuthorId,
-                previewText = "Your post \"${postTitle.take(50)}\" was removed: $reason"
+                previewText = "Your post \"${postTitle.take(50)}\" was removed: $reason",
+                originalPostTitle = postTitle,
+                originalPostContent = postContent
             )
             
             val response = RetrofitClient.notificationApi.triggerNotification(request)
@@ -143,6 +146,7 @@ class PushNotificationService {
         postId: String,
         postAuthorId: String,
         postTitle: String,
+        postContent: String,
         reason: String = "Content policy violation",
         isAiRejected: Boolean = false
     ): Result<Unit> {
@@ -158,7 +162,9 @@ class PushNotificationService {
                 actorName = actorName,
                 targetId = postId,
                 targetUserId = postAuthorId,
-                previewText = "Your post \"${postTitle.take(50)}\" was rejected: $reason"
+                previewText = "Your post \"${postTitle.take(50)}\" was rejected: $reason",
+                originalPostTitle = postTitle,
+                originalPostContent = postContent
             )
             
             val response = RetrofitClient.notificationApi.triggerNotification(request)

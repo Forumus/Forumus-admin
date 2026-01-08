@@ -23,7 +23,13 @@ data class NotificationTriggerRequest(
     val targetUserId: String, // The user to notify
     
     @SerializedName("previewText")
-    val previewText: String // Snippet of content or reason
+    val previewText: String, // Snippet of content or reason
+
+    @SerializedName("originalPostTitle")
+    val originalPostTitle: String? = null,
+
+    @SerializedName("originalPostContent")
+    val originalPostContent: String? = null
 )
 
 /**
