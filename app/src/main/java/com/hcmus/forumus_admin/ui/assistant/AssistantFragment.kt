@@ -78,10 +78,16 @@ class AssistantFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = AiPostsAdapter(
             onApprove = { postId ->
-                viewModel.approvePost(postId)
+                val post = viewModel.state.value?.allPosts?.find { it.postData.id == postId }
+                if (post != null) {
+                    showApproveConfirmation(post)
+                }
             },
             onReject = { postId ->
-                viewModel.rejectPost(postId)
+                val post = viewModel.state.value?.allPosts?.find { it.postData.id == postId }
+                if (post != null) {
+                    showRejectConfirmation(post)
+                }
             }
         )
         
@@ -89,6 +95,49 @@ class AssistantFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = this@AssistantFragment.adapter
         }
+    }
+
+    private fun showApproveConfirmation(post: com.hcmus.forumus_admin.data.model.AiModerationResult) {
+        val message = if (viewModel.state.value?.currentTab == TabType.AI_REJECTED) {
+            "Are you sure you want to APPROVE this rejected post?"
+        } else {
+             // For AI Approved tab, "Approve" might not make sense (it's already approved), 
+             // but maybe they want to explicit "verify" it?
+             // User Request: "For the approve button, when click will show up a confirmation box... change status to APPROVED".
+             // If I am in "AI approved" tab, the post is *already* approved? 
+             // The user said: "And for the AI rejected tab... For the approve button... change status to APPROVED".
+             // The buttons available in Approved Tab are usually Reject. 
+             // In Rejected Tab, buttons are Approve.
+             // Let's assume this action is primarily for the Rejected Tab to move to Approved.
+             "Are you sure you want to approve this post?"
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Approve Post")
+            .setMessage("$message\n\nTitle: ${post.postData.title}")
+            .setPositiveButton("Approve") { _, _ ->
+                viewModel.approvePost(post.postData.id)
+                Toast.makeText(requireContext(), "Post Approved", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showRejectConfirmation(post: com.hcmus.forumus_admin.data.model.AiModerationResult) {
+        val isApprovedTab = viewModel.state.value?.currentTab == TabType.AI_APPROVED
+        val title = if (isApprovedTab) "Reject Post" else "Delete Post"
+        val message = "Are you sure you want to reject/delete this post? This action cannot be undone."
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage("$message\n\nTitle: ${post.postData.title}")
+            .setPositiveButton("Reject") { _, _ ->
+                // Only send notification if rejecting from AI Approved tab
+                viewModel.rejectPost(post.postData.id, sendNotification = isApprovedTab)
+                Toast.makeText(requireContext(), "Post Rejected", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
     
     private fun setupTabs() {

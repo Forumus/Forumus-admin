@@ -162,7 +162,7 @@ class PushNotificationService {
                 actorName = actorName,
                 targetId = postId,
                 targetUserId = postAuthorId,
-                previewText = "Your post \"${postTitle.take(50)}\" was rejected: $reason",
+                previewText = "Your post \"${postTitle.take(50)}\" has been rejected by the verification system",
                 originalPostTitle = postTitle,
                 originalPostContent = postContent
             )

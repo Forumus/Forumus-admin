@@ -182,7 +182,7 @@ class AiModerationViewModel : ViewModel() {
      * Reject a post and escalate the author's status.
      * This will trigger the status escalation workflow.
      */
-    fun rejectPost(postId: String) {
+    fun rejectPost(postId: String, sendNotification: Boolean = true) {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
             
@@ -213,6 +213,21 @@ class AiModerationViewModel : ViewModel() {
                         }
                     }
                     
+                    // Send push notification about post rejection
+                    if (sendNotification && post != null) {
+                        try {
+                            pushNotificationService.sendPostRejectedNotification(
+                                postId = post.id,
+                                postAuthorId = post.authorId,
+                                postTitle = post.title,
+                                postContent = post.content,
+                                isAiRejected = false // Admin rejected
+                            )
+                        } catch (e: Exception) {
+                            Log.w("AiModerationViewModel", "Failed to send notification (non-blocking)", e)
+                        }
+                    }
+
                     // Reload posts after rejection
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
@@ -250,6 +265,19 @@ class AiModerationViewModel : ViewModel() {
                         }
                     }
                     
+                    // Send push notification about post rejection
+                    try {
+                        pushNotificationService.sendPostRejectedNotification(
+                            postId = post.id,
+                            postAuthorId = post.authorId,
+                            postTitle = post.title,
+                            postContent = post.content,
+                            isAiRejected = false // Admin rejected
+                        )
+                    } catch (e: Exception) {
+                        Log.w("AiModerationViewModel", "Failed to send notification (non-blocking)", e)
+                    }
+
                     // Reload posts after rejection
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
