@@ -88,7 +88,9 @@ class ReportedPostsFragment : Fragment() {
                 )
             },
             onDismissClick = { post -> showDismissConfirmation(post) },
-            onDeleteClick = { post -> showDeleteConfirmation(post) }
+            onDeleteClick = { post -> showDeleteConfirmation(post) },
+            onViolationBadgeClick = { post -> showViolationsDialog(post) },
+            onReportBadgeClick = { post -> showReportDetailsDialog(post) }
         )
         
         binding.postsRecyclerView.apply {
@@ -378,41 +380,69 @@ class ReportedPostsFragment : Fragment() {
                                 adapter.updatePosts(filteredPosts)
                             }
                         } else {
-                            // Get violation counts for all reported posts in one batch query
+                            // Get violation and report counts for all reported posts in one batch query
                             val postIds = reportedFirestorePosts.map { it.post_id }
                             val violationCountsResult = reportRepository.getViolationCountsForPosts(postIds)
+                            val reportCountsResult = reportRepository.getReportCountsForPosts(postIds)
                             
                             violationCountsResult.onSuccess { violationCounts ->
-                                // Convert Firestore posts to ReportedPost model with accurate violation counts
-                                allPosts = reportedFirestorePosts.map { firestorePost ->
-                                    val author = userMap[firestorePost.authorId]?.fullName 
-                                        ?: firestorePost.authorId
+                                reportCountsResult.onSuccess { reportCounts ->
+                                    // Convert Firestore posts to ReportedPost model with accurate counts
+                                    allPosts = reportedFirestorePosts.map { firestorePost ->
+                                        val author = userMap[firestorePost.authorId]?.fullName 
+                                            ?: firestorePost.authorId
+                                        
+                                        ReportedPost(
+                                            id = firestorePost.post_id,
+                                            title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                            author = author,
+                                            authorId = firestorePost.authorId,
+                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            categories = firestorePost.topic,
+                                            description = firestorePost.content.take(200),
+                                            fullContent = firestorePost.content,
+                                            violationCount = violationCounts[firestorePost.post_id] ?: 0,
+                                            reportCount = reportCounts[firestorePost.post_id] ?: 0,
+                                            violationTypes = firestorePost.violation_type
+                                        )
+                                    }
+                                
+                                    context?.let {
+                                        Toast.makeText(it, "Loaded ${allPosts.size} reported posts", Toast.LENGTH_SHORT).show()
+                                    }
                                     
-                                    ReportedPost(
-                                        id = firestorePost.post_id,
-                                        title = firestorePost.title.ifEmpty { "Untitled Post" },
-                                        author = author,
-                                        authorId = firestorePost.authorId,
-                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
-                                        categories = firestorePost.topic,
-                                        description = firestorePost.content.take(200),
-                                        fullContent = firestorePost.content,
-                                        violationCount = violationCounts[firestorePost.post_id] ?: 0,
-                                        reportCount = firestorePost.reportCount.toInt(),
-                                        violationTypes = firestorePost.violation_type
-                                    )
-                                }
-                                
-                                context?.let {
-                                    Toast.makeText(it, "Loaded ${allPosts.size} reported posts", Toast.LENGTH_SHORT).show()
-                                }
-                                
-                                filteredPosts = allPosts
-                                if (isAdded && _binding != null) {
-                                    adapter.updatePosts(filteredPosts)
+                                    filteredPosts = allPosts
+                                    if (isAdded && _binding != null) {
+                                        adapter.updatePosts(filteredPosts)
+                                    }
+                                }.onFailure {
+                                    // Fallback to 0 report count if query fails
+                                    allPosts = reportedFirestorePosts.map { firestorePost ->
+                                        val author = userMap[firestorePost.authorId]?.fullName 
+                                            ?: firestorePost.authorId
+                                        
+                                        ReportedPost(
+                                            id = firestorePost.post_id,
+                                            title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                            author = author,
+                                            authorId = firestorePost.authorId,
+                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            categories = firestorePost.topic,
+                                            description = firestorePost.content.take(200),
+                                            fullContent = firestorePost.content,
+                                            violationCount = violationCounts[firestorePost.post_id] ?: 0,
+                                            reportCount = 0,
+                                            violationTypes = firestorePost.violation_type
+                                        )
+                                    }
+                                    
+                                    filteredPosts = allPosts
+                                    if (isAdded && _binding != null) {
+                                        adapter.updatePosts(filteredPosts)
+                                    }
                                 }
                             }.onFailure {
-                                // Fallback to 0 violation count if query fails
+                                // Fallback to 0 for both counts if violation query fails
                                 allPosts = reportedFirestorePosts.map { firestorePost ->
                                     val author = userMap[firestorePost.authorId]?.fullName 
                                         ?: firestorePost.authorId
@@ -427,7 +457,7 @@ class ReportedPostsFragment : Fragment() {
                                         description = firestorePost.content.take(200),
                                         fullContent = firestorePost.content,
                                         violationCount = 0,
-                                        reportCount = firestorePost.reportCount.toInt(),
+                                        reportCount = 0,
                                         violationTypes = firestorePost.violation_type
                                     )
                                 }
@@ -449,33 +479,57 @@ class ReportedPostsFragment : Fragment() {
                                 adapter.updatePosts(filteredPosts)
                             }
                         } else {
-                            // Get violation counts
+                            // Get violation and report counts
                             val postIds = reportedFirestorePosts.map { it.post_id }
                             val violationCountsResult = reportRepository.getViolationCountsForPosts(postIds)
+                            val reportCountsResult = reportRepository.getReportCountsForPosts(postIds)
                             
                             violationCountsResult.onSuccess { violationCounts ->
-                                allPosts = reportedFirestorePosts.map { firestorePost ->
-                                    ReportedPost(
-                                        id = firestorePost.post_id,
-                                        title = firestorePost.title.ifEmpty { "Untitled Post" },
-                                        author = firestorePost.authorId,
-                                        authorId = firestorePost.authorId,
-                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
-                                        categories = firestorePost.topic,
-                                        description = firestorePost.content.take(200),
-                                        fullContent = firestorePost.content,
-                                        violationCount = violationCounts[firestorePost.post_id] ?: 0,
-                                        reportCount = firestorePost.reportCount.toInt(),
-                                        violationTypes = firestorePost.violation_type
-                                    )
-                                }
-                                
-                                filteredPosts = allPosts
-                                if (isAdded && _binding != null) {
-                                    adapter.updatePosts(filteredPosts)
+                                reportCountsResult.onSuccess { reportCounts ->
+                                    allPosts = reportedFirestorePosts.map { firestorePost ->
+                                        ReportedPost(
+                                            id = firestorePost.post_id,
+                                            title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                            author = firestorePost.authorId,
+                                            authorId = firestorePost.authorId,
+                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            categories = firestorePost.topic,
+                                            description = firestorePost.content.take(200),
+                                            fullContent = firestorePost.content,
+                                            violationCount = violationCounts[firestorePost.post_id] ?: 0,
+                                            reportCount = reportCounts[firestorePost.post_id] ?: 0,
+                                            violationTypes = firestorePost.violation_type
+                                        )
+                                    }
+                                    
+                                    filteredPosts = allPosts
+                                    if (isAdded && _binding != null) {
+                                        adapter.updatePosts(filteredPosts)
+                                    }
+                                }.onFailure {
+                                    allPosts = reportedFirestorePosts.map { firestorePost ->
+                                        ReportedPost(
+                                            id = firestorePost.post_id,
+                                            title = firestorePost.title.ifEmpty { "Untitled Post" },
+                                            author = firestorePost.authorId,
+                                            authorId = firestorePost.authorId,
+                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            categories = firestorePost.topic,
+                                            description = firestorePost.content.take(200),
+                                            fullContent = firestorePost.content,
+                                            violationCount = violationCounts[firestorePost.post_id] ?: 0,
+                                            reportCount = 0,
+                                            violationTypes = firestorePost.violation_type
+                                        )
+                                    }
+                                    
+                                    filteredPosts = allPosts
+                                    if (isAdded && _binding != null) {
+                                        adapter.updatePosts(filteredPosts)
+                                    }
                                 }
                             }.onFailure {
-                                // Fallback to 0 violation count
+                                // Fallback to 0 for both counts
                                 allPosts = reportedFirestorePosts.map { firestorePost ->
                                     ReportedPost(
                                         id = firestorePost.post_id,
@@ -487,7 +541,7 @@ class ReportedPostsFragment : Fragment() {
                                         description = firestorePost.content.take(200),
                                         fullContent = firestorePost.content,
                                         violationCount = 0,
-                                        reportCount = firestorePost.reportCount.toInt(),
+                                        reportCount = 0,
                                         violationTypes = firestorePost.violation_type
                                     )
                                 }
@@ -711,6 +765,146 @@ class ReportedPostsFragment : Fragment() {
                     contentContainer.visibility = View.GONE
                     errorText.visibility = View.VISIBLE
                     errorText.text = "Failed to load report details: ${exception.message}"
+                }
+            } catch (e: Exception) {
+                // Show error
+                loadingIndicator.visibility = View.GONE
+                contentContainer.visibility = View.GONE
+                errorText.visibility = View.VISIBLE
+                errorText.text = "Error: ${e.message}"
+            }
+        }
+    }
+
+    private fun showViolationsDialog(post: ReportedPost) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_violations, null)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+        
+        // Make dialog background transparent for rounded corners
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        
+        // Get views
+        val closeButton = dialogView.findViewById<View>(R.id.closeButton)
+        val loadingIndicator = dialogView.findViewById<ProgressBar>(R.id.loadingIndicator)
+        val contentContainer = dialogView.findViewById<View>(R.id.contentContainer)
+        val errorText = dialogView.findViewById<TextView>(R.id.errorText)
+        val violationSummaryText = dialogView.findViewById<TextView>(R.id.violationSummaryText)
+        val violationsContainer = dialogView.findViewById<LinearLayout>(R.id.violationsContainer)
+        
+        // Close button
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        
+        // Show loading state
+        loadingIndicator.visibility = View.VISIBLE
+        contentContainer.visibility = View.GONE
+        errorText.visibility = View.GONE
+        
+        // Show dialog first
+        dialog.show()
+        
+        // Load report data from Firebase to get unique violations
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val reportsResult = reportRepository.getReportsForPost(post.id)
+                
+                reportsResult.onSuccess { reports ->
+                    if (reports.isEmpty()) {
+                        // No reports found
+                        loadingIndicator.visibility = View.GONE
+                        contentContainer.visibility = View.GONE
+                        errorText.visibility = View.VISIBLE
+                        errorText.text = "No reports found for this post"
+                    } else {
+                        // Group reports by violation type and count occurrences
+                        val violationCounts = reports
+                            .map { report -> 
+                                report.descriptionViolation.name.ifEmpty { report.nameViolation }
+                            }
+                            .filter { it.isNotEmpty() }
+                            .groupBy { it }
+                            .mapValues { entry -> entry.value.size }
+                            .toList()
+                            .sortedByDescending { it.second } // Sort by count descending
+                        
+                        if (violationCounts.isEmpty()) {
+                            loadingIndicator.visibility = View.GONE
+                            contentContainer.visibility = View.GONE
+                            errorText.visibility = View.VISIBLE
+                            errorText.text = "No violation types found"
+                        } else {
+                            val uniqueViolationCount = violationCounts.size
+                            val totalReportCount = reports.size
+                            
+                            // Build summary text
+                            violationSummaryText.text = if (uniqueViolationCount == 1) {
+                                "$uniqueViolationCount unique violation type from $totalReportCount report${if (totalReportCount != 1) "s" else ""}"
+                            } else {
+                                "$uniqueViolationCount unique violation types from $totalReportCount report${if (totalReportCount != 1) "s" else ""}"
+                            }
+                            
+                            // Clear and populate violations container with unique types and counts
+                            violationsContainer.removeAllViews()
+                            
+                            violationCounts.forEachIndexed { index, (violationType, count) ->
+                                // Create a card-like view for each violation type
+                                val violationCard = LinearLayout(requireContext()).apply {
+                                    orientation = LinearLayout.HORIZONTAL
+                                    setPadding(16, 12, 16, 12)
+                                    setBackgroundResource(R.drawable.bg_sort_option_unselected)
+                                    layoutParams = LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                    ).apply {
+                                        if (index > 0) topMargin = 12
+                                    }
+                                }
+                                
+                                // Violation name (left aligned)
+                                val violationNameText = TextView(requireContext()).apply {
+                                    text = violationType
+                                    setTextColor(resources.getColor(R.color.danger_red, null))
+                                    textSize = 14f
+                                    setTypeface(null, android.graphics.Typeface.BOLD)
+                                    layoutParams = LinearLayout.LayoutParams(
+                                        0,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                                        1f
+                                    )
+                                }
+                                violationCard.addView(violationNameText)
+                                
+                                // Count badge (right aligned)
+                                val countBadge = TextView(requireContext()).apply {
+                                    text = "$count"
+                                    setTextColor(resources.getColor(android.R.color.white, null))
+                                    textSize = 13f
+                                    setTypeface(null, android.graphics.Typeface.BOLD)
+                                    setBackgroundResource(R.drawable.bg_delete_button)
+                                    setPadding(12, 6, 12, 6)
+                                    gravity = android.view.Gravity.CENTER
+                                    minWidth = 40
+                                }
+                                violationCard.addView(countBadge)
+                                
+                                violationsContainer.addView(violationCard)
+                            }
+                            
+                            // Show content
+                            loadingIndicator.visibility = View.GONE
+                            contentContainer.visibility = View.VISIBLE
+                            errorText.visibility = View.GONE
+                        }
+                    }
+                }.onFailure { exception ->
+                    // Show error
+                    loadingIndicator.visibility = View.GONE
+                    contentContainer.visibility = View.GONE
+                    errorText.visibility = View.VISIBLE
+                    errorText.text = "Failed to load violations: ${exception.message}"
                 }
             } catch (e: Exception) {
                 // Show error

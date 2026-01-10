@@ -102,11 +102,14 @@
 
                 <!-- Violation Badge -->
                 <LinearLayout
+                    android:id="@+id/violationBadgeContainer"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_violation_badge"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:paddingStart="12dp"
@@ -132,10 +135,13 @@
 
                 <!-- Report Badge -->
                 <LinearLayout
+                    android:id="@+id/reportBadgeContainer"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_report_badge"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp">

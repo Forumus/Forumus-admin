@@ -11,7 +11,9 @@ class ReportedPostsAdapter(
     private var posts: List<ReportedPost>,
     private val onItemClick: (ReportedPost) -> Unit,
     private val onDismissClick: (ReportedPost) -> Unit,
-    private val onDeleteClick: (ReportedPost) -> Unit
+    private val onDeleteClick: (ReportedPost) -> Unit,
+    private val onViolationBadgeClick: (ReportedPost) -> Unit,
+    private val onReportBadgeClick: (ReportedPost) -> Unit
 ) : RecyclerView.Adapter<ReportedPostsAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -20,8 +22,10 @@ class ReportedPostsAdapter(
         val dateText: TextView = view.findViewById(R.id.postDate)
         val categoriesText: TextView = view.findViewById(R.id.postCategories)
         val descriptionText: TextView = view.findViewById(R.id.postDescription)
-        val violationBadge: TextView = view.findViewById(R.id.violationBadge)
-        val reportBadge: TextView = view.findViewById(R.id.reportBadge)
+        val violationBadgeText: TextView = view.findViewById(R.id.violationBadge)
+        val reportBadgeText: TextView = view.findViewById(R.id.reportBadge)
+        val violationBadgeContainer: View = view.findViewById(R.id.violationBadgeContainer)
+        val reportBadgeContainer: View = view.findViewById(R.id.reportBadgeContainer)
         val dismissButton: View = view.findViewById(R.id.dismissButton)
         val deleteButton: View = view.findViewById(R.id.deleteButton)
     }
@@ -46,15 +50,24 @@ class ReportedPostsAdapter(
         
         // Set violation count
         val violationText = "${post.violationCount} violation${if (post.violationCount != 1) "s" else ""}"
-        holder.violationBadge.text = violationText
+        holder.violationBadgeText.text = violationText
         
         // Set report count
         val reportText = "${post.reportCount} report${if (post.reportCount != 1) "s" else ""}"
-        holder.reportBadge.text = reportText
+        holder.reportBadgeText.text = reportText
         
         // Handle item click
         holder.itemView.setOnClickListener {
             onItemClick(post)
+        }
+        
+        // Handle badge clicks
+        holder.violationBadgeContainer.setOnClickListener {
+            onViolationBadgeClick(post)
+        }
+        
+        holder.reportBadgeContainer.setOnClickListener {
+            onReportBadgeClick(post)
         }
         
         // Handle button clicks

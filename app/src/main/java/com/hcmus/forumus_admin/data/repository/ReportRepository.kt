@@ -42,6 +42,12 @@ class ReportRepository {
         }
     }
     
+    /**
+     * Get unique violation type counts for multiple posts.
+     * Returns a map of postId to number of UNIQUE violation types (not total reports).
+     * Example: If a post has 3 reports with violations [SPAM, SPAM, HARASSMENT],
+     * the count will be 2 (not 3).
+     */
     suspend fun getViolationCountsForPosts(postIds: List<String>): Result<Map<String, Int>> {
         return try {
             if (postIds.isEmpty()) {
@@ -57,7 +63,54 @@ class ReportRepository {
                     .get()
                     .await()
                 
-                // Group reports by postId and count TOTAL reports (not just unique violations)
+                // Group reports by postId, then count UNIQUE violation types per post
+                val reportsByPost = snapshot.documents
+                    .mapNotNull { doc ->
+                        try {
+                            val postId = doc.getString("postId")
+                            val violationType = doc.getString("nameViolation") ?: ""
+                            if (postId != null && violationType.isNotEmpty()) {
+                                Pair(postId, violationType)
+                            } else null
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                    .groupBy { it.first } // Group by postId
+                
+                // Count unique violation types for each post
+                reportsByPost.forEach { (postId, reports) ->
+                    val uniqueViolations = reports.map { it.second }.toSet().size
+                    violationCounts[postId] = uniqueViolations
+                }
+            }
+            
+            Result.success(violationCounts)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+    
+    /**
+     * Get total report counts for multiple posts.
+     * Returns a map of postId to total number of reports.
+     */
+    suspend fun getReportCountsForPosts(postIds: List<String>): Result<Map<String, Int>> {
+        return try {
+            if (postIds.isEmpty()) {
+                return Result.success(emptyMap())
+            }
+            
+            // Firestore whereIn() has a limit of 10 items, so we need to batch
+            val reportCounts = mutableMapOf<String, Int>()
+            
+            postIds.chunked(10).forEach { batch ->
+                val snapshot = reportsCollection
+                    .whereIn("postId", batch)
+                    .get()
+                    .await()
+                
+                // Count total reports per post
                 val batchCounts = snapshot.documents
                     .mapNotNull { doc ->
                         try {
@@ -67,15 +120,12 @@ class ReportRepository {
                         }
                     }
                     .groupBy { it }
-                    .mapValues { entry ->
-                        // Count total number of reports for each post
-                        entry.value.size
-                    }
+                    .mapValues { entry -> entry.value.size }
                 
-                violationCounts.putAll(batchCounts)
+                reportCounts.putAll(batchCounts)
             }
             
-            Result.success(violationCounts)
+            Result.success(reportCounts)
         } catch (e: Exception) {
             Result.failure(e)
         }
