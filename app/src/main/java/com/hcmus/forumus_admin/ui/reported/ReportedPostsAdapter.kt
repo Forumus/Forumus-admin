@@ -40,7 +40,7 @@ class ReportedPostsAdapter(
         val post = posts[position]
         
         holder.titleText.text = post.title
-        holder.authorText.text = "by ${post.author}"
+        holder.authorText.text = holder.itemView.context.getString(R.string.by_author, post.author)
         holder.dateText.text = post.date
         
         // Format categories with › separator
@@ -49,11 +49,20 @@ class ReportedPostsAdapter(
         holder.descriptionText.text = post.description
         
         // Set violation count
-        val violationText = "${post.violationCount} violation${if (post.violationCount != 1) "s" else ""}"
+        val resources = holder.itemView.context.resources
+        val violationText = resources.getQuantityString(
+            R.plurals.violation_count, 
+            post.violationCount, 
+            post.violationCount
+        )
         holder.violationBadgeText.text = violationText
         
         // Set report count
-        val reportText = "${post.reportCount} report${if (post.reportCount != 1) "s" else ""}"
+        val reportText = resources.getQuantityString(
+            R.plurals.report_count, 
+            post.reportCount, 
+            post.reportCount
+        )
         holder.reportBadgeText.text = reportText
         
         // Handle item click

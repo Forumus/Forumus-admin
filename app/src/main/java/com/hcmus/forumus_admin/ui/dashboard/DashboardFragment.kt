@@ -279,7 +279,7 @@ class DashboardFragment : Fragment() {
     
     private fun formatNumber(number: Int): String {
         return when {
-            number >= 1000 -> String.format("%,d", number)
+            number >= 1000 -> "%,d".format(number)
             else -> number.toString()
         }
     }
@@ -405,16 +405,31 @@ class DashboardFragment : Fragment() {
     }
     
     private fun updatePeriodLabel() {
-        val monthNames = arrayOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        val monthNames = arrayOf(
+            getString(R.string.jan), getString(R.string.feb), getString(R.string.mar), 
+            getString(R.string.apr), getString(R.string.may), getString(R.string.jun), 
+            getString(R.string.jul), getString(R.string.aug), getString(R.string.sep), 
+            getString(R.string.oct), getString(R.string.nov), getString(R.string.dec)
+        )
         val label = when (currentChartPeriod) {
             "month" -> currentYear.toString()
-            "week" -> "${monthNames[currentMonth]} $currentYear"
+            "week" -> {
+                if (Locale.getDefault().language == "vi") {
+                   	"${monthNames[currentMonth]} $currentYear"
+                } else {
+                    "${monthNames[currentMonth]} $currentYear"
+                }
+            }
             "day" -> {
                 val weekEnd = currentWeekStart.clone() as Calendar
                 weekEnd.add(Calendar.DAY_OF_WEEK, 6)
-                val dateFormat = SimpleDateFormat("MMM d", Locale.getDefault())
-                "${dateFormat.format(currentWeekStart.time)} - ${dateFormat.format(weekEnd.time)}, ${currentWeekStart.get(Calendar.YEAR)}"
+                
+                // Use localized formatted string for the date range
+                val startFormat = SimpleDateFormat(getString(R.string.chart_day_format), Locale.getDefault())
+                val endFormat = SimpleDateFormat(getString(R.string.chart_day_format), Locale.getDefault())
+                
+                // Format: "Nov 17 - Nov 23, 2024" or equivalent
+                "${startFormat.format(currentWeekStart.time)} - ${endFormat.format(weekEnd.time)}, ${currentWeekStart.get(Calendar.YEAR)}"
             }
             else -> ""
         }
@@ -458,11 +473,32 @@ class DashboardFragment : Fragment() {
         val dailyCounts = IntArray(7) { 0 }
         val dayLabels = mutableListOf<String>()
         
-        // Generate day labels
+        // Generate day labels using localized strings
+        // We order them based on the calendar (e.g. starting Monday or Sunday)
+        // Instead of hardcoded array, we can use format 
         val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
+        // BUT user provided resources: mon, tue etc. Let's try to map if we can, 
+        // OR rely on SimpleDateFormat("EEE", Locale.getDefault()) which is standard.
+        // Given user provided "Th 2", "Th 3" etc for Vietnam, standard EEE might give "Th 2" or "Mon".
+        // Let's use the resources to be safe and match user expectation
+        
         val tempCal = weekStart.clone() as Calendar
+        // Map calendar day constant to resource string
+        fun getDayString(cal: Calendar): String {
+            return when(cal.get(Calendar.DAY_OF_WEEK)) {
+                Calendar.MONDAY -> getString(R.string.mon)
+                Calendar.TUESDAY -> getString(R.string.tue)
+                Calendar.WEDNESDAY -> getString(R.string.wed)
+                Calendar.THURSDAY -> getString(R.string.thu)
+                Calendar.FRIDAY -> getString(R.string.fri)
+                Calendar.SATURDAY -> getString(R.string.sat)
+                Calendar.SUNDAY -> getString(R.string.sun)
+                else -> ""
+            }
+        }
+
         for (i in 0 until 7) {
-            dayLabels.add(dayFormat.format(tempCal.time))
+            dayLabels.add(getDayString(tempCal))
             tempCal.add(Calendar.DAY_OF_WEEK, 1)
         }
         
@@ -485,7 +521,7 @@ class DashboardFragment : Fragment() {
             BarEntry(index.toFloat(), count.toFloat())
         }
         
-        val dataSet = BarDataSet(entries, "Posts").apply {
+        val dataSet = BarDataSet(entries, getString(R.string.total_posts)).apply {
             color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
             valueTextColor = Color.TRANSPARENT
             setDrawValues(false)
@@ -564,7 +600,9 @@ class DashboardFragment : Fragment() {
         
         // Initialize weekly counts
         val weeklyCounts = IntArray(maxWeek) { 0 }
-        val weekLabels = (1..maxWeek).map { "Week $it" }
+        
+        // Use localized label for "Week X"
+        val weekLabels = (1..maxWeek).map { getString(R.string.chart_week_label).format(it) }
         
         // Count posts per week in this month
         cachedPosts.forEach { post ->
@@ -586,7 +624,7 @@ class DashboardFragment : Fragment() {
             BarEntry(index.toFloat(), count.toFloat())
         }
         
-        val dataSet = BarDataSet(entries, "Posts").apply {
+        val dataSet = BarDataSet(entries, getString(R.string.total_posts)).apply {
             color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
             valueTextColor = Color.TRANSPARENT
             setDrawValues(false)
@@ -662,8 +700,14 @@ class DashboardFragment : Fragment() {
         
         // Initialize monthly counts
         val monthlyCounts = IntArray(12) { 0 }
-        val monthLabels = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
-                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+        
+        // Use localized month names
+        val monthLabels = listOf(
+            getString(R.string.jan), getString(R.string.feb), getString(R.string.mar), 
+            getString(R.string.apr), getString(R.string.may), getString(R.string.jun), 
+            getString(R.string.jul), getString(R.string.aug), getString(R.string.sep), 
+            getString(R.string.oct), getString(R.string.nov), getString(R.string.dec)
+        )
         
         // Count posts per month in this year
         cachedPosts.forEach { post ->
@@ -684,7 +728,7 @@ class DashboardFragment : Fragment() {
             BarEntry(index.toFloat(), count.toFloat())
         }
         
-        val dataSet = BarDataSet(entries, "Posts").apply {
+        val dataSet = BarDataSet(entries, getString(R.string.total_posts)).apply {
             color = ContextCompat.getColor(requireContext(), R.color.primary_blue)
             valueTextColor = Color.TRANSPARENT
             setDrawValues(false)

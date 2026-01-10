@@ -4,6 +4,9 @@
     <string name="dashboard">Dashboard</string>
     <string name="total_users">Total Users</string>
     <string name="total_posts">Total Posts</string>
+    <string name="ai_moderation_title">AI Moderation</string>
+    <string name="settings_title">Settings</string>
+    <string name="dashboard_title">Dashboard</string>
     <string name="blacklisted_users">Blacklisted Users</string>
     <string name="reported_posts">Reported Posts</string>
     <string name="posts_over_time">Posts Over Time</string>
@@ -22,6 +25,29 @@
     <string name="others">Others</string>
     <string name="sports">Sports</string>
     <string name="technology">Technology</string>
+    <string name="chart_day_format">MMM d</string>
+    <string name="chart_day_week_year_format">MMM d - MMM d, yyyy</string>
+    <string name="chart_month_year_format">MMM yyyy</string>
+    <string name="chart_week_label">Week %d</string>
+    <string name="jan">Jan</string>
+    <string name="feb">Feb</string>
+    <string name="mar">Mar</string>
+    <string name="apr">Apr</string>
+    <string name="may">May</string>
+    <string name="jun">Jun</string>
+    <string name="jul">Jul</string>
+    <string name="aug">Aug</string>
+    <string name="sep">Sep</string>
+    <string name="oct">Oct</string>
+    <string name="nov">Nov</string>
+    <string name="dec">Dec</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
     
     <!-- Blacklist Screen & Total Users Screen -->
     <string name="back">Back</string>
@@ -213,4 +239,42 @@
     <string name="theme_icon">Theme Icon</string>
     <string name="language_flag">Language Flag</string>
     <string name="selected_indicator">Selected Indicator</string>
+    <string name="forumus_title">Forumus</string>
+    <string name="post_details">Post Details</string>
+    <string name="upvotes_lower">upvotes</string>
+    <string name="downvotes_lower">downvotes</string>
+    <string name="comments_lower">comments</string>
+    <string name="status_info">Status Information</string>
+    <string name="status_label">Status:</string>
+    <string name="reports_label">Reports:</string>
+    <string name="violations_label">Violations:</string>
+    <string name="author_info">Author Information</string>
+    <string name="author_id_label">Author ID:</string>
+    <string name="post_id_label">Post ID:</string>
+    <string name="no_posts_found">No posts found</string>
+    <string name="violation_types_title">Violation Types</string>
+    <string name="violation_summary">Summary</string>
+    <string name="report_details">Report Details</string>
+    <string name="report_summary">Report Summary</string>
+    <string name="individual_reports">Individual Reports</string>
+    <string name="failed_to_load_report_details">Failed to load report details</string>
+    <string name="failed_to_load_violations">Failed to load violations</string>
+    <string name="loading_ellipsis">Loading...</string>
+    <string name="unique_violation_types">Unique Violation Types</string>
+    <string name="light_theme_selected">Light theme selected</string>
+    <string name="dark_theme_selected">Dark theme selected</string>
+    <string name="auto_theme_selected">Auto theme selected</string>
+    <string name="english_selected">English selected</string>
+    <string name="vietnamese_selected">Vietnamese selected</string>
+    <string name="post_date_format">MMMM dd, yyyy</string>
+
+    <plurals name="violation_count">
+        <item quantity="one">%d violation</item>
+        <item quantity="other">%d violations</item>
+    </plurals>
+
+    <plurals name="report_count">
+        <item quantity="one">%d report</item>
+        <item quantity="other">%d reports</item>
+    </plurals>
 </resources>

@@ -230,7 +230,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No posts found"
+            android:text="@string/no_posts_found"
             android:textSize="@dimen/text_size_medium"
             android:textColor="@color/text_secondary" />
     </LinearLayout>

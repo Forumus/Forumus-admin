@@ -114,37 +114,49 @@ class SettingsFragment : Fragment() {
             selectedTheme = Theme.LIGHT
             updateThemeSelection(Theme.LIGHT)
             savePreferences()
-            Toast.makeText(context, "Light theme selected", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.light_theme_selected), Toast.LENGTH_SHORT).show()
         }
 
         darkThemeButton.setOnClickListener {
             selectedTheme = Theme.DARK
             updateThemeSelection(Theme.DARK)
             savePreferences()
-            Toast.makeText(context, "Dark theme selected", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.dark_theme_selected), Toast.LENGTH_SHORT).show()
         }
 
         autoThemeButton.setOnClickListener {
             selectedTheme = Theme.AUTO
             updateThemeSelection(Theme.AUTO)
             savePreferences()
-            Toast.makeText(context, "Auto theme selected", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, getString(R.string.auto_theme_selected), Toast.LENGTH_SHORT).show()
         }
 
         englishLanguageButton.setOnClickListener {
-            selectedLanguage = Language.ENGLISH
-            updateLanguageSelection(Language.ENGLISH)
-            savePreferences()
-            Toast.makeText(context, "English selected", Toast.LENGTH_SHORT).show()
+            if (selectedLanguage != Language.ENGLISH) {
+                selectedLanguage = Language.ENGLISH
+                updateLanguageSelection(Language.ENGLISH)
+                setLocale("en")
+                Toast.makeText(context, getString(R.string.english_selected), Toast.LENGTH_SHORT).show()
+            }
         }
 
         vietnameseLanguageButton.setOnClickListener {
-            selectedLanguage = Language.VIETNAMESE
-            updateLanguageSelection(Language.VIETNAMESE)
-            savePreferences()
-            Toast.makeText(context, "Tiếng Việt được chọn", Toast.LENGTH_SHORT).show()
+            if (selectedLanguage != Language.VIETNAMESE) {
+                selectedLanguage = Language.VIETNAMESE
+                updateLanguageSelection(Language.VIETNAMESE)
+                setLocale("vi")
+                Toast.makeText(context, getString(R.string.vietnamese_selected), Toast.LENGTH_SHORT).show()
+            }
         }
     }
+
+    private fun setLocale(lang: String) {
+        val context = requireContext()
+        com.hcmus.forumus_admin.core.LocaleHelper.setLocale(context, lang)
+        activity?.recreate()
+    }
+
+    // ... (theme update methods remain the same)
 
     private fun updateThemeSelection(theme: Theme) {
         // Reset all theme buttons to default state
@@ -252,19 +264,22 @@ class SettingsFragment : Fragment() {
     }
 
     private fun loadPreferences() {
+        // Theme loading still uses "settings" prefs for now as it seems to be handled locally here,
+        // but language loading should check the LocaleHelper to be consistent with app startup.
         val prefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
         val themeName = prefs.getString("theme", "LIGHT") ?: "LIGHT"
-        val languageName = prefs.getString("language", "ENGLISH") ?: "ENGLISH"
-
         selectedTheme = Theme.valueOf(themeName)
-        selectedLanguage = Language.valueOf(languageName)
+        
+        // Load language from LocaleHelper
+        val currentLang = com.hcmus.forumus_admin.core.LocaleHelper.getLanguage(requireContext())
+        selectedLanguage = if (currentLang == "vi") Language.VIETNAMESE else Language.ENGLISH
     }
 
     private fun savePreferences() {
         val prefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
         prefs.edit().apply {
             putString("theme", selectedTheme.name)
-            putString("language", selectedLanguage.name)
+            // Language is saved via LocaleHelper.setLocale
             apply()
         }
     }

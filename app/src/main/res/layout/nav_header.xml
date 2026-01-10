@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="Forumus"
+            android:text="@string/forumus_title"
             android:textSize="20sp"
             android:textColor="@color/text_primary"
             android:fontFamily="serif" />

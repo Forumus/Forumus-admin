@@ -96,7 +96,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif"
-                        android:text="--"
+                        tools:text="--"
                         android:textColor="#155dfc"
                         android:textSize="48sp" />
 
@@ -106,7 +106,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif"
-                        android:text="1/1/2024 - 12/31/2024"
+                        tools:text="1/1/2024 - 12/31/2024"
                         android:textColor="#6a7282"
                         android:textSize="16sp" />
 
@@ -339,7 +339,7 @@
                     android:background="@drawable/bg_pagination_button"
                     android:fontFamily="sans-serif"
                     android:gravity="center"
-                    android:text="1 / 10"
+                    tools:text="1 / 10"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
 

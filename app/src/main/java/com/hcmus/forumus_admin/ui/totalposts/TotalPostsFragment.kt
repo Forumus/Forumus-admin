@@ -187,7 +187,7 @@ class TotalPostsFragment : Fragment() {
                                 id = firestorePost.post_id,
                                 title = firestorePost.title.ifEmpty { "Untitled Post" },
                                 author = firestorePost.authorName.ifEmpty { "Unknown Author" },
-                                date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                date = formatPostDate(firestorePost.createdAt),
                                 description = firestorePost.content.take(200),
                                 tags = firestorePost.topic.map { topicName ->
                                     Tag(
@@ -304,7 +304,7 @@ class TotalPostsFragment : Fragment() {
                             id = firestorePost.post_id,
                             title = firestorePost.title.ifEmpty { "Untitled Post" },
                             author = firestorePost.authorName.ifEmpty { "Unknown Author" },
-                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                            date = formatPostDate(firestorePost.createdAt),
                             description = firestorePost.content.take(200),
                             tags = firestorePost.topic.map { topicName ->
                                 Tag(
@@ -401,6 +401,12 @@ class TotalPostsFragment : Fragment() {
     }
 
 
+
+    private fun formatPostDate(timestamp: Any?): String {
+        return PostRepository.getFirebaseTimestampAsDate(timestamp)?.let { dateObj ->
+            java.text.SimpleDateFormat(getString(R.string.post_date_format), java.util.Locale.getDefault()).format(dateObj)
+        } ?: "Unknown date"
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

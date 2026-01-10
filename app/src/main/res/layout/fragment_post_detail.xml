@@ -39,7 +39,7 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:text="Post Details"
+            android:text="@string/post_details"
             android:textColor="@color/text_primary"
             android:textSize="20sp" />
 
@@ -236,7 +236,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"
                                 android:fontFamily="sans-serif"
-                                android:text="upvotes"
+                                android:text="@string/upvotes_lower"
                                 android:textColor="@color/text_meta"
                                 android:textSize="13sp" />
 
@@ -272,7 +272,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"
                                 android:fontFamily="sans-serif"
-                                android:text="downvotes"
+                                android:text="@string/downvotes_lower"
                                 android:textColor="@color/text_meta"
                                 android:textSize="13sp" />
 
@@ -307,7 +307,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"
                                 android:fontFamily="sans-serif"
-                                android:text="comments"
+                                android:text="@string/comments_lower"
                                 android:textColor="@color/text_meta"
                                 android:textSize="13sp" />
 
@@ -341,7 +341,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Status Information"
+                        android:text="@string/status_info"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
@@ -356,7 +356,7 @@
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
-                            android:text="Status:"
+                            android:text="@string/status_label"
                             android:textColor="@color/text_meta"
                             android:textSize="14sp" />
 
@@ -385,7 +385,7 @@
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
-                            android:text="Reports:"
+                            android:text="@string/reports_label"
                             android:textColor="@color/text_meta"
                             android:textSize="14sp" />
 
@@ -414,7 +414,7 @@
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
-                            android:text="Violations:"
+                            android:text="@string/violations_label"
                             android:textColor="@color/text_meta"
                             android:textSize="14sp" />
 
@@ -455,7 +455,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif-medium"
-                        android:text="Author Information"
+                        android:text="@string/author_info"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
@@ -470,7 +470,7 @@
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
-                            android:text="Author ID:"
+                            android:text="@string/author_id_label"
                             android:textColor="@color/text_meta"
                             android:textSize="14sp" />
 
@@ -498,7 +498,7 @@
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
-                            android:text="Post ID:"
+                            android:text="@string/post_id_label"
                             android:textColor="@color/text_meta"
                             android:textSize="14sp" />
 

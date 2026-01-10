@@ -397,7 +397,7 @@ class ReportedPostsFragment : Fragment() {
                                             title = firestorePost.title.ifEmpty { "Untitled Post" },
                                             author = author,
                                             authorId = firestorePost.authorId,
-                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            date = formatPostDate(firestorePost.createdAt),
                                             categories = firestorePost.topic,
                                             description = firestorePost.content.take(200),
                                             fullContent = firestorePost.content,
@@ -426,7 +426,7 @@ class ReportedPostsFragment : Fragment() {
                                             title = firestorePost.title.ifEmpty { "Untitled Post" },
                                             author = author,
                                             authorId = firestorePost.authorId,
-                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            date = formatPostDate(firestorePost.createdAt),
                                             categories = firestorePost.topic,
                                             description = firestorePost.content.take(200),
                                             fullContent = firestorePost.content,
@@ -452,7 +452,7 @@ class ReportedPostsFragment : Fragment() {
                                         title = firestorePost.title.ifEmpty { "Untitled Post" },
                                         author = author,
                                         authorId = firestorePost.authorId,
-                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                        date = formatPostDate(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
                                         fullContent = firestorePost.content,
@@ -492,7 +492,7 @@ class ReportedPostsFragment : Fragment() {
                                             title = firestorePost.title.ifEmpty { "Untitled Post" },
                                             author = firestorePost.authorId,
                                             authorId = firestorePost.authorId,
-                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            date = formatPostDate(firestorePost.createdAt),
                                             categories = firestorePost.topic,
                                             description = firestorePost.content.take(200),
                                             fullContent = firestorePost.content,
@@ -513,7 +513,7 @@ class ReportedPostsFragment : Fragment() {
                                             title = firestorePost.title.ifEmpty { "Untitled Post" },
                                             author = firestorePost.authorId,
                                             authorId = firestorePost.authorId,
-                                            date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                            date = formatPostDate(firestorePost.createdAt),
                                             categories = firestorePost.topic,
                                             description = firestorePost.content.take(200),
                                             fullContent = firestorePost.content,
@@ -536,7 +536,7 @@ class ReportedPostsFragment : Fragment() {
                                         title = firestorePost.title.ifEmpty { "Untitled Post" },
                                         author = firestorePost.authorId,
                                         authorId = firestorePost.authorId,
-                                        date = PostRepository.formatFirebaseTimestamp(firestorePost.createdAt),
+                                        date = formatPostDate(firestorePost.createdAt),
                                         categories = firestorePost.topic,
                                         description = firestorePost.content.take(200),
                                         fullContent = firestorePost.content,
@@ -914,6 +914,12 @@ class ReportedPostsFragment : Fragment() {
                 errorText.text = "Error: ${e.message}"
             }
         }
+    }
+
+    private fun formatPostDate(timestamp: Any?): String {
+        return PostRepository.getFirebaseTimestampAsDate(timestamp)?.let { dateObj ->
+            java.text.SimpleDateFormat(getString(R.string.post_date_format), java.util.Locale.getDefault()).format(dateObj)
+        } ?: "Unknown date"
     }
 
     override fun onDestroyView() {

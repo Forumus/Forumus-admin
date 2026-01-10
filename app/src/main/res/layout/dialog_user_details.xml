@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_rounded"
@@ -95,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="sans-serif"
-                android:text="Trần Anh Khoa"
+                tools:text="Trần Anh Khoa"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
@@ -122,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="sans-serif"
-                android:text="23120135"
+                tools:text="23120135"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
@@ -153,7 +154,7 @@
                 android:paddingTop="4dp"
                 android:paddingEnd="8dp"
                 android:paddingBottom="4dp"
-                android:text="Warning"
+                tools:text="Warning"
                 android:textSize="10sp" />
 
         </LinearLayout>
@@ -179,7 +180,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="sans-serif"
-                android:text="Member"
+                tools:text="Member"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 
@@ -205,7 +206,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="sans-serif"
-                android:text="Nov 18, 2023"
+                tools:text="Nov 18, 2023"
                 android:textColor="@color/text_primary"
                 android:textSize="16sp" />
 

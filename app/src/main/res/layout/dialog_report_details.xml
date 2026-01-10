@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
-            android:text="Report Details"
+            android:text="@string/report_details"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:paddingBottom="12dp"
-                android:text="Report Summary"
+                android:text="@string/report_summary"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:paddingBottom="16dp"
-                android:text="Loading..."
+                android:text="@string/loading_ellipsis"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
@@ -108,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:paddingBottom="12dp"
-                android:text="Individual Reports"
+                android:text="@string/individual_reports"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -135,7 +135,7 @@
         android:layout_marginBottom="32dp"
         android:fontFamily="sans-serif"
         android:gravity="center"
-        android:text="Failed to load report details"
+        android:text="@string/failed_to_load_report_details"
         android:textColor="@color/danger_red"
         android:textSize="14sp"
         android:visibility="gone" />

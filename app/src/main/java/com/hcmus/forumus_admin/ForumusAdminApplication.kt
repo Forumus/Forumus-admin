@@ -5,7 +5,14 @@ import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 
+import android.content.Context
+import com.hcmus.forumus_admin.core.LocaleHelper
+
 class ForumusAdminApplication : Application() {
+    
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(LocaleHelper.onAttach(base))
+    }
     
     override fun onCreate() {
         super.onCreate()

@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:fontFamily="sans-serif-medium"
-            android:text="Dashboard"
+            android:text="@string/dashboard"
             android:textColor="@color/primary_blue"
             android:textSize="28sp"
             android:textStyle="bold" />

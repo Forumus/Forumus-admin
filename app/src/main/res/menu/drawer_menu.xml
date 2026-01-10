@@ -4,16 +4,16 @@
         <item
             android:id="@+id/dashboardFragment"
             android:icon="@drawable/ic_dashboard"
-            android:title="Dashboard" />
+            android:title="@string/dashboard_title" />
 
         <item
             android:id="@+id/assistantFragment"
             android:icon="@drawable/ic_assistant"
-            android:title="AI Moderation" />
+            android:title="@string/ai_moderation_title" />
 
         <item
             android:id="@+id/settingsFragment"
             android:icon="@drawable/ic_settings"
-            android:title="Settings" />
+            android:title="@string/settings_title" />
     </group>
 </menu>

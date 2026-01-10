@@ -384,7 +384,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/language_flag"
-                                android:text="🇺🇸"
+                                tools:text="🇺🇸"
                                 android:textSize="24sp" />
                         </FrameLayout>
 
@@ -461,7 +461,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/language_flag"
-                                android:text="🇻🇳"
+                                tools:text="🇻🇳"
                                 android:textSize="24sp" />
                         </FrameLayout>
 

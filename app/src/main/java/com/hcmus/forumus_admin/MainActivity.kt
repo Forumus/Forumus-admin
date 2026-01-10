@@ -10,7 +10,14 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 
+import android.content.Context
+import com.hcmus.forumus_admin.core.LocaleHelper
+
 class MainActivity : AppCompatActivity() {
+    
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.onAttach(newBase))
+    }
     
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView

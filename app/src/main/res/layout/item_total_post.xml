@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
@@ -51,7 +52,7 @@
                     android:id="@+id/labelText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Posts"
+                    android:text="@string/total_posts"
                     android:textSize="11sp"
                     android:textColor="#999999"
                     android:fontFamily="sans-serif"/>
@@ -61,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="1,234"
+                    tools:text="1,234"
                     android:textSize="20sp"
                     android:textColor="@color/text_primary"
                     android:textStyle="bold"
