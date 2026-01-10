@@ -41,7 +41,8 @@
     <string name="warn">Warned</string>
     <string name="remind">Reminded</string>
     <string name="normal">Normal</string>
-    <string name="remove">Removed</string>
+    <string name="remove">Remove</string>
+    <string name="action_column">Action</string>
     <string name="user_avatar">User Avatar</string>
     <string name="previous_page">Previous Page</string>
     <string name="next_page">Next Page</string>
