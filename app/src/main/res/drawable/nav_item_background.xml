@@ -2,14 +2,20 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <shape android:shape="rectangle">
-            <solid android:color="#F5F5F5"/>
-            <corners android:radius="10dp"/>
+            <solid android:color="#E0E7FF" /> <!-- Light Indigo -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#F1F5F9" /> <!-- Light Slate -->
+            <corners android:radius="12dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@android:color/transparent"/>
-            <corners android:radius="10dp"/>
+            <solid android:color="@android:color/transparent" />
+            <corners android:radius="12dp" />
         </shape>
     </item>
 </selector>

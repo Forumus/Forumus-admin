@@ -24,7 +24,10 @@ class SettingsFragment : Fragment() {
     private lateinit var lightThemeIcon: ImageView
     private lateinit var lightThemeText: TextView
     private lateinit var lightThemeIndicator: FrameLayout
+
     private lateinit var lightThemeIndicatorDot: View
+
+    private lateinit var menuIcon: FrameLayout
 
     private lateinit var darkThemeButton: FrameLayout
     private lateinit var darkThemeIconContainer: FrameLayout
@@ -70,6 +73,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun initializeViews(view: View) {
+        menuIcon = view.findViewById(R.id.menuIcon)
+
         // Theme buttons
         lightThemeButton = view.findViewById(R.id.lightThemeButton)
         lightThemeIconContainer = view.findViewById(R.id.lightThemeIconContainer)
@@ -101,6 +106,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
+        menuIcon.setOnClickListener {
+            (activity as? com.hcmus.forumus_admin.MainActivity)?.openDrawer()
+        }
+
         lightThemeButton.setOnClickListener {
             selectedTheme = Theme.LIGHT
             updateThemeSelection(Theme.LIGHT)

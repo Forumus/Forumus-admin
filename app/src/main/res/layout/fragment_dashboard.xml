@@ -5,18 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="@color/background_light">
 
     <!-- Header -->
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:elevation="3dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:elevation="0dp"
         android:paddingHorizontal="20dp"
-        android:paddingTop="40dp"
+        android:paddingTop="16dp"
         android:paddingBottom="16dp">
 
         <FrameLayout
@@ -25,7 +23,9 @@
             android:layout_height="38dp"
             android:background="@drawable/bg_menu_icon"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true">
 
             <ImageView
                 android:layout_width="30dp"
@@ -36,35 +36,17 @@
 
         </FrameLayout>
 
-        <ImageView
-            android:id="@+id/logoIcon"
-            android:layout_width="44dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="12dp"
-            android:contentDescription="Logo"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_logo_dark" />
-
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:fontFamily="serif"
-            android:text="Forumus"
-            android:textColor="@color/text_primary"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/adminLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Admin"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:fontFamily="serif" />
+            android:layout_centerInParent="true"
+            android:fontFamily="sans-serif-medium"
+            android:text="Dashboard"
+            android:textColor="@color/primary_blue"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
@@ -143,8 +125,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
+                app:cardCornerRadius="@dimen/modern_corner_radius"
+                app:cardElevation="0dp"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="@color/white">
 
@@ -292,8 +274,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp"
+                app:cardCornerRadius="@dimen/modern_corner_radius"
+                app:cardElevation="0dp"
                 app:strokeWidth="0dp"
                 app:cardBackgroundColor="@color/white">
 

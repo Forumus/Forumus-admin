@@ -5,6 +5,8 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    app:statusBarBackground="@color/white"
     tools:context=".MainActivity">
 
     <!-- Main Content -->
@@ -32,12 +34,12 @@
         app:itemTextAppearance="@style/NavigationItemTextAppearance"
         app:itemBackground="@drawable/nav_item_background"
         app:itemHorizontalPadding="24dp"
-        app:itemVerticalPadding="12dp"
-        app:itemIconPadding="12dp"
-        app:itemIconSize="20dp"
+        app:itemVerticalPadding="16dp"
+        app:itemIconPadding="16dp"
+        app:itemIconSize="24dp"
         app:itemShapeFillColor="@android:color/transparent"
-        app:itemShapeInsetStart="0dp"
-        app:itemShapeInsetEnd="0dp"
+        app:itemShapeInsetStart="16dp"
+        app:itemShapeInsetEnd="16dp"
         app:itemShapeInsetTop="0dp"
         app:itemShapeInsetBottom="0dp"
         tools:ignore="VisualLintBounds" />

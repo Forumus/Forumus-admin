@@ -19,6 +19,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Enforce White Status Bar with Dark Icons
+        val window = window
+        window.statusBarColor = androidx.core.content.ContextCompat.getColor(this, android.R.color.white)
+        androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         
         setupNavigation()
         setupBackPressedHandler()
@@ -26,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     
     private fun setupNavigation() {
         drawerLayout = findViewById(R.id.drawerLayout)
+        drawerLayout.setStatusBarBackgroundColor(androidx.core.content.ContextCompat.getColor(this, android.R.color.white))
         navigationView = findViewById(R.id.navigationView)
         
         val navHostFragment = supportFragmentManager

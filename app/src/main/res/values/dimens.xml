@@ -20,6 +20,7 @@
     <dimen name="corner_radius_normal">10dp</dimen>
     <dimen name="corner_radius_large">14dp</dimen>
     <dimen name="corner_radius_xlarge">40dp</dimen>
+    <dimen name="modern_corner_radius">16dp</dimen>
     
     <!-- Icon Sizes -->
     <dimen name="icon_size_small">16dp</dimen>

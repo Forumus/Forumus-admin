@@ -6,7 +6,7 @@
     android:layout_marginStart="@dimen/spacing_normal"
     android:layout_marginEnd="@dimen/spacing_normal"
     android:layout_marginBottom="@dimen/spacing_medium"
-    app:cardCornerRadius="@dimen/corner_radius_normal"
+    app:cardCornerRadius="@dimen/modern_corner_radius"
     app:cardElevation="0dp"
     app:strokeColor="@color/border_gray"
     app:strokeWidth="@dimen/border_width"

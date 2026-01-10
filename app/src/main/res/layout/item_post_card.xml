@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@android:color/white"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="@dimen/modern_corner_radius"
         app:cardElevation="0dp"
-        app:strokeColor="#E0E0E0"
+        app:strokeColor="@color/border_gray"
         app:strokeWidth="1dp">
 
         <LinearLayout
@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
-                android:textColor="#155DFC"
+                android:textColor="@color/primary_blue"
                 android:textSize="16sp"
                 tools:text="Misleading Information about React" />
 
@@ -46,7 +46,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
-                    android:textColor="#6A7282"
+                    android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     tools:text="by John Doe" />
 
@@ -57,7 +57,7 @@
                     android:layout_marginEnd="8dp"
                     android:fontFamily="sans-serif"
                     android:text="•"
-                    android:textColor="#D1D5DC"
+                    android:textColor="@color/border_gray"
                     android:textSize="14sp" />
 
                 <TextView
@@ -65,7 +65,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
-                    android:textColor="#6A7282"
+                    android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     tools:text="November 18, 2025" />
 
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:fontFamily="sans-serif"
-                android:textColor="#4A5565"
+                android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:lineSpacingExtra="2dp"
                 tools:text="Information Technology › Software Engineering › Web Development" />
@@ -93,7 +93,7 @@
                 android:fontFamily="sans-serif"
                 android:lineSpacingExtra="4dp"
                 android:maxLines="3"
-                android:textColor="#4A5565"
+                android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 tools:text="This article contains misleading information about React best practices and promotes outdated patterns that could harm application performance." />
 

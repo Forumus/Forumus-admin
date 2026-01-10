@@ -167,9 +167,7 @@ class AssistantFragment : Fragment() {
             (activity as? MainActivity)?.openDrawer()
         }
         
-        binding.moreOptionsIcon.setOnClickListener {
-            // Show options menu
-        }
+
         
         binding.sortButton.setOnClickListener {
             showSortDialog()
