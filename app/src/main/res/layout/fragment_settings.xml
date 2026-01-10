@@ -384,7 +384,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/language_flag"
-                                tools:text="🇺🇸"
+                                android:text="🇺🇸"
                                 android:textSize="24sp" />
                         </FrameLayout>
 
@@ -404,12 +404,7 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/language_english"
-                                android:textColor="@color/settings_text_secondary"
-                                android:textSize="14sp" />
+
                         </LinearLayout>
 
                         <!-- Selection Checkmark (visible when selected) -->
@@ -461,7 +456,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="center"
                                 android:contentDescription="@string/language_flag"
-                                tools:text="🇻🇳"
+                                android:text="🇻🇳"
                                 android:textSize="24sp" />
                         </FrameLayout>
 
@@ -481,12 +476,7 @@
                                 android:textSize="16sp"
                                 android:textStyle="bold" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/language_vietnamese"
-                                android:textColor="@color/settings_text_secondary"
-                                android:textSize="14sp" />
+
                         </LinearLayout>
 
                         <!-- Selection Checkmark (visible when selected) -->
