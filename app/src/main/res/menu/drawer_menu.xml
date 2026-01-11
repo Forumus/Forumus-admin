@@ -5,7 +5,9 @@
             android:id="@+id/dashboardFragment"
             android:icon="@drawable/ic_dashboard"
             android:title="@string/dashboard_title" />
-
+    </group>
+    
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/assistantFragment"
             android:icon="@drawable/ic_assistant"

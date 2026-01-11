@@ -2,13 +2,19 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <shape android:shape="rectangle">
-            <solid android:color="#E0E7FF" /> <!-- Light Indigo -->
+            <solid android:color="@color/drawer_item_selected_bg" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item android:state_activated="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/drawer_item_selected_bg" />
             <corners android:radius="12dp" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="#F1F5F9" /> <!-- Light Slate -->
+            <solid android:color="@color/drawer_ripple" />
             <corners android:radius="12dp" />
         </shape>
     </item>

@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    app:statusBarBackground="@color/white"
     tools:context=".MainActivity">
 
     <!-- Main Content -->
@@ -22,26 +21,28 @@
     <!-- Navigation Drawer -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
-        android:layout_width="280dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/white"
+        android:background="@color/drawer_background"
         android:fitsSystemWindows="true"
+        android:elevation="8dp"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"
-        app:itemIconTint="@color/text_primary"
-        app:itemTextColor="@color/text_primary"
+        app:itemIconTint="@color/drawer_item_icon_state"
+        app:itemTextColor="@color/drawer_item_text_state"
         app:itemTextAppearance="@style/NavigationItemTextAppearance"
         app:itemBackground="@drawable/nav_item_background"
-        app:itemHorizontalPadding="24dp"
-        app:itemVerticalPadding="16dp"
-        app:itemIconPadding="16dp"
+        app:itemHorizontalPadding="20dp"
+        app:itemVerticalPadding="14dp"
+        app:itemIconPadding="20dp"
         app:itemIconSize="24dp"
         app:itemShapeFillColor="@android:color/transparent"
-        app:itemShapeInsetStart="16dp"
-        app:itemShapeInsetEnd="16dp"
-        app:itemShapeInsetTop="0dp"
-        app:itemShapeInsetBottom="0dp"
+        app:itemShapeInsetStart="12dp"
+        app:itemShapeInsetEnd="12dp"
+        app:itemShapeInsetTop="4dp"
+        app:itemShapeInsetBottom="4dp"
+        app:itemRippleColor="@color/drawer_ripple"
         tools:ignore="VisualLintBounds" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

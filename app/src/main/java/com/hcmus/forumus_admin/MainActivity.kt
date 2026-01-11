@@ -57,14 +57,14 @@ class MainActivity : AppCompatActivity() {
     private fun setupNavigation() {
         drawerLayout = findViewById(R.id.drawerLayout)
         
-        // Set drawer status bar background based on theme
+        // Set drawer status bar background to match header gradient
         val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-        val statusBarColor = if (isDarkMode) {
-            androidx.core.content.ContextCompat.getColor(this, R.color.background_gray)
+        val drawerStatusBarColor = if (isDarkMode) {
+            androidx.core.content.ContextCompat.getColor(this, R.color.drawer_header_background)
         } else {
-            androidx.core.content.ContextCompat.getColor(this, android.R.color.white)
+            androidx.core.content.ContextCompat.getColor(this, R.color.drawer_header_gradient_end)
         }
-        drawerLayout.setStatusBarBackgroundColor(statusBarColor)
+        drawerLayout.setStatusBarBackgroundColor(drawerStatusBarColor)
         
         navigationView = findViewById(R.id.navigationView)
         

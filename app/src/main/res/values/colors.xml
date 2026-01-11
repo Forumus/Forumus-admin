@@ -81,4 +81,22 @@
     <color name="settings_indicator_dot_orange">#FF6900</color>
     <color name="settings_indicator_dot_dark">#314158</color>
     <color name="settings_gradient_accent">#155DFC</color>
+    
+    <!-- Navigation Drawer Colors -->
+    <color name="drawer_background">#FFFFFF</color>
+    <color name="drawer_header_background">#F8FAFC</color>
+    <color name="drawer_header_gradient_start">#818CF8</color>
+    <color name="drawer_header_gradient_end">#6366F1</color>
+    <color name="drawer_item_text">#1E293B</color>
+    <color name="drawer_item_icon">#64748B</color>
+    <color name="drawer_item_selected_bg">#E0E7FF</color>
+    <color name="drawer_item_selected_text">#4338CA</color>
+    <color name="drawer_item_selected_icon">#6366F1</color>
+    <color name="drawer_divider">#E2E8F0</color>
+    <color name="drawer_ripple">#F1F5F9</color>
+    
+    <!-- Button Colors -->
+    <color name="button_border">#1A000000</color>
+    <color name="toggle_group_bg">#ECECF0</color>
+    <color name="toggle_button_selected">#FFFFFF</color>
 </resources>
