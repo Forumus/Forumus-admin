@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/card_background"
         android:elevation="3dp"
         android:paddingHorizontal="20dp"
         android:paddingTop="16dp"
@@ -99,7 +99,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_settings_card"
-                android:elevation="0dp"
                 android:paddingStart="21dp"
                 android:paddingTop="21dp"
                 android:paddingEnd="21dp"
@@ -353,7 +352,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_settings_card"
-                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="12dp">
 

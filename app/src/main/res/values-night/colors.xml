@@ -73,7 +73,7 @@
     <color name="settings_text_title">#F1F5F9</color>
     <color name="settings_text_light">#F3E8FF</color>
     <color name="settings_card_bg">#1E293B</color>
-    <color name="settings_button_bg">#2D3748</color>
+    <color name="settings_button_bg">#0F172A</color>
     <color name="settings_button_icon_bg">#374151</color>
     <color name="settings_button_icon_bg_semi">#33FFFFFF</color>
     <color name="settings_button_icon_bg_selected_light">#4DFFFFFF</color>
