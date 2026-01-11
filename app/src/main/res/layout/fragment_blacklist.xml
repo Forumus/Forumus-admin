@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@color/background_light">
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="85dp"
-        android:background="@android:color/white"
+        android:background="@color/card_background"
         android:elevation="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -59,7 +59,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@android:color/white"
+        android:background="@color/background_light"
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -139,7 +139,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            app:cardBackgroundColor="#F1F3F5"
+            app:cardBackgroundColor="@color/table_header_bg"
             app:cardCornerRadius="10dp"
             app:cardElevation="0dp"
             app:contentPadding="1dp">
@@ -153,7 +153,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:background="#F1F3F5"
+                    android:background="@color/table_header_bg"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingStart="10dp"
@@ -165,7 +165,7 @@
                         android:layout_marginEnd="10dp"
                         android:fontFamily="sans-serif-medium"
                         android:text="@string/avatar"
-                        android:textColor="#666666"
+                        android:textColor="@color/table_header_text"
                         android:textSize="12sp" />
 
                     <TextView
@@ -175,7 +175,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:text="@string/name"
-                        android:textColor="#666666"
+                        android:textColor="@color/table_header_text"
                         android:textSize="12sp" />
 
                     <TextView
@@ -185,7 +185,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:text="@string/id"
-                        android:textColor="#666666"
+                        android:textColor="@color/table_header_text"
                         android:textSize="12sp" />
 
                     <TextView
@@ -195,7 +195,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:text="@string/status"
-                        android:textColor="#666666"
+                        android:textColor="@color/table_header_text"
                         android:textSize="12sp" />
 
                     <TextView
@@ -205,7 +205,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:gravity="center"
                         android:text="@string/action_column"
-                        android:textColor="#666666"
+                        android:textColor="@color/table_header_text"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -220,7 +220,7 @@
                         android:id="@+id/usersRecyclerView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="@android:color/white"
+                        android:background="@color/list_item_bg"
                         tools:listitem="@layout/item_blacklist_user" />
 
                     <!-- Loading Indicator -->
@@ -230,7 +230,7 @@
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:background="@android:color/white"
+                        android:background="@color/list_item_bg"
                         android:visibility="gone">
 
                         <ProgressBar

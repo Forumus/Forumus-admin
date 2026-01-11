@@ -18,7 +18,7 @@
         android:layout_height="20dp"
         android:src="@drawable/ic_search"
         android:contentDescription="@string/search_icon"
-        app:tint="#9CA3AF" />
+        app:tint="@color/text_secondary" />
 
     <!-- Suggestion Text Container -->
     <LinearLayout
@@ -33,7 +33,7 @@
             android:id="@+id/suggestionPrimaryText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#1F2937"
+            android:textColor="@color/text_primary"
             android:textSize="15sp"
             android:fontFamily="sans-serif"
             android:ellipsize="end"
@@ -45,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="#9CA3AF"
+            android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:fontFamily="sans-serif"
             android:ellipsize="end"
@@ -63,6 +63,6 @@
         android:src="@drawable/ic_arrow_upward_left"
         android:contentDescription="@string/filter"
         android:visibility="gone"
-        app:tint="#9CA3AF" />
+        app:tint="@color/text_secondary" />
 
 </LinearLayout>

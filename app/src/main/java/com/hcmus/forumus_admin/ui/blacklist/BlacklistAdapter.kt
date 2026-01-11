@@ -44,21 +44,21 @@ class BlacklistAdapter(
                 holder.statusBadge.text = holder.itemView.context.getString(R.string.ban)
                 holder.statusBadge.setBackgroundResource(R.drawable.bg_badge_ban)
                 holder.statusBadge.setTextColor(
-                    ContextCompat.getColor(holder.itemView.context, R.color.danger_red)
+                    ContextCompat.getColor(holder.itemView.context, R.color.badge_ban_text)
                 )
             }
             UserStatus.WARNED -> {
                 holder.statusBadge.text = holder.itemView.context.getString(R.string.warning)
                 holder.statusBadge.setBackgroundResource(R.drawable.bg_badge_warning)
                 holder.statusBadge.setTextColor(
-                    ContextCompat.getColor(holder.itemView.context, R.color.warning_orange)
+                    ContextCompat.getColor(holder.itemView.context, R.color.badge_warning_text)
                 )
             }
             UserStatus.REMINDED -> {
                 holder.statusBadge.text = holder.itemView.context.getString(R.string.remind)
                 holder.statusBadge.setBackgroundResource(R.drawable.bg_badge_remind)
                 holder.statusBadge.setTextColor(
-                    ContextCompat.getColor(holder.itemView.context, R.color.primary_blue)
+                    ContextCompat.getColor(holder.itemView.context, R.color.badge_remind_text)
                 )
             }
             UserStatus.NORMAL -> {

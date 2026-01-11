@@ -99,4 +99,36 @@
     <color name="button_border">#1A000000</color>
     <color name="toggle_group_bg">#ECECF0</color>
     <color name="toggle_button_selected">#FFFFFF</color>
+    
+    <!-- User List Screen Colors -->
+    <color name="table_header_bg">#F1F3F5</color>
+    <color name="table_header_text">#6A7282</color>
+    <color name="list_item_bg">#FFFFFF</color>
+    <color name="list_item_text">#101828</color>
+    <color name="list_item_text_secondary">#4A5565</color>
+    <color name="search_bar_bg">#F9F5FF</color>
+    <color name="search_bar_border">#E0E0E0</color>
+    <color name="filter_button_bg">#F9F5FF</color>
+    <color name="filter_button_border">#E0E0E0</color>
+    <color name="pagination_button_bg">#FFFFFF</color>
+    <color name="pagination_button_border">#C4CDD5</color>
+    <color name="dropdown_bg">#FFFFFF</color>
+    <color name="dropdown_border">#E5E7EB</color>
+    
+    <!-- Badge Colors -->
+    <color name="badge_warning_bg">#FFF6DD</color>
+    <color name="badge_warning_text">#BB4D00</color>
+    <color name="badge_warning_border">#C49A68</color>
+    <color name="badge_normal_bg">#E0F5EB</color>
+    <color name="badge_normal_text">#047857</color>
+    <color name="badge_normal_border">#B9F8CF</color>
+    <color name="badge_remove_bg">#F8F9FA</color>
+    <color name="badge_remove_text">#666666</color>
+    <color name="badge_remove_border">#666666</color>
+    <color name="badge_ban_bg">#FFECE6</color>
+    <color name="badge_ban_text">#B91C1C</color>
+    <color name="badge_ban_border">#E7000B</color>
+    <color name="badge_remind_bg">#E3F2FD</color>
+    <color name="badge_remind_text">#1565C0</color>
+    <color name="badge_remind_border">#1976D2</color>
 </resources>

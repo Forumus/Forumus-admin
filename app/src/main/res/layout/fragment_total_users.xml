@@ -4,14 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="@color/background_light">
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="85dp"
-        android:background="@android:color/white"
+        android:background="@color/card_background"
         android:elevation="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -59,7 +59,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@android:color/white"
+        android:background="@color/background_light"
         android:orientation="vertical"
         android:padding="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -145,7 +145,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#F1F3F5"
+                android:background="@color/table_header_bg"
                 android:orientation="horizontal"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
@@ -158,7 +158,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="center"
                     android:text="@string/avatar"
-                    android:textColor="#6A7282"
+                    android:textColor="@color/table_header_text"
                     android:textSize="12sp" />
 
                 <TextView
@@ -168,7 +168,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="center"
                     android:text="@string/name"
-                    android:textColor="#6A7282"
+                    android:textColor="@color/table_header_text"
                     android:textSize="12sp" />
 
                 <TextView
@@ -177,7 +177,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="center"
                     android:text="@string/id"
-                    android:textColor="#6A7282"
+                    android:textColor="@color/table_header_text"
                     android:textSize="12sp" />
 
                 <TextView
@@ -186,7 +186,7 @@
                     android:fontFamily="sans-serif"
                     android:gravity="center"
                     android:text="@string/status"
-                    android:textColor="#6A7282"
+                    android:textColor="@color/table_header_text"
                     android:textSize="12sp" />
 
             </LinearLayout>
@@ -201,7 +201,7 @@
                     android:id="@+id/usersRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@android:color/white"
+                    android:background="@color/background_light"
                     android:clipToPadding="false"
                     tools:listitem="@layout/item_user_list" />
 
@@ -212,7 +212,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:background="@android:color/white"
+                    android:background="@color/background_light"
                     android:visibility="gone">
 
                     <ProgressBar

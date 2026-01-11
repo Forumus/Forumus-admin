@@ -52,28 +52,28 @@ class TotalUsersAdapter(
                     userStatus.text = itemView.context.getString(R.string.ban)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_ban)
                     userStatus.setTextColor(
-                        ContextCompat.getColor(itemView.context, R.color.danger_red)
+                        ContextCompat.getColor(itemView.context, R.color.badge_ban_text)
                     )
                 }
                 UserStatus.WARNED -> {
                     userStatus.text = itemView.context.getString(R.string.warning)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_warning)
                     userStatus.setTextColor(
-                        ContextCompat.getColor(itemView.context, R.color.warning_orange)
+                        ContextCompat.getColor(itemView.context, R.color.badge_warning_text)
                     )
                 }
                 UserStatus.REMINDED -> {
                     userStatus.text = itemView.context.getString(R.string.remind)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_remind)
                     userStatus.setTextColor(
-                        ContextCompat.getColor(itemView.context, R.color.primary_blue)
+                        ContextCompat.getColor(itemView.context, R.color.badge_remind_text)
                     )
                 }
                 UserStatus.NORMAL -> {
                     userStatus.text = itemView.context.getString(R.string.normal)
                     userStatus.setBackgroundResource(R.drawable.bg_badge_normal)
                     userStatus.setTextColor(
-                        ContextCompat.getColor(itemView.context, R.color.success_green)
+                        ContextCompat.getColor(itemView.context, R.color.badge_normal_text)
                     )
                 }
             }

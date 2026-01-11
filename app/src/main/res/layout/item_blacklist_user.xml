@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white"
+    android:background="@color/list_item_bg"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="10dp">
@@ -65,7 +65,7 @@
         android:paddingHorizontal="6dp"
         android:paddingVertical="4dp"
         android:text="@string/warning"
-        android:textColor="#C49A68"
+        android:textColor="@color/badge_warning_text"
         android:textSize="12sp" />
 
     <!-- Remove Button -->
@@ -82,7 +82,7 @@
         android:paddingHorizontal="6dp"
         android:paddingVertical="4dp"
         android:text="@string/remove"
-        android:textColor="#666666"
+        android:textColor="@color/badge_remove_text"
         android:textSize="12sp" />
 
 </LinearLayout>
