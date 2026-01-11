@@ -30,7 +30,7 @@
     <color name="text_primary">#E2E8F0</color>
     <color name="text_hint">#64748B</color>
     <color name="border_gray">#2D3748</color>
-    <color name="background_gray">#1E293B</color>
+    <color name="background_gray">#121212</color>
     <color name="card_background">#1E293B</color>
     
     <!-- AI Moderation Colors -->
@@ -161,4 +161,29 @@
     <color name="dismiss_button_border">#7F1D1D</color>
     <color name="delete_button_bg">#DC2626</color>
     <color name="delete_button_text">#FFFFFF</color>
+    
+    <!-- Post Detail Screen Colors - Dark Mode -->
+    <color name="info_card_bg">#1E293B</color>
+    <color name="info_label_text">#94A3B8</color>
+    <color name="info_value_text">#E2E8F0</color>
+    <color name="info_section_title">#CBD5E1</color>
+    <color name="info_divider">#334155</color>
+    
+    <!-- Dialog Colors - Dark Mode -->
+    <color name="dialog_bg">#1E293B</color>
+    <color name="dialog_title_text">#E2E8F0</color>
+    <color name="dialog_description_text">#94A3B8</color>
+    <color name="dialog_button_bg">#6366F1</color>
+    <color name="dialog_button_text">#FFFFFF</color>
+    
+    <!-- Input Field Colors - Dark Mode -->
+    <color name="input_field_bg">#2D3748</color>
+    <color name="input_field_border">#475569</color>
+    <color name="input_field_text">#E2E8F0</color>
+    <color name="input_field_hint">#64748B</color>
+    
+    <!-- Topic Item Colors - Dark Mode -->
+    <color name="topic_item_bg">@android:color/transparent</color>
+    <color name="topic_item_border">#475569</color>
+    <color name="topic_name_text">#E2E8F0</color>
 </resources>

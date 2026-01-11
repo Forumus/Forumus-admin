@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/manage_topics_description"
-                android:textColor="#717182"
+                android:textColor="@color/dialog_description_text"
                 android:textSize="14sp"
                 android:fontFamily="sans-serif"
                 android:gravity="center" />
@@ -66,8 +66,8 @@
             android:layout_weight="1"
             android:background="@drawable/bg_input_field"
             android:hint="@string/new_topic_name"
-            android:textColorHint="#717182"
-            android:textColor="@color/text_primary"
+            android:textColorHint="@color/input_field_hint"
+            android:textColor="@color/input_field_text"
             android:textSize="16sp"
             android:paddingHorizontal="12dp"
             android:singleLine="true"
@@ -88,9 +88,9 @@
             app:iconGravity="textStart"
             app:iconPadding="0dp"
             app:iconSize="16dp"
-            app:iconTint="@color/white"
+            app:iconTint="@color/dialog_button_text"
             app:cornerRadius="8dp"
-            app:backgroundTint="#030213" />
+            app:backgroundTint="@color/dialog_button_bg" />
 
     </LinearLayout>
 
