@@ -12,10 +12,11 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.hcmus.forumus_admin.R
+import com.hcmus.forumus_admin.core.ThemeManager
 
 class SettingsFragment : Fragment() {
 
-    private var selectedTheme: Theme = Theme.LIGHT
+    private var selectedTheme: ThemeManager.ThemeMode = ThemeManager.ThemeMode.LIGHT
     private var selectedLanguage: Language = Language.ENGLISH
 
     // Theme buttons and their components
@@ -111,23 +112,23 @@ class SettingsFragment : Fragment() {
         }
 
         lightThemeButton.setOnClickListener {
-            selectedTheme = Theme.LIGHT
-            updateThemeSelection(Theme.LIGHT)
-            savePreferences()
+            selectedTheme = ThemeManager.ThemeMode.LIGHT
+            updateThemeSelection(ThemeManager.ThemeMode.LIGHT)
+            applyTheme(ThemeManager.ThemeMode.LIGHT)
             Toast.makeText(context, getString(R.string.light_theme_selected), Toast.LENGTH_SHORT).show()
         }
 
         darkThemeButton.setOnClickListener {
-            selectedTheme = Theme.DARK
-            updateThemeSelection(Theme.DARK)
-            savePreferences()
+            selectedTheme = ThemeManager.ThemeMode.DARK
+            updateThemeSelection(ThemeManager.ThemeMode.DARK)
+            applyTheme(ThemeManager.ThemeMode.DARK)
             Toast.makeText(context, getString(R.string.dark_theme_selected), Toast.LENGTH_SHORT).show()
         }
 
         autoThemeButton.setOnClickListener {
-            selectedTheme = Theme.AUTO
-            updateThemeSelection(Theme.AUTO)
-            savePreferences()
+            selectedTheme = ThemeManager.ThemeMode.AUTO
+            updateThemeSelection(ThemeManager.ThemeMode.AUTO)
+            applyTheme(ThemeManager.ThemeMode.AUTO)
             Toast.makeText(context, getString(R.string.auto_theme_selected), Toast.LENGTH_SHORT).show()
         }
 
@@ -158,7 +159,12 @@ class SettingsFragment : Fragment() {
 
     // ... (theme update methods remain the same)
 
-    private fun updateThemeSelection(theme: Theme) {
+    private fun applyTheme(mode: ThemeManager.ThemeMode) {
+        ThemeManager.saveThemeMode(requireContext(), mode)
+        ThemeManager.applyTheme(mode)
+    }
+
+    private fun updateThemeSelection(theme: ThemeManager.ThemeMode) {
         // Reset all theme buttons to default state
         resetThemeButton(lightThemeButton, lightThemeIconContainer, lightThemeIcon, lightThemeText, lightThemeIndicator)
         resetThemeButton(darkThemeButton, darkThemeIconContainer, darkThemeIcon, darkThemeText, darkThemeIndicator)
@@ -166,7 +172,7 @@ class SettingsFragment : Fragment() {
 
         // Apply selected state to the chosen theme
         when (theme) {
-            Theme.LIGHT -> {
+            ThemeManager.ThemeMode.LIGHT -> {
                 applySelectedTheme(
                     lightThemeButton,
                     lightThemeIconContainer,
@@ -179,7 +185,7 @@ class SettingsFragment : Fragment() {
                     R.color.settings_indicator_dot_orange
                 )
             }
-            Theme.DARK -> {
+            ThemeManager.ThemeMode.DARK -> {
                 applySelectedTheme(
                     darkThemeButton,
                     darkThemeIconContainer,
@@ -192,7 +198,7 @@ class SettingsFragment : Fragment() {
                     R.color.settings_indicator_dot_dark
                 )
             }
-            Theme.AUTO -> {
+            ThemeManager.ThemeMode.AUTO -> {
                 applySelectedTheme(
                     autoThemeButton,
                     autoThemeIconContainer,
@@ -264,28 +270,12 @@ class SettingsFragment : Fragment() {
     }
 
     private fun loadPreferences() {
-        // Theme loading still uses "settings" prefs for now as it seems to be handled locally here,
-        // but language loading should check the LocaleHelper to be consistent with app startup.
-        val prefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val themeName = prefs.getString("theme", "LIGHT") ?: "LIGHT"
-        selectedTheme = Theme.valueOf(themeName)
+        // Load theme from ThemeManager
+        selectedTheme = ThemeManager.getSavedThemeMode(requireContext())
         
         // Load language from LocaleHelper
         val currentLang = com.hcmus.forumus_admin.core.LocaleHelper.getLanguage(requireContext())
         selectedLanguage = if (currentLang == "vi") Language.VIETNAMESE else Language.ENGLISH
-    }
-
-    private fun savePreferences() {
-        val prefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE)
-        prefs.edit().apply {
-            putString("theme", selectedTheme.name)
-            // Language is saved via LocaleHelper.setLocale
-            apply()
-        }
-    }
-
-    enum class Theme {
-        LIGHT, DARK, AUTO
     }
 
     enum class Language {

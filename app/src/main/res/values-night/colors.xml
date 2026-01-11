@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="background_light">#121212</color>
+    
+    <!-- Dashboard Colors -->
+    <color name="primary_blue">#8B8FFF</color>
+    <color name="success_green">#34D399</color>
+    <color name="danger_red">#F87171</color>
+    <color name="warning_orange">#FBBF24</color>
+    <color name="chart_blue">#42A5F5</color>
+    <color name="chart_red">#FF4444</color>
+    <color name="chart_gray">#9E9E9E</color>
+    <color name="chart_brown">#D4A574</color>
+    <color name="chart_tech_blue">#64B5F6</color>
+    <color name="chart_purple">#BA68C8</color>
+    <color name="chart_orange">#FF7043</color>
+    <color name="chart_teal">#26A69A</color>
+    <color name="chart_pink">#F06292</color>
+    <color name="chart_green">#66BB6A</color>
+    <color name="chart_indigo">#5C6BC0</color>
+    <color name="chart_amber">#FFCA28</color>
+    <color name="chart_cyan">#26C6DA</color>
+    <color name="chart_lime">#9CCC65</color>
+    <color name="chart_deep_orange">#FF8A65</color>
+    <color name="chart_blue_gray">#78909C</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_primary">#E2E8F0</color>
+    <color name="text_hint">#64748B</color>
+    <color name="border_gray">#2D3748</color>
+    <color name="background_gray">#1E293B</color>
+    <color name="card_background">#1E293B</color>
+    
+    <!-- AI Moderation Colors -->
+    <color name="tab_selected">@color/primary_blue</color>
+    <color name="tab_unselected">@color/text_secondary</color>
+    <color name="tab_indicator">@color/primary_blue</color>
+    <color name="search_background">#2D3748</color>
+    <color name="search_border">@color/border_gray</color>
+    <color name="search_hint">@color/text_hint</color>
+    <color name="text_title">@color/primary_blue</color>
+    <color name="text_body">@color/text_primary</color>
+    <color name="text_meta">@color/text_secondary</color>
+    <color name="separator">@color/border_gray</color>
+    <color name="reject_button">@color/danger_red</color>
+    <color name="reject_button_border">#7F1D1D</color>
+    <color name="approve_button">@color/text_hint</color>
+    <color name="approve_button_active">@color/primary_blue</color>
+    <color name="tag_programming_bg">#1E3A5F</color>
+    <color name="tag_programming_text">#64B5F6</color>
+    <color name="tag_react_bg">#1A4D5C</color>
+    <color name="tag_react_text">#4FC3F7</color>
+    <color name="tag_typescript_bg">#4A1A5B</color>
+    <color name="tag_typescript_text">#BA68C8</color>
+    <color name="tag_design_bg">#5C1A33</color>
+    <color name="tag_design_text">#F06292</color>
+    <color name="tag_css_bg">#5C3A1A</color>
+    <color name="tag_css_text">#FFB74D</color>
+    
+    <!-- Settings Page Colors -->
+    <color name="settings_gradient_start">#8B8FFF</color>
+    <color name="settings_gradient_end">#6366F1</color>
+    <color name="settings_purple">#818CF8</color>
+    <color name="settings_blue">#60A5FA</color>
+    <color name="settings_orange_start">#FBBF24</color>
+    <color name="settings_orange_end">#F59E0B</color>
+    <color name="settings_dark_start">#475569</color>
+    <color name="settings_dark_end">#1E293B</color>
+    <color name="settings_text_primary">#E2E8F0</color>
+    <color name="settings_text_secondary">#94A3B8</color>
+    <color name="settings_text_title">#F1F5F9</color>
+    <color name="settings_text_light">#F3E8FF</color>
+    <color name="settings_card_bg">#1E293B</color>
+    <color name="settings_button_bg">#2D3748</color>
+    <color name="settings_button_icon_bg">#374151</color>
+    <color name="settings_button_icon_bg_semi">#33FFFFFF</color>
+    <color name="settings_button_icon_bg_selected_light">#4DFFFFFF</color>
+    <color name="settings_button_icon_bg_selected_dark">#1AFFFFFF</color>
+    <color name="settings_button_selected_indicator">#FFFFFF</color>
+    <color name="settings_indicator_dot_orange">#FF6900</color>
+    <color name="settings_indicator_dot_dark">#314158</color>
+    <color name="settings_gradient_accent">#155DFC</color>
+</resources>

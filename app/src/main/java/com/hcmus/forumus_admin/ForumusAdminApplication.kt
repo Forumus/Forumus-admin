@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 import android.content.Context
 import com.hcmus.forumus_admin.core.LocaleHelper
+import com.hcmus.forumus_admin.core.ThemeManager
 
 class ForumusAdminApplication : Application() {
     
@@ -16,6 +17,9 @@ class ForumusAdminApplication : Application() {
     
     override fun onCreate() {
         super.onCreate()
+        
+        // Apply saved theme preference
+        ThemeManager.applyTheme(this)
         
         // Initialize Firebase
         FirebaseApp.initializeApp(this)
