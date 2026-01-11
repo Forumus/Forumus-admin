@@ -131,4 +131,33 @@
     <color name="badge_remind_bg">#E3F2FD</color>
     <color name="badge_remind_text">#1565C0</color>
     <color name="badge_remind_border">#1976D2</color>
+    
+    <!-- Post Screen Colors -->
+    <color name="post_card_bg">#FFFFFF</color>
+    <color name="post_title_text">#155DFC</color>
+    <color name="post_content_text">#4A5565</color>
+    <color name="post_metadata_text">#6A7282</color>
+    <color name="post_separator">#D1D5DC</color>
+    <color name="filter_card_bg">#FFFFFF</color>
+    <color name="filter_label_text">#364153</color>
+    <color name="date_input_bg">#FFFFFF</color>
+    <color name="date_input_border">#D1D5DC</color>
+    <color name="apply_button_bg">#155DFC</color>
+    <color name="stats_card_bg">#FFFFFF</color>
+    <color name="stats_label_text">#4A5565</color>
+    <color name="stats_value_text">#155DFC</color>
+    <color name="stats_date_text">#6A7282</color>
+    
+    <!-- Badge & Action Button Colors -->
+    <color name="violation_badge_bg">#FFF1F3</color>
+    <color name="violation_badge_text">#C10007</color>
+    <color name="violation_badge_border">#FFC9C9</color>
+    <color name="report_badge_bg">#FFF4ED</color>
+    <color name="report_badge_text">#CA3500</color>
+    <color name="report_badge_border">#FFD6A7</color>
+    <color name="dismiss_button_bg">#FFFFFF</color>
+    <color name="dismiss_button_text">#E7000B</color>
+    <color name="dismiss_button_border">#FFC9C9</color>
+    <color name="delete_button_bg">#DC2626</color>
+    <color name="delete_button_text">#FFFFFF</color>
 </resources>

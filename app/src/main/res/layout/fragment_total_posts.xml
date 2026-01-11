@@ -11,7 +11,7 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/toolbar_height"
-        android:background="@android:color/white"
+        android:background="@color/card_background"
         android:elevation="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -69,7 +69,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="@color/stats_card_bg"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/border_gray"
@@ -87,7 +87,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="sans-serif"
                         android:text="@string/total_post_count"
-                        android:textColor="#4a5565"
+                        android:textColor="@color/stats_label_text"
                         android:textSize="16sp" />
 
                     <TextView
@@ -97,7 +97,7 @@
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif"
                         tools:text="--"
-                        android:textColor="#155dfc"
+                        android:textColor="@color/stats_value_text"
                         android:textSize="48sp" />
 
                     <TextView
@@ -107,7 +107,7 @@
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif"
                         tools:text="1/1/2024 - 12/31/2024"
-                        android:textColor="#6a7282"
+                        android:textColor="@color/stats_date_text"
                         android:textSize="16sp" />
 
                 </LinearLayout>
@@ -119,7 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="@color/filter_card_bg"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/border_gray"
@@ -151,7 +151,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
                             android:text="@string/start_date"
-                            android:textColor="#364153"
+                            android:textColor="@color/filter_label_text"
                             android:textSize="16sp" />
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -194,7 +194,7 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="sans-serif"
                             android:text="@string/end_date"
-                            android:textColor="#364153"
+                            android:textColor="@color/filter_label_text"
                             android:textSize="16sp" />
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -231,7 +231,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="16dp"
-                        android:backgroundTint="#155dfc"
+                        android:backgroundTint="@color/apply_button_bg"
                         android:fontFamily="sans-serif"
                         android:text="@string/apply_filter"
                         android:textColor="@android:color/white"
@@ -247,7 +247,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@android:color/white"
+                app:cardBackgroundColor="@color/card_background"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/border_gray"
