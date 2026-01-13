@@ -120,7 +120,7 @@ class BlacklistFragment : Fragment() {
                 result.onSuccess { firestoreUsers ->
                     if (firestoreUsers.isEmpty()) {
                         context?.let {
-                            Toast.makeText(it, "No blacklisted users found", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(it, getString(R.string.no_blacklisted_users), Toast.LENGTH_SHORT).show()
                         }
                         // Use empty list instead of fallback
                         allUsers = emptyList()
@@ -139,7 +139,7 @@ class BlacklistFragment : Fragment() {
                         }
                         
                         context?.let {
-                            Toast.makeText(it, "Loaded ${allUsers.size} blacklisted users", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(it, getString(R.string.loading_users_count, allUsers.size), Toast.LENGTH_SHORT).show()
                         }
                     }
                     
@@ -152,7 +152,7 @@ class BlacklistFragment : Fragment() {
                     }
                 }.onFailure { exception ->
                     context?.let {
-                        Toast.makeText(it, "Error loading users: ${exception.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(it, getString(R.string.loading_users_error, exception.message), Toast.LENGTH_LONG).show()
                     }
                     
                     // Initialize with empty list on error
@@ -319,14 +319,14 @@ class BlacklistFragment : Fragment() {
             applySearchFilter(binding.searchInput.text.toString())
             
             val message = when (newStatus) {
-                UserStatus.BANNED -> "${user.name} has been banned"
-                UserStatus.WARNED -> "Warning sent to ${user.name}"
-                UserStatus.REMINDED -> "Reminder sent to ${user.name}"
-                UserStatus.NORMAL -> "${user.name} removed from blacklist"
+                UserStatus.BANNED -> getString(R.string.user_banned_message, user.name)
+                UserStatus.WARNED -> getString(R.string.user_warned_message, user.name)
+                UserStatus.REMINDED -> getString(R.string.user_reminded_message, user.name)
+                UserStatus.NORMAL -> getString(R.string.user_removed_blacklist_message, user.name)
             }
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }.onFailure { exception ->
-            Toast.makeText(requireContext(), "Failed to update status: ${exception.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.update_status_failed, exception.message), Toast.LENGTH_SHORT).show()
         }
     }
     
@@ -525,9 +525,9 @@ class BlacklistFragment : Fragment() {
             applySearchFilter(binding.searchInput.text.toString())
             
             val filterMessage = if (selectedStatuses.isEmpty()) {
-                "Filter cleared"
+                getString(R.string.filter_cleared)
             } else {
-                "Filtered by: ${selectedStatuses.joinToString(", ")}"
+                getString(R.string.filtered_by, selectedStatuses.joinToString(", "))
             }
             Toast.makeText(requireContext(), filterMessage, Toast.LENGTH_SHORT).show()
             

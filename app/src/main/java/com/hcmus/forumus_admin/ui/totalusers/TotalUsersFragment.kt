@@ -73,7 +73,7 @@ class TotalUsersFragment : Fragment() {
 
         binding.moreButton.setOnClickListener {
             // TODO: Implement more options menu
-            Toast.makeText(requireContext(), "More options coming soon", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.more_options_soon), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -183,7 +183,7 @@ class TotalUsersFragment : Fragment() {
                 result.onSuccess { firestoreUsers ->
                     if (firestoreUsers.isEmpty()) {
                         context?.let {
-                            Toast.makeText(it, "No users found in database", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(it, getString(R.string.no_users_found_db), Toast.LENGTH_SHORT).show()
                         }
                         allUsers = emptyList()
                     } else {
@@ -201,7 +201,7 @@ class TotalUsersFragment : Fragment() {
                         }
                         
                         context?.let {
-                            Toast.makeText(it, "Loaded ${allUsers.size} users", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(it, getString(R.string.loading_users_count, allUsers.size), Toast.LENGTH_SHORT).show()
                         }
                     }
                     
@@ -213,7 +213,7 @@ class TotalUsersFragment : Fragment() {
                     }
                 }.onFailure { exception ->
                     context?.let {
-                        Toast.makeText(it, "Error loading users: ${exception.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(it, getString(R.string.loading_users_error, exception.message), Toast.LENGTH_LONG).show()
                     }
                     
                     allUsers = emptyList()
@@ -437,16 +437,16 @@ class TotalUsersFragment : Fragment() {
             
             val filterParts = mutableListOf<String>()
             if (selectedStatuses.isNotEmpty()) {
-                filterParts.add("Status: ${selectedStatuses.joinToString(", ")}")
+                filterParts.add(getString(R.string.filter_status_label, selectedStatuses.joinToString(", ")))
             }
             if (selectedRoles.isNotEmpty()) {
-                filterParts.add("Role: ${selectedRoles.joinToString(", ")}")
+                filterParts.add(getString(R.string.filter_role_label, selectedRoles.joinToString(", ")))
             }
             
             val filterMessage = if (filterParts.isEmpty()) {
-                "Filter cleared"
+                getString(R.string.filter_cleared)
             } else {
-                "Filtered by ${filterParts.joinToString(" | ")}"
+                getString(R.string.filtered_by_label, filterParts.joinToString(" | "))
             }
             Toast.makeText(requireContext(), filterMessage, Toast.LENGTH_SHORT).show()
             

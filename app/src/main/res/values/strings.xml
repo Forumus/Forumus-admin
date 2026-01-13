@@ -82,6 +82,19 @@
     <string name="select_filters">Select filters</string>
     <string name="teacher">Teacher</string>
     <string name="student">Student</string>
+    <string name="loading_users_count">Loaded %d users</string>
+    <string name="loading_users_error">Error loading users: %1$s</string>
+    <string name="no_users_found_db">No users found in database</string>
+    <string name="no_blacklisted_users">No blacklisted users found</string>
+    <string name="more_options_soon">More options coming soon</string>
+    <string name="user_banned_message">%1$s has been banned</string>
+    <string name="user_warned_message">Warning sent to %1$s</string>
+    <string name="user_reminded_message">Reminder sent to %1$s</string>
+    <string name="user_removed_blacklist_message">%1$s removed from blacklist</string>
+    <string name="update_status_failed">Failed to update status: %1$s</string>
+    <string name="filter_status_label">Status: %1$s</string>
+    <string name="filter_role_label">Role: %1$s</string>
+    <string name="filtered_by_label">Filtered by %1$s</string>
 
     <!-- Dialog Messages -->
     <string name="confirm_remove_title">Remove User</string>
@@ -126,6 +139,18 @@
     <string name="sorted_by_reports_desc">Sorted by reports (descending)</string>
     <string name="sorted_by_violations_asc">Sorted by violations (ascending)</string>
     <string name="sorted_by_violations_desc">Sorted by violations (descending)</string>
+    <string name="failed_to_dismiss_reports">Failed to dismiss reports: %1$s</string>
+    <string name="error_dismissing_reports">Error dismissing reports: %1$s</string>
+    <string name="failed_to_delete_post">Failed to delete post: %1$s</string>
+    <string name="error_deleting_post">Error deleting post: %1$s</string>
+    <string name="no_reported_posts_found">No reported posts found</string>
+    <string name="error_loading_posts">Error loading posts: %1$s</string>
+    <string name="no_reports_for_post">No reports found for this post</string>
+    <string name="no_violation_types_found">No violation types found</string>
+    <string name="user_status_change">User status: %1$s → %2$s</string>
+    <string name="violation">Violation: %1$s</string>
+    <string name="user_label">User: %1$s</string>
+    <string name="error_message">Error: %1$s</string>
 
     <!-- AI Moderation -->
     <string name="ai_moderation">AI Moderation</string>
@@ -168,6 +193,18 @@
     <string name="filter_applied">Filter applied: %s</string>
     <string name="filter_cleared">Filter cleared</string>
     <string name="no_violations">No Violations</string>
+    <string name="load_violation_types_failed">Failed to load violation types: %1$s</string>
+    <string name="error_loading_violations">Error loading violations: %1$s</string>
+    <string name="loading_violation_types">Loading violation types...</string>
+    <string name="confirm_approve_rejected_post">Are you sure you want to APPROVE this rejected post?</string>
+    <string name="confirm_approve_post">Are you sure you want to approve this post?</string>
+    <string name="approve_post_title">Approve Post</string>
+    <string name="post_approved_toast">Post Approved</string>
+    <string name="reject_post_title">Reject Post</string>
+    <string name="delete_post_text">Delete Post</string>
+    <string name="confirm_reject_delete_message">Are you sure you want to reject/delete this post? This action cannot be undone.</string>
+    <string name="post_rejected_toast">Post Rejected</string>
+    <string name="filtered_by">Filtered by: %1$s</string>
 
     <!-- Total Posts Screen -->
     <string name="total_post_count">Total Post Count</string>
@@ -277,4 +314,14 @@
         <item quantity="one">%d report</item>
         <item quantity="other">%d reports</item>
     </plurals>
+    
+    <plurals name="users_count">
+        <item quantity="one">%d user</item>
+        <item quantity="other">%d users</item>
+    </plurals>
+    
+    <string name="reported_by_header">This post was reported by %s:</string>
+    <string name="reported_by_message">This post was reported by %s</string>
+    <string name="reported_message_generic">%s reported this post</string>
+    <string name="violation_stats_header">%1$d unique violation types from %2$s</string>
 </resources>

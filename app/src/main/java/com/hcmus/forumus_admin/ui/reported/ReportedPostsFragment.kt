@@ -278,14 +278,14 @@ class ReportedPostsFragment : Fragment() {
                 }.onFailure { exception ->
                     Toast.makeText(
                         requireContext(), 
-                        "Failed to dismiss reports: ${exception.message}", 
+                        getString(R.string.failed_to_dismiss_reports, exception.message), 
                         Toast.LENGTH_LONG
                     ).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(), 
-                    "Error dismissing reports: ${e.message}", 
+                    getString(R.string.error_dismissing_reports, e.message), 
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -319,7 +319,7 @@ class ReportedPostsFragment : Fragment() {
                         if (escalationResult.success && escalationResult.wasEscalated) {
                             // Show notification about status escalation
                             val message = getString(R.string.post_deleted) + "\n" +
-                                "User status: ${escalationResult.previousStatus.displayName} → ${escalationResult.newStatus.displayName}"
+                                getString(R.string.user_status_change, escalationResult.previousStatus.displayName, escalationResult.newStatus.displayName)
                             Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
                         } else {
                             Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
@@ -334,14 +334,14 @@ class ReportedPostsFragment : Fragment() {
                 }.onFailure { exception ->
                     Toast.makeText(
                         requireContext(), 
-                        "Failed to delete post: ${exception.message}", 
+                        getString(R.string.failed_to_delete_post, exception.message), 
                         Toast.LENGTH_LONG
                     ).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(
                     requireContext(), 
-                    "Error deleting post: ${e.message}", 
+                    getString(R.string.error_deleting_post, e.message), 
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -372,7 +372,7 @@ class ReportedPostsFragment : Fragment() {
                         
                         if (reportedFirestorePosts.isEmpty()) {
                             context?.let {
-                                Toast.makeText(it, "No reported posts found", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(it, getString(R.string.no_reported_posts_found), Toast.LENGTH_SHORT).show()
                             }
                             allPosts = emptyList()
                             filteredPosts = allPosts
@@ -555,7 +555,7 @@ class ReportedPostsFragment : Fragment() {
                     }
                 }.onFailure { exception ->
                     context?.let {
-                        Toast.makeText(it, "Error loading posts: ${exception.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(it, getString(R.string.error_loading_posts, exception.message), Toast.LENGTH_LONG).show()
                     }
                     
                     allPosts = emptyList()
@@ -624,11 +624,12 @@ class ReportedPostsFragment : Fragment() {
                             loadingIndicator.visibility = View.GONE
                             contentContainer.visibility = View.GONE
                             errorText.visibility = View.VISIBLE
-                            errorText.text = "No reports found for this post"
+                            errorText.text = getString(R.string.no_reports_for_post)
                         } else {
                             // Build report summary
                             val reportCount = reports.size
-                            val reportText = StringBuilder("This post was reported by $reportCount user${if (reportCount != 1) "s" else ""}:\n\n")
+                            val userCountText = resources.getQuantityString(R.plurals.users_count, reportCount, reportCount)
+                            val reportText = StringBuilder(getString(R.string.reported_by_header, userCountText) + "\n\n")
                             
                             // Clear and populate violations container with user-specific reports
                             violationsContainer.removeAllViews()
@@ -653,7 +654,7 @@ class ReportedPostsFragment : Fragment() {
                                 
                                 // User name
                                 val userText = TextView(requireContext()).apply {
-                                    text = "• $userName"
+                                    text = context.getString(R.string.user_label, userName)
                                     setTextColor(resources.getColor(R.color.text_primary, null))
                                     textSize = 14f
                                     setTypeface(null, android.graphics.Typeface.BOLD)
@@ -664,7 +665,7 @@ class ReportedPostsFragment : Fragment() {
                                 // Violation name
                                 if (violationName.isNotEmpty()) {
                                     val violationNameText = TextView(requireContext()).apply {
-                                        text = "Violation: $violationName"
+                                        text = context.getString(R.string.violation, violationName)
                                         setTextColor(resources.getColor(R.color.danger_red, null))
                                         textSize = 13f
                                         setTypeface(null, android.graphics.Typeface.BOLD)
@@ -686,7 +687,8 @@ class ReportedPostsFragment : Fragment() {
                                 violationsContainer.addView(reportCard)
                             }
                             
-                            userReportText.text = "This post was reported by $reportCount user${if (reportCount != 1) "s" else ""}"
+                            val userCountTextFinal = resources.getQuantityString(R.plurals.users_count, reportCount, reportCount)
+                            userReportText.text = getString(R.string.reported_by_message, userCountTextFinal)
                             
                             // Show content
                             loadingIndicator.visibility = View.GONE
@@ -696,7 +698,8 @@ class ReportedPostsFragment : Fragment() {
                     }.onFailure {
                         // Continue without user names
                         val reportCount = reports.size
-                        userReportText.text = "$reportCount user${if (reportCount != 1) "s" else ""} reported this post"
+                        val userCountText = resources.getQuantityString(R.plurals.users_count, reportCount, reportCount)
+                        userReportText.text = getString(R.string.reported_message_generic, userCountText)
                         
                         // Clear and populate violations container
                         violationsContainer.removeAllViews()
@@ -721,7 +724,7 @@ class ReportedPostsFragment : Fragment() {
                             
                             // User ID
                             val userText = TextView(requireContext()).apply {
-                                text = "• User: $userName"
+                                text = context.getString(R.string.user_label, userName)
                                 setTextColor(resources.getColor(R.color.text_primary, null))
                                 textSize = 14f
                                 setTypeface(null, android.graphics.Typeface.BOLD)
@@ -732,7 +735,7 @@ class ReportedPostsFragment : Fragment() {
                             // Violation name
                             if (violationName.isNotEmpty()) {
                                 val violationNameText = TextView(requireContext()).apply {
-                                    text = "Violation: $violationName"
+                                    text = context.getString(R.string.violation, violationName)
                                     setTextColor(resources.getColor(R.color.danger_red, null))
                                     textSize = 13f
                                     setTypeface(null, android.graphics.Typeface.BOLD)
@@ -764,14 +767,14 @@ class ReportedPostsFragment : Fragment() {
                     loadingIndicator.visibility = View.GONE
                     contentContainer.visibility = View.GONE
                     errorText.visibility = View.VISIBLE
-                    errorText.text = "Failed to load report details: ${exception.message}"
+                    errorText.text = getString(R.string.failed_to_load_report_details) + ": ${exception.message}"
                 }
             } catch (e: Exception) {
                 // Show error
                 loadingIndicator.visibility = View.GONE
                 contentContainer.visibility = View.GONE
                 errorText.visibility = View.VISIBLE
-                errorText.text = "Error: ${e.message}"
+                errorText.text = getString(R.string.error_message, e.message)
             }
         }
     }
@@ -817,7 +820,7 @@ class ReportedPostsFragment : Fragment() {
                         loadingIndicator.visibility = View.GONE
                         contentContainer.visibility = View.GONE
                         errorText.visibility = View.VISIBLE
-                        errorText.text = "No reports found for this post"
+                        errorText.text = getString(R.string.no_reports_for_post)
                     } else {
                         // Group reports by violation type and count occurrences
                         val violationCounts = reports
@@ -834,17 +837,12 @@ class ReportedPostsFragment : Fragment() {
                             loadingIndicator.visibility = View.GONE
                             contentContainer.visibility = View.GONE
                             errorText.visibility = View.VISIBLE
-                            errorText.text = "No violation types found"
+                            errorText.text = getString(R.string.no_violation_types_found)
                         } else {
                             val uniqueViolationCount = violationCounts.size
                             val totalReportCount = reports.size
-                            
-                            // Build summary text
-                            violationSummaryText.text = if (uniqueViolationCount == 1) {
-                                "$uniqueViolationCount unique violation type from $totalReportCount report${if (totalReportCount != 1) "s" else ""}"
-                            } else {
-                                "$uniqueViolationCount unique violation types from $totalReportCount report${if (totalReportCount != 1) "s" else ""}"
-                            }
+                            val reportCountText = resources.getQuantityString(R.plurals.report_count, totalReportCount, totalReportCount)
+                            violationSummaryText.text = getString(R.string.violation_stats_header, uniqueViolationCount, reportCountText)
                             
                             // Clear and populate violations container with unique types and counts
                             violationsContainer.removeAllViews()
@@ -904,14 +902,14 @@ class ReportedPostsFragment : Fragment() {
                     loadingIndicator.visibility = View.GONE
                     contentContainer.visibility = View.GONE
                     errorText.visibility = View.VISIBLE
-                    errorText.text = "Failed to load violations: ${exception.message}"
+                    errorText.text = getString(R.string.failed_to_load_violations) + ": ${exception.message}"
                 }
             } catch (e: Exception) {
                 // Show error
                 loadingIndicator.visibility = View.GONE
                 contentContainer.visibility = View.GONE
                 errorText.visibility = View.VISIBLE
-                errorText.text = "Error: ${e.message}"
+                errorText.text = getString(R.string.error_message, e.message)
             }
         }
     }

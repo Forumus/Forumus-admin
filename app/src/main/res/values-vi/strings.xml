@@ -82,6 +82,19 @@
     <string name="select_filters">Chọn bộ lọc</string>
     <string name="teacher">Giáo viên</string>
     <string name="student">Sinh viên</string>
+    <string name="loading_users_count">Đã tải %d người dùng</string>
+    <string name="loading_users_error">Lỗi khi tải người dùng: %1$s</string>
+    <string name="no_users_found_db">Không người dùng nào trong cơ sở dữ liệu</string>
+    <string name="no_blacklisted_users">Không có người dùng nào bị chặn</string>
+    <string name="more_options_soon">Tùy chọn thêm sắp ra mắt</string>
+    <string name="user_banned_message">%1$s đã bị cấm</string>
+    <string name="user_warned_message">Đã gửi cảnh báo tới %1$s</string>
+    <string name="user_reminded_message">Đã gửi nhắc nhở tới %1$s</string>
+    <string name="user_removed_blacklist_message">%1$s đã được gỡ khỏi danh sách đen</string>
+    <string name="update_status_failed">Lỗi cập nhật trạng thái: %1$s</string>
+    <string name="filter_status_label">Trạng thái: %1$s</string>
+    <string name="filter_role_label">Vai trò: %1$s</string>
+    <string name="filtered_by_label">Đã lọc theo %1$s</string>
 
     <!-- Dialog Messages -->
     <string name="confirm_remove_title">Gỡ người dùng</string>
@@ -126,6 +139,18 @@
     <string name="sorted_by_reports_desc">Sắp xếp theo báo cáo (giảm dần)</string>
     <string name="sorted_by_violations_asc">Sắp xếp theo vi phạm (tăng dần)</string>
     <string name="sorted_by_violations_desc">Sắp xếp theo vi phạm (giảm dần)</string>
+    <string name="failed_to_dismiss_reports">Không thể bỏ qua báo cáo: %1$s</string>
+    <string name="error_dismissing_reports">Lỗi khi bỏ qua báo cáo: %1$s</string>
+    <string name="failed_to_delete_post">Không thể xóa bài đăng: %1$s</string>
+    <string name="error_deleting_post">Lỗi khi xóa bài đăng: %1$s</string>
+    <string name="no_reported_posts_found">Không tìm thấy bài đăng bị báo cáo</string>
+    <string name="error_loading_posts">Lỗi khi tải bài đăng: %1$s</string>
+    <string name="no_reports_for_post">Không có báo cáo nào cho bài đăng này</string>
+    <string name="no_violation_types_found">Không có loại vi phạm nào</string>
+    <string name="user_status_change">Trạng thái người dùng: %1$s → %2$s</string>
+    <string name="violation">Vi phạm: %1$s</string>
+    <string name="user_label">Người dùng: %1$s</string>
+    <string name="error_message">Lỗi: %1$s</string>
 
     <!-- AI Moderation -->
     <string name="ai_moderation">Kiểm duyệt AI</string>
@@ -168,6 +193,18 @@
     <string name="filter_applied">Đã lọc: %s</string>
     <string name="filter_cleared">Đã xóa bộ lọc</string>
     <string name="no_violations">Không có vi phạm</string>
+    <string name="load_violation_types_failed">Không thể tải loại vi phạm: %1$s</string>
+    <string name="error_loading_violations">Lỗi khi tải vi phạm: %1$s</string>
+    <string name="loading_violation_types">Đang tải loại vi phạm...</string>
+    <string name="confirm_approve_rejected_post">Bạn có chắc muốn CHẤP THUẬN bài đăng bị từ chối này không?</string>
+    <string name="confirm_approve_post">Bạn có chắc muốn chấp thuận bài đăng này không?</string>
+    <string name="approve_post_title">Chấp thuận bài đăng</string>
+    <string name="post_approved_toast">Bài đăng đã được chấp thuận</string>
+    <string name="reject_post_title">Từ chối bài đăng</string>
+    <string name="delete_post_text">Xóa bài đăng</string>
+    <string name="confirm_reject_delete_message">Bạn có chắc muốn từ chối/xóa bài đăng này không? Hành động này không thể hoàn tác.</string>
+    <string name="post_rejected_toast">Bài đăng đã bị từ chối</string>
+    <string name="filtered_by">Đã lọc theo: %1$s</string>
 
     <!-- Total Posts Screen -->
     <string name="total_post_count">Tổng số bài đăng</string>
@@ -277,4 +314,14 @@
         <item quantity="one">%d báo cáo</item>
         <item quantity="other">%d báo cáo</item>
     </plurals>
+    
+    <plurals name="users_count">
+        <item quantity="one">%d người dùng</item>
+        <item quantity="other">%d người dùng</item>
+    </plurals>
+    
+    <string name="reported_by_header">Bài đăng này đã bị báo cáo bởi %s:</string>
+    <string name="reported_by_message">Bài đăng này đã bị báo cáo bởi %s</string>
+    <string name="reported_message_generic">%s đã báo cáo bài đăng này</string>
+    <string name="violation_stats_header">%1$d loại vi phạm duy nhất từ %2$s</string>
 </resources>

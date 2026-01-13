@@ -64,12 +64,12 @@ class AssistantFragment : Fragment() {
                     availableViolations = violations
                 }.onFailure { exception ->
                     context?.let {
-                        Toast.makeText(it, "Failed to load violation types: ${exception.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(it, getString(R.string.load_violation_types_failed, exception.message), Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 context?.let {
-                    Toast.makeText(it, "Error loading violations: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(it, getString(R.string.error_loading_violations, e.message), Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -99,44 +99,36 @@ class AssistantFragment : Fragment() {
 
     private fun showApproveConfirmation(post: com.hcmus.forumus_admin.data.model.AiModerationResult) {
         val message = if (viewModel.state.value?.currentTab == TabType.AI_REJECTED) {
-            "Are you sure you want to APPROVE this rejected post?"
+            getString(R.string.confirm_approve_rejected_post)
         } else {
-             // For AI Approved tab, "Approve" might not make sense (it's already approved), 
-             // but maybe they want to explicit "verify" it?
-             // User Request: "For the approve button, when click will show up a confirmation box... change status to APPROVED".
-             // If I am in "AI approved" tab, the post is *already* approved? 
-             // The user said: "And for the AI rejected tab... For the approve button... change status to APPROVED".
-             // The buttons available in Approved Tab are usually Reject. 
-             // In Rejected Tab, buttons are Approve.
-             // Let's assume this action is primarily for the Rejected Tab to move to Approved.
-             "Are you sure you want to approve this post?"
+             getString(R.string.confirm_approve_post)
         }
 
         AlertDialog.Builder(requireContext())
-            .setTitle("Approve Post")
+            .setTitle(getString(R.string.approve_post_title))
             .setMessage("$message\n\nTitle: ${post.postData.title}")
-            .setPositiveButton("Approve") { _, _ ->
+            .setPositiveButton(getString(R.string.approve)) { _, _ ->
                 viewModel.approvePost(post.postData.id)
-                Toast.makeText(requireContext(), "Post Approved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.post_approved_toast), Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
     private fun showRejectConfirmation(post: com.hcmus.forumus_admin.data.model.AiModerationResult) {
         val isApprovedTab = viewModel.state.value?.currentTab == TabType.AI_APPROVED
-        val title = if (isApprovedTab) "Reject Post" else "Delete Post"
-        val message = "Are you sure you want to reject/delete this post? This action cannot be undone."
+        val title = if (isApprovedTab) getString(R.string.reject_post_title) else getString(R.string.delete_post_text)
+        val message = getString(R.string.confirm_reject_delete_message)
 
         AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setMessage("$message\n\nTitle: ${post.postData.title}")
-            .setPositiveButton("Reject") { _, _ ->
+            .setPositiveButton(getString(R.string.reject)) { _, _ ->
                 // Only send notification if rejecting from AI Approved tab
                 viewModel.rejectPost(post.postData.id, sendNotification = isApprovedTab)
-                Toast.makeText(requireContext(), "Post Rejected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.post_rejected_toast), Toast.LENGTH_SHORT).show()
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
     
@@ -240,7 +232,7 @@ class AssistantFragment : Fragment() {
     
     private fun showFilterDialog() {
         if (availableViolations.isEmpty()) {
-            Toast.makeText(requireContext(), "Loading violation types...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.loading_violation_types), Toast.LENGTH_SHORT).show()
             return
         }
         
@@ -320,7 +312,7 @@ class AssistantFragment : Fragment() {
                     val selectedNames = availableViolations
                         .filter { it.violation in tempSelectedIds }
                         .joinToString(", ") { it.name }
-                    "Filtered by: $selectedNames"
+                    getString(R.string.filtered_by, selectedNames)
                 }
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
@@ -408,7 +400,7 @@ class AssistantFragment : Fragment() {
                 val selectedNames = availableViolations
                     .filter { it.violation in tempSelectedIds }
                     .joinToString(", ") { it.name }
-                "Filtered by: $selectedNames"
+                getString(R.string.filtered_by, selectedNames)
             }
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             dialog.dismiss()
