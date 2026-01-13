@@ -642,7 +642,7 @@ class ReportedPostsFragment : Fragment() {
                                 val reportCard = LinearLayout(requireContext()).apply {
                                     orientation = LinearLayout.VERTICAL
                                     setPadding(16, 12, 16, 12)
-                                    setBackgroundResource(R.drawable.bg_sort_option_unselected)
+                                    setBackgroundResource(R.drawable.bg_report_item)
                                     layoutParams = LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -710,7 +710,7 @@ class ReportedPostsFragment : Fragment() {
                             val reportCard = LinearLayout(requireContext()).apply {
                                 orientation = LinearLayout.VERTICAL
                                 setPadding(16, 12, 16, 12)
-                                setBackgroundResource(R.drawable.bg_sort_option_unselected)
+                                setBackgroundResource(R.drawable.bg_report_item)
                                 layoutParams = LinearLayout.LayoutParams(
                                     LinearLayout.LayoutParams.MATCH_PARENT,
                                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -854,7 +854,7 @@ class ReportedPostsFragment : Fragment() {
                                 val violationCard = LinearLayout(requireContext()).apply {
                                     orientation = LinearLayout.HORIZONTAL
                                     setPadding(16, 12, 16, 12)
-                                    setBackgroundResource(R.drawable.bg_sort_option_unselected)
+                                    setBackgroundResource(R.drawable.bg_report_item)
                                     layoutParams = LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT
