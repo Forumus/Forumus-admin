@@ -172,9 +172,24 @@ class UserRepository {
     suspend fun updateUserStatus(userId: String, newStatus: UserStatus): Result<Unit> {
         return try {
             val statusString = mapEnumToStatus(newStatus)
-            usersCollection.document(userId)
-                .update("status", statusString)
-                .await()
+
+            if (statusString == "BANNED") {
+                val oneYearFromNow = System.currentTimeMillis() + (365L * 24 * 60 * 60 * 1000)
+
+                usersCollection.document(userId)
+                    .update(mapOf(
+                        "status" to statusString,
+                        "blacklistedUntil" to oneYearFromNow
+                    ))
+                    .await()
+            } else {
+                usersCollection.document(userId)
+                    .update(mapOf(
+                        "status" to statusString,
+                        "blacklistedUntil" to null
+                    ))
+                    .await()
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

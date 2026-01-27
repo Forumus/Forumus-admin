@@ -49,10 +49,10 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     
     // MPAndroidChart for charts
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.mpandroidchart)
     
     // Gson for JSON serialization (caching)
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
     
     // SwipeRefreshLayout
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
@@ -62,20 +62,20 @@ dependencies {
     implementation(libs.androidx.navigation.ui)
 
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation(platform(libs.firebase.bom.v3460))
     
     // TODO: Add the dependencies for Firebase products you want to use
     // When using the BoM, don't specify versions in Firebase dependencies
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(libs.google.firebase.analytics)
     
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-storage")
+    implementation(libs.google.firebase.firestore)
+    implementation(libs.google.firebase.auth)
+    implementation(libs.google.firebase.storage)
     
     // Glide for image loading
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.bumptech.glide:glide:5.0.5")
     
     // Retrofit for REST API calls
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
