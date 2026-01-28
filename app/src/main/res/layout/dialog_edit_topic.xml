@@ -29,6 +29,7 @@
             android:layout_gravity="end"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_close"
+            app:tint="@color/text_primary"
             android:alpha="0.7"
             android:contentDescription="@string/close" />
 

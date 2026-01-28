@@ -32,7 +32,8 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:contentDescription="Menu"
-                android:src="@drawable/ic_menu" />
+                android:src="@drawable/ic_menu"
+                app:tint="@color/text_primary" />
 
         </FrameLayout>
 

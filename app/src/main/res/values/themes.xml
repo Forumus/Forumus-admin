@@ -12,6 +12,20 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@color/white</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogTheme</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.Material3.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/primary_blue</item>
     </style>
 
     <style name="Theme.Forumusadmin" parent="Base.Theme.Forumusadmin" />

@@ -123,7 +123,8 @@
                 android:layout_height="42dp"
                 android:background="@drawable/bg_filter_button"
                 android:contentDescription="@string/filter"
-                android:src="@drawable/ic_filter" />
+                android:src="@drawable/ic_filter"
+                app:tint="@color/text_primary" />
 
         </LinearLayout>
 
@@ -244,7 +245,8 @@
                 android:layout_height="38dp"
                 android:background="@drawable/bg_pagination_button"
                 android:contentDescription="@string/previous_page"
-                android:src="@drawable/ic_chevron_left" />
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/text_primary" />
 
             <TextView
                 android:id="@+id/pageIndicatorText"
@@ -265,7 +267,8 @@
                 android:layout_height="38dp"
                 android:background="@drawable/bg_pagination_button"
                 android:contentDescription="@string/next_page"
-                android:src="@drawable/ic_chevron_right" />
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/text_primary" />
 
         </LinearLayout>
 

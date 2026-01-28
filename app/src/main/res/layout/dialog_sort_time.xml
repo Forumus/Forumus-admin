@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/sort_by_time"
-            android:textColor="#0A0A0A"
+            android:textColor="@color/dialog_title_text"
             android:textSize="18sp"
             android:textStyle="normal" />
 
@@ -29,13 +29,14 @@
             android:layout_height="28dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_close"
+            app:tint="@color/text_primary"
             android:contentDescription="@string/close" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#1A000000" />
+        android:background="@color/border_gray" />
 
     <!-- Content -->
     <LinearLayout
@@ -52,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sort_order"
-            android:textColor="#45556C"
+            android:textColor="@color/dialog_description_text"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
@@ -69,19 +70,14 @@
             android:clickable="true"
             android:focusable="true">
 
-            <FrameLayout
+            <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:background="@drawable/bg_sort_arrow_selected">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_arrow_down"
-                    app:tint="#009966"
-                    android:contentDescription="@string/newest_first" />
-            </FrameLayout>
+                android:padding="8dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_down"
+                app:tint="@color/success_green"
+                android:contentDescription="@string/newest_first" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -94,14 +90,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/newest_first"
-                    android:textColor="#0F172B"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/newest_posts_first"
-                    android:textColor="#62748E"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -124,19 +120,14 @@
             android:clickable="true"
             android:focusable="true">
 
-            <FrameLayout
+            <ImageView
                 android:layout_width="36dp"
                 android:layout_height="36dp"
-                android:background="@drawable/bg_sort_arrow_unselected">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_arrow_up"
-                    app:tint="#94A3B8"
-                    android:contentDescription="@string/oldest_first" />
-            </FrameLayout>
+                android:padding="8dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_up"
+                app:tint="@color/text_secondary"
+                android:contentDescription="@string/oldest_first" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -149,14 +140,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/oldest_first"
-                    android:textColor="#314158"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/oldest_posts_first"
-                    android:textColor="#62748E"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -171,7 +162,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#1A000000" />
+        android:background="@color/border_gray" />
 
     <!-- Footer with Apply Button -->
     <LinearLayout
