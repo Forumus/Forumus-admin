@@ -100,10 +100,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_settings_card"
-                android:paddingStart="21dp"
-                android:paddingTop="21dp"
-                android:paddingEnd="21dp"
-                android:paddingBottom="1dp">
+                android:paddingStart="12dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -121,6 +121,8 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:background="@drawable/bg_theme_button">
+
+                        <!-- Selection Indicator (visible when selected) -->
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -155,7 +157,6 @@
                                 android:textSize="14sp" />
                         </LinearLayout>
 
-                        <!-- Selection Indicator (visible when selected) -->
                         <FrameLayout
                             android:id="@+id/lightThemeIndicator"
                             android:layout_width="21dp"
