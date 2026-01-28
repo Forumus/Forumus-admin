@@ -86,10 +86,6 @@ class MainActivity : AppCompatActivity() {
 
         // Handle Logout Click
         findViewById<android.view.View>(R.id.btnLogout).setOnClickListener {
-            // Clear remember me preference
-            val sharedPreferences = getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
-            sharedPreferences.edit().clear().apply()
-
             // Sign out from Firebase
             com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
             

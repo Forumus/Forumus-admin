@@ -324,4 +324,19 @@
     <string name="reported_by_message">Bài đăng này đã bị báo cáo bởi %s</string>
     <string name="reported_message_generic">%s đã báo cáo bài đăng này</string>
     <string name="violation_stats_header">%1$d loại vi phạm duy nhất từ %2$s</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Chào mừng trở lại</string>
+    <string name="login_subtitle">Đăng nhập để truy cập Cổng quản trị</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="login_button">Đăng nhập</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="access_denied">Truy cập bị từ chối: Bạn không có quyền quản trị viên.</string>
+    <string name="login_failed">Đăng nhập thất bại: %s</string>
+    <string name="email_required">Vui lòng nhập Email</string>
+    <string name="password_required">Vui lòng nhập Mật khẩu</string>
+    <string name="password_reset_sent">Email đặt lại mật khẩu đã được gửi đến %s</string>
+    <string name="password_reset_failed">Gửi email đặt lại thất bại: %s</string>
+    <string name="enter_email_reset">Nhập email để đặt lại mật khẩu</string>
 </resources>

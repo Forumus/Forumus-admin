@@ -324,4 +324,19 @@
     <string name="reported_by_message">This post was reported by %s</string>
     <string name="reported_message_generic">%s reported this post</string>
     <string name="violation_stats_header">%1$d unique violation types from %2$s</string>
+    
+    <!-- Login Screen -->
+    <string name="login_title">Welcome Back</string>
+    <string name="login_subtitle">Sign in to access Admin Portal</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="login_button">Login</string>
+    <string name="logout">Logout</string>
+    <string name="access_denied">Access Denied: You do not have administrator privileges.</string>
+    <string name="login_failed">Login failed: %s</string>
+    <string name="email_required">Email is required</string>
+    <string name="password_required">Password is required</string>
+    <string name="password_reset_sent">Password reset email sent to %s</string>
+    <string name="password_reset_failed">Failed to send reset email: %s</string>
+    <string name="enter_email_reset">Enter email to reset password</string>
 </resources>

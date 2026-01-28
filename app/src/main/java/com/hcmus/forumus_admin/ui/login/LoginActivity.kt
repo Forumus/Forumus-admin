@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.hcmus.forumus_admin.MainActivity
+import com.hcmus.forumus_admin.R
 import com.hcmus.forumus_admin.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
@@ -42,13 +43,13 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString().trim()
 
             if (email.isEmpty()) {
-                binding.tilEmail.error = "Email is required"
+                binding.tilEmail.error = getString(R.string.email_required)
                 return@setOnClickListener
             }
             binding.tilEmail.error = null
 
             if (password.isEmpty()) {
-                binding.tilPassword.error = "Password is required"
+                binding.tilPassword.error = getString(R.string.password_required)
                 return@setOnClickListener
             }
             binding.tilPassword.error = null
@@ -63,27 +64,8 @@ class LoginActivity : AppCompatActivity() {
                 }
                 .addOnFailureListener { e ->
                     showLoading(false)
-                    Toast.makeText(this, "Login failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.login_failed, e.message), Toast.LENGTH_SHORT).show()
                 }
-        }
-
-        binding.cbRemember.setOnClickListener {
-            binding.cbRemember.isChecked = !binding.cbRemember.isChecked
-        }
-        
-        binding.tvForgotPassword.setOnClickListener {
-             val email = binding.etEmail.text.toString().trim()
-             if (email.isNotEmpty()) {
-                 auth.sendPasswordResetEmail(email)
-                     .addOnSuccessListener {
-                         Toast.makeText(this, "Password reset email sent to $email", Toast.LENGTH_SHORT).show()
-                     }
-                     .addOnFailureListener {
-                         Toast.makeText(this, "Failed to send reset email: ${it.message}", Toast.LENGTH_SHORT).show()
-                     }
-             } else {
-                 binding.tilEmail.error = "Enter email to reset password"
-             }
         }
     }
 
@@ -104,7 +86,7 @@ class LoginActivity : AppCompatActivity() {
                         // Not an admin
                         auth.signOut()
                         showLoading(false)
-                        Toast.makeText(this, "Access Denied: You do not have administrator privileges.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, getString(R.string.access_denied), Toast.LENGTH_LONG).show()
                     }
                 } else {
                     auth.signOut()
