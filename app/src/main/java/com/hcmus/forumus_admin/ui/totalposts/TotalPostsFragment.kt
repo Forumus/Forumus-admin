@@ -200,9 +200,7 @@ class TotalPostsFragment : Fragment() {
                             )
                         }
                         
-                        context?.let {
-                            Toast.makeText(it, "Loaded ${allPosts.size} posts", Toast.LENGTH_SHORT).show()
-                        }
+
                     }
                     
                     filteredPosts = allPosts

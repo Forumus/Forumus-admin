@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/filter_by_violation"
-            android:textColor="#0A0A0A"
+            android:textColor="@color/dialog_title_text"
             android:textSize="18sp"
             android:textStyle="normal" />
 
@@ -34,7 +34,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#1A000000" />
+        android:background="@color/border_gray" />
 
     <!-- Content -->
     <LinearLayout
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/select_violation_types"
-                android:textColor="#4A5565"
+                android:textColor="@color/dialog_description_text"
                 android:textSize="14sp" />
 
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/clear_all"
-                android:textColor="#155DFC"
+                android:textColor="@color/primary_blue"
                 android:textSize="14sp"
                 android:clickable="true"
                 android:focusable="true"
@@ -108,7 +108,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/toxicity"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -140,7 +140,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/severe_toxicity"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -172,7 +172,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/identity_attack"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -204,7 +204,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/insult"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -236,7 +236,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/profanity"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -268,7 +268,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/threat"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -300,7 +300,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/spam"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -332,7 +332,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/sexually_explicit"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -363,7 +363,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/misinformation"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="15sp" />
 
                     <ImageView
@@ -382,7 +382,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#1A000000" />
+        android:background="@color/border_gray" />
 
     <!-- Footer with Apply Button -->
     <LinearLayout

@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/sort_by"
-            android:textColor="#0F172B"
+            android:textColor="@color/dialog_title_text"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -35,7 +35,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#E2E8F0" />
+        android:background="@color/border_gray" />
 
     <!-- Content -->
     <LinearLayout
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/what_to_sort_by"
-            android:textColor="#45556C"
+            android:textColor="@color/dialog_description_text"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
@@ -88,7 +88,7 @@
                             android:layout_height="24dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_reports"
-                            app:tint="#4F39F6"
+                            app:tint="@color/primary_blue"
                             android:contentDescription="@string/reports" />
                     </FrameLayout>
 
@@ -97,8 +97,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/reports"
-                        android:textColor="#0F172B"
-                        android:textSize="14sp" />
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp" /> />
                 </LinearLayout>
 
                 <!-- Selection indicator -->
@@ -140,7 +140,7 @@
                             android:layout_height="24dp"
                             android:layout_gravity="center"
                             android:src="@drawable/ic_warning"
-                            app:tint="#e7000b"
+                            app:tint="@color/danger_red"
                             android:contentDescription="@string/violations" />
                     </FrameLayout>
 
@@ -149,8 +149,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/violations"
-                        android:textColor="#45556C"
-                        android:textSize="14sp" />
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" /> />
                 </LinearLayout>
 
                 <!-- Selection indicator (hidden) -->
@@ -169,7 +169,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="0.8dp"
-            android:background="#E2E8F0"
+            android:background="@color/border_gray"
             android:layout_marginBottom="24dp" />
 
         <!-- Sort order section -->
@@ -177,7 +177,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sort_order"
-            android:textColor="#45556C"
+            android:textColor="@color/dialog_description_text"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
@@ -204,7 +204,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_arrow_up"
-                    app:tint="#009966"
+                    app:tint="@color/success_green"
                     android:contentDescription="@string/low_to_high" />
             </FrameLayout>
 
@@ -219,7 +219,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/low_to_high"
-                    android:textColor="#0F172B"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
                 <TextView
@@ -259,7 +259,7 @@
                     android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_arrow_down"
-                    app:tint="#94A3B8"
+                    app:tint="@color/text_secondary"
                     android:contentDescription="@string/high_to_low" />
             </FrameLayout>
 
@@ -274,7 +274,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/high_to_low"
-                    android:textColor="#314158"
+                    android:textColor="@color/text_primary"
                     android:textSize="14sp" />
 
                 <TextView
@@ -296,7 +296,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#E2E8F0" />
+        android:background="@color/border_gray" />
 
     <!-- Footer with Apply Button -->
     <LinearLayout

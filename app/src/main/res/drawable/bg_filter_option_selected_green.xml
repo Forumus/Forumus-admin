@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#E8F8EE" />
+    <solid android:color="@color/filter_option_bg_selected_green" />
     <corners android:radius="14dp" />
     <stroke
         android:width="1.6dp"
-        android:color="#00A63E" />
+        android:color="@color/filter_option_stroke_selected_green" />
 </shape>

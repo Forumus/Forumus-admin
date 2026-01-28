@@ -174,6 +174,7 @@
     <color name="dialog_description_text">#6A7282</color>
     <color name="dialog_button_bg">#155DFC</color>
     <color name="dialog_button_text">#FFFFFF</color>
+    <color name="dialog_section_text">#364153</color>
     
     <!-- Input Field Colors -->
     <color name="input_field_bg">#F3F3F5</color>
@@ -185,4 +186,31 @@
     <color name="topic_item_bg">@android:color/transparent</color>
     <color name="topic_item_border">#1A000000</color>
     <color name="topic_name_text">#101828</color>
+    <!-- Filter & Sort Colors -->
+    <color name="filter_option_bg_unselected">#FFFFFF</color>
+    <color name="filter_option_stroke_unselected">#E5E7EB</color>
+
+    <color name="filter_option_bg_selected_green">#E8F8EE</color>
+    <color name="filter_option_stroke_selected_green">#00A63E</color>
+
+    <color name="filter_option_bg_selected_blue">#EBF3FE</color>
+    <color name="filter_option_stroke_selected_blue">#155DFC</color>
+
+    <color name="filter_option_bg_selected_orange">#FFF1E6</color>
+    <color name="filter_option_stroke_selected_orange">#F54900</color>
+
+    <color name="filter_option_bg_selected_red">#FFECE6</color>
+    <color name="filter_option_stroke_selected_red">#E7000B</color>
+
+    <color name="filter_option_bg_selected_purple">#F5EDFE</color>
+    <color name="filter_option_stroke_selected_purple">#9810FA</color>
+
+    <color name="sort_option_bg_selected">#EEF2FF</color>
+    <color name="sort_option_stroke_selected">#615FFF</color>
+
+    <color name="sort_option_bg_unselected">#FFFFFF</color>
+    <color name="sort_option_stroke_unselected">#E2E8F0</color>
+
+    <color name="sort_arrow_bg_selected">#D0FAE5</color>
+    <color name="sort_arrow_bg_unselected">#F1F5F9</color>
 </resources>

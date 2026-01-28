@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/filter_by_status"
-            android:textColor="#0A0A0A"
+            android:textColor="@color/dialog_title_text"
             android:textSize="18sp"
             android:textStyle="normal" />
 
@@ -34,7 +34,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#1A000000" />
+        android:background="@color/border_gray" />
 
     <!-- Content -->
     <LinearLayout
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/select_status_to_filter"
-                android:textColor="#4A5565"
+                android:textColor="@color/dialog_description_text"
                 android:textSize="14sp" />
 
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/clear_all"
-                android:textColor="#155DFC"
+                android:textColor="@color/primary_blue"
                 android:textSize="14sp"
                 android:clickable="true"
                 android:focusable="true"
@@ -104,7 +104,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/remind"
-                        android:textColor="#155DFC"
+                        android:textColor="@color/badge_remind_text"
                         android:textSize="16sp" />
 
                     <ImageView
@@ -135,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/warning"
-                    android:textColor="#364153"
+                    android:textColor="@color/text_body"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -169,7 +169,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/ban"
-                        android:textColor="#E7000B"
+                        android:textColor="@color/badge_ban_text"
                         android:textSize="16sp" />
 
                     <ImageView
@@ -186,7 +186,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#1A000000" />
+        android:background="@color/border_gray" />
 
     <!-- Footer with Apply Button -->
     <LinearLayout

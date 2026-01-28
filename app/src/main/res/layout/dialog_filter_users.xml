@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/filter_users"
-            android:textColor="#0A0A0A"
+            android:textColor="@color/dialog_title_text"
             android:textSize="18sp"
             android:textStyle="normal" />
 
@@ -34,7 +34,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#E5E7EB" />
+        android:background="@color/border_gray" />
 
     <!-- Content -->
     <LinearLayout
@@ -59,7 +59,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/select_filters"
-                android:textColor="#4A5565"
+                android:textColor="@color/dialog_description_text"
                 android:textSize="14sp" />
 
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/clear_all"
-                android:textColor="#155DFC"
+                android:textColor="@color/primary_blue"
                 android:textSize="14sp"
                 android:clickable="true"
                 android:focusable="true"
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/status"
-            android:textColor="#364153"
+            android:textColor="@color/dialog_section_text"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
@@ -121,7 +121,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/normal"
-                            android:textColor="#364153"
+                            android:textColor="@color/text_body"
                             android:textSize="14sp"
                             android:gravity="center" />
 
@@ -158,7 +158,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/remind"
-                            android:textColor="#364153"
+                            android:textColor="@color/text_body"
                             android:textSize="14sp"
                             android:gravity="center" />
 
@@ -202,7 +202,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/warning"
-                            android:textColor="#364153"
+                            android:textColor="@color/text_body"
                             android:textSize="14sp"
                             android:gravity="center" />
 
@@ -239,7 +239,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/ban"
-                            android:textColor="#364153"
+                            android:textColor="@color/text_body"
                             android:textSize="14sp"
                             android:gravity="center" />
 
@@ -260,7 +260,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/role"
-            android:textColor="#364153"
+            android:textColor="@color/dialog_section_text"
             android:textSize="14sp"
             android:layout_marginBottom="12dp" />
 
@@ -293,7 +293,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/teacher"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="14sp"
                         android:gravity="center" />
 
@@ -330,7 +330,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/student"
-                        android:textColor="#364153"
+                        android:textColor="@color/text_body"
                         android:textSize="14sp"
                         android:gravity="center" />
 
@@ -349,7 +349,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="0.8dp"
-        android:background="#E5E7EB" />
+        android:background="@color/border_gray" />
 
     <!-- Footer with Apply Button -->
     <LinearLayout

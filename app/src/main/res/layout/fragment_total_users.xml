@@ -44,14 +44,7 @@
             android:textSize="20sp" />
 
         <!-- More Button -->
-        <ImageButton
-            android:id="@+id/moreButton"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/more_options"
-            android:src="@drawable/ic_more_vertical"
-            app:tint="@color/text_primary" />
+
 
     </LinearLayout>
 

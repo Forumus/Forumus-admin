@@ -71,10 +71,7 @@ class TotalUsersFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        binding.moreButton.setOnClickListener {
-            // TODO: Implement more options menu
-            Toast.makeText(requireContext(), getString(R.string.more_options_soon), Toast.LENGTH_SHORT).show()
-        }
+
     }
 
     private fun setupRecyclerView() {
@@ -467,25 +464,25 @@ class TotalUsersFragment : Fragment() {
             when (button.id) {
                 R.id.normalButton -> {
                     button.setBackgroundResource(R.drawable.bg_filter_option_selected_green)
-                    textView?.setTextColor(android.graphics.Color.parseColor("#00A63E"))
+                    textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.badge_normal_text))
                 }
                 R.id.remindButton -> {
                     button.setBackgroundResource(R.drawable.bg_filter_option_selected_blue)
-                    textView?.setTextColor(android.graphics.Color.parseColor("#155DFC"))
+                    textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.badge_remind_text))
                 }
                 R.id.warningButton -> {
                     button.setBackgroundResource(R.drawable.bg_filter_option_selected_orange)
-                    textView?.setTextColor(android.graphics.Color.parseColor("#F54900"))
+                    textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.badge_warning_text))
                 }
                 R.id.banButton -> {
                     button.setBackgroundResource(R.drawable.bg_filter_option_selected_red)
-                    textView?.setTextColor(android.graphics.Color.parseColor("#E7000B"))
+                    textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.badge_ban_text))
                 }
             }
             checkmark.visibility = View.VISIBLE
         } else {
             button.setBackgroundResource(R.drawable.bg_filter_option_unselected)
-            textView?.setTextColor(android.graphics.Color.parseColor("#364153"))
+            textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_body))
             checkmark.visibility = View.GONE
         }
     }
@@ -499,11 +496,11 @@ class TotalUsersFragment : Fragment() {
         
         if (isSelected) {
             button.setBackgroundResource(R.drawable.bg_filter_option_selected_purple)
-            textView?.setTextColor(android.graphics.Color.parseColor("#9810FA"))
+            textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.filter_option_stroke_selected_purple))
             checkmark.visibility = View.VISIBLE
         } else {
             button.setBackgroundResource(R.drawable.bg_filter_option_unselected)
-            textView?.setTextColor(android.graphics.Color.parseColor("#364153"))
+            textView?.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_body))
             checkmark.visibility = View.GONE
         }
     }
