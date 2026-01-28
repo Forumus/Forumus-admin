@@ -83,6 +83,22 @@ class MainActivity : AppCompatActivity() {
             }
             handled
         }
+
+        // Handle Logout Click
+        findViewById<android.view.View>(R.id.btnLogout).setOnClickListener {
+            // Clear remember me preference
+            val sharedPreferences = getSharedPreferences("login_prefs", Context.MODE_PRIVATE)
+            sharedPreferences.edit().clear().apply()
+
+            // Sign out from Firebase
+            com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+            
+            // Navigate to LoginActivity
+            val intent = android.content.Intent(this, com.hcmus.forumus_admin.ui.login.LoginActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+        }
     }
     
     fun openDrawer() {

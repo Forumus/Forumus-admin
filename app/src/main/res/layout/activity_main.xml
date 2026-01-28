@@ -18,31 +18,84 @@
         app:navGraph="@navigation/nav_graph"
         tools:layout="@layout/fragment_dashboard" />
 
-    <!-- Navigation Drawer -->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigationView"
+    <!-- Navigation Drawer Container -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@color/drawer_background"
         android:fitsSystemWindows="true"
-        android:elevation="8dp"
-        app:headerLayout="@layout/nav_header"
-        app:menu="@menu/drawer_menu"
-        app:itemIconTint="@color/drawer_item_icon_state"
-        app:itemTextColor="@color/drawer_item_text_state"
-        app:itemTextAppearance="@style/NavigationItemTextAppearance"
-        app:itemBackground="@drawable/nav_item_background"
-        app:itemHorizontalPadding="20dp"
-        app:itemVerticalPadding="14dp"
-        app:itemIconPadding="20dp"
-        app:itemIconSize="24dp"
-        app:itemShapeFillColor="@android:color/transparent"
-        app:itemShapeInsetStart="12dp"
-        app:itemShapeInsetEnd="12dp"
-        app:itemShapeInsetTop="4dp"
-        app:itemShapeInsetBottom="4dp"
-        app:itemRippleColor="@color/drawer_ripple"
-        tools:ignore="VisualLintBounds" />
+        android:elevation="8dp">
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@android:color/transparent"
+            app:headerLayout="@layout/nav_header"
+            app:menu="@menu/drawer_menu"
+            app:itemIconTint="@color/drawer_item_icon_state"
+            app:itemTextColor="@color/drawer_item_text_state"
+            app:itemTextAppearance="@style/NavigationItemTextAppearance"
+            app:itemBackground="@drawable/nav_item_background"
+            app:itemHorizontalPadding="20dp"
+            app:itemVerticalPadding="14dp"
+            app:itemIconPadding="20dp"
+            app:itemIconSize="24dp"
+            app:itemShapeFillColor="@android:color/transparent"
+            app:itemShapeInsetStart="12dp"
+            app:itemShapeInsetEnd="12dp"
+            app:itemShapeInsetTop="4dp"
+            app:itemShapeInsetBottom="4dp"
+            app:itemRippleColor="@color/drawer_ripple"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/logoutContainer"
+            tools:ignore="VisualLintBounds" />
+
+        <!-- Sticky Logout Section -->
+        <LinearLayout
+            android:id="@+id/logoutContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/drawer_divider" />
+
+            <LinearLayout
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="32dp"
+                android:paddingVertical="20dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_logout"
+                    app:tint="@color/danger_red" 
+                    android:contentDescription="Logout" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:text="Logout"
+                    android:textColor="@color/danger_red"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/montserrat_medium" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>
