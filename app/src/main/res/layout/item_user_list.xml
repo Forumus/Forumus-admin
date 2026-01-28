@@ -47,7 +47,7 @@
     <!-- ID -->
     <TextView
         android:id="@+id/userId"
-        android:layout_width="70dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:fontFamily="sans-serif"
