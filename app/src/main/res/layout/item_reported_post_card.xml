@@ -175,67 +175,97 @@
                 android:orientation="horizontal">
 
                 <!-- Dismiss Button -->
-                <LinearLayout
-                    android:id="@+id/dismissButton"
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="32dp"
                     android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_dismiss_button"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
+                    android:layout_weight="1">
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_close"
-                        app:tint="@color/dismiss_button_text" />
+                    <LinearLayout
+                        android:id="@+id/dismissButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_dismiss_button"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="sans-serif"
-                        android:text="@string/dismiss"
-                        android:textColor="@color/dismiss_button_text"
-                        android:textSize="14sp" />
+                        <ImageView
+                            android:id="@+id/dismissIcon"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_close"
+                            app:tint="@color/dismiss_button_text" />
 
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/dismissText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="sans-serif"
+                            android:text="@string/dismiss"
+                            android:textColor="@color/dismiss_button_text"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/dismissLoadingIndicator"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
+                        android:indeterminateTint="@color/dismiss_button_text" />
+                </FrameLayout>
 
                 <!-- Delete Button -->
-                <LinearLayout
-                    android:id="@+id/deleteButton"
+                <FrameLayout
                     android:layout_width="0dp"
                     android:layout_height="32dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_delete_button"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp">
+                    android:layout_weight="1">
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_delete"
-                        app:tint="@android:color/white" />
+                    <LinearLayout
+                        android:id="@+id/deleteButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_delete_button"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="sans-serif"
-                        android:text="@string/delete_post"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp" />
+                        <ImageView
+                            android:id="@+id/deleteIcon"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_delete"
+                            app:tint="@android:color/white" />
 
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/deleteText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="sans-serif"
+                            android:text="@string/delete_post"
+                            android:textColor="@android:color/white"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <ProgressBar
+                        android:id="@+id/deleteLoadingIndicator"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:visibility="gone"
+                        android:indeterminateTint="@android:color/white" />
+                </FrameLayout>
 
             </LinearLayout>
 

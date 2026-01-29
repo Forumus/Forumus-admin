@@ -139,8 +139,10 @@ class AiModerationViewModel : ViewModel() {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
             
-            // Show loading
-            _state.value = currentState.copy(isLoading = true)
+            // Add post to loading set (show loading indicator on this specific post)
+            _state.value = currentState.copy(
+                loadingPostIds = currentState.loadingPostIds + postId
+            )
             
             try {
                 // Call repository to override decision (approval doesn't trigger escalation)
@@ -167,13 +169,27 @@ class AiModerationViewModel : ViewModel() {
                         }
                     }
                     
-                    // Reload posts after approval
+                    // Remove from loading set and reload posts after approval
+                    val updatedState = _state.value ?: currentState
+                    _state.value = updatedState.copy(
+                        loadingPostIds = updatedState.loadingPostIds - postId
+                    )
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
-                    _state.value = currentState.copy(error = error.message, isLoading = false)
+                    // Remove from loading set on error
+                    val updatedState = _state.value ?: currentState
+                    _state.value = updatedState.copy(
+                        error = error.message,
+                        loadingPostIds = updatedState.loadingPostIds - postId
+                    )
                 }
             } catch (e: Exception) {
-                _state.value = currentState.copy(error = e.message, isLoading = false)
+                // Remove from loading set on exception
+                val updatedState = _state.value ?: currentState
+                _state.value = updatedState.copy(
+                    error = e.message,
+                    loadingPostIds = updatedState.loadingPostIds - postId
+                )
             }
         }
     }
@@ -189,8 +205,10 @@ class AiModerationViewModel : ViewModel() {
             // Find the post to get author information
             val post = currentState.allPosts.find { it.postData.id == postId }?.postData
             
-            // Show loading
-            _state.value = currentState.copy(isLoading = true)
+            // Add post to loading set (show loading indicator on this specific post)
+            _state.value = currentState.copy(
+                loadingPostIds = currentState.loadingPostIds + postId
+            )
             
             try {
                 // Call repository to override decision with author info for escalation
@@ -228,13 +246,27 @@ class AiModerationViewModel : ViewModel() {
                         }
                     }
 
-                    // Reload posts after rejection
+                    // Remove from loading set and reload posts after rejection
+                    val updatedState = _state.value ?: currentState
+                    _state.value = updatedState.copy(
+                        loadingPostIds = updatedState.loadingPostIds - postId
+                    )
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
-                    _state.value = currentState.copy(error = error.message, isLoading = false)
+                    // Remove from loading set on error
+                    val updatedState = _state.value ?: currentState
+                    _state.value = updatedState.copy(
+                        error = error.message,
+                        loadingPostIds = updatedState.loadingPostIds - postId
+                    )
                 }
             } catch (e: Exception) {
-                _state.value = currentState.copy(error = e.message, isLoading = false)
+                // Remove from loading set on exception
+                val updatedState = _state.value ?: currentState
+                _state.value = updatedState.copy(
+                    error = e.message,
+                    loadingPostIds = updatedState.loadingPostIds - postId
+                )
             }
         }
     }
@@ -247,8 +279,10 @@ class AiModerationViewModel : ViewModel() {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
             
-            // Show loading
-            _state.value = currentState.copy(isLoading = true)
+            // Add post to loading set (show loading indicator on this specific post)
+            _state.value = currentState.copy(
+                loadingPostIds = currentState.loadingPostIds + post.id
+            )
             
             try {
                 val result = repository.overrideModerationDecisionWithPost(post, false)
@@ -278,13 +312,27 @@ class AiModerationViewModel : ViewModel() {
                         Log.w("AiModerationViewModel", "Failed to send notification (non-blocking)", e)
                     }
 
-                    // Reload posts after rejection
+                    // Remove from loading set and reload posts after rejection
+                    val updatedState = _state.value ?: currentState
+                    _state.value = updatedState.copy(
+                        loadingPostIds = updatedState.loadingPostIds - post.id
+                    )
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
-                    _state.value = currentState.copy(error = error.message, isLoading = false)
+                    // Remove from loading set on error
+                    val updatedState = _state.value ?: currentState
+                    _state.value = updatedState.copy(
+                        error = error.message,
+                        loadingPostIds = updatedState.loadingPostIds - post.id
+                    )
                 }
             } catch (e: Exception) {
-                _state.value = currentState.copy(error = e.message, isLoading = false)
+                // Remove from loading set on exception
+                val updatedState = _state.value ?: currentState
+                _state.value = updatedState.copy(
+                    error = e.message,
+                    loadingPostIds = updatedState.loadingPostIds - post.id
+                )
             }
         }
     }

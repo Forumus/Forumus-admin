@@ -237,6 +237,8 @@
     <string name="topic_delete_failed">Xóa chủ đề thất bại</string>
     <string name="loading_topics">Đang tải chủ đề...</string>
     <string name="loading">Đang tải...</string>
+    <string name="processing">Đang xử lý…</string>
+    <string name="processing_request">Đang xử lý yêu cầu của bạn…</string>
     <string name="topic_name_label">Chủ đề: %s</string>
     
     <!-- Edit Topic Dialog -->

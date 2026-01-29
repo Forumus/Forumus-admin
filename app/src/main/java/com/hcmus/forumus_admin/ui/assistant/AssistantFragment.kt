@@ -422,12 +422,15 @@ class AssistantFragment : Fragment() {
             updateTabSelection(state.currentTab)
             adapter.submitList(state.filteredPosts)
             
+            // Update loading states for individual posts
+            adapter.setLoadingPostIds(state.loadingPostIds)
+            
             // Update sort/filter state from ViewModel
             currentSortOrder = state.sortOrder
             selectedViolationIds.clear()
             selectedViolationIds.addAll(state.selectedViolationIds)
             
-            // Show/hide loading indicator
+            // Show/hide loading indicator (for full list loading)
             binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
             
             // Show/hide empty state

@@ -3,6 +3,8 @@ package com.hcmus.forumus_admin.ui.reported
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.hcmus.forumus_admin.R
@@ -16,6 +18,20 @@ class ReportedPostsAdapter(
     private val onReportBadgeClick: (ReportedPost) -> Unit
 ) : RecyclerView.Adapter<ReportedPostsAdapter.ViewHolder>() {
 
+    // Track which posts are currently loading (for dismiss/delete operations)
+    private var loadingPostIds: Set<String> = emptySet()
+
+    fun setLoadingPostIds(ids: Set<String>) {
+        val oldIds = loadingPostIds
+        loadingPostIds = ids
+        // Notify items that changed loading state
+        posts.forEachIndexed { index, post ->
+            if ((post.id in oldIds) != (post.id in ids)) {
+                notifyItemChanged(index, PAYLOAD_LOADING_STATE)
+            }
+        }
+    }
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.findViewById(R.id.postTitle)
         val authorText: TextView = view.findViewById(R.id.postAuthor)
@@ -28,6 +44,14 @@ class ReportedPostsAdapter(
         val reportBadgeContainer: View = view.findViewById(R.id.reportBadgeContainer)
         val dismissButton: View = view.findViewById(R.id.dismissButton)
         val deleteButton: View = view.findViewById(R.id.deleteButton)
+        
+        // Loading indicator views
+        val dismissIcon: ImageView = view.findViewById(R.id.dismissIcon)
+        val dismissText: TextView = view.findViewById(R.id.dismissText)
+        val dismissLoadingIndicator: ProgressBar = view.findViewById(R.id.dismissLoadingIndicator)
+        val deleteIcon: ImageView = view.findViewById(R.id.deleteIcon)
+        val deleteText: TextView = view.findViewById(R.id.deleteText)
+        val deleteLoadingIndicator: ProgressBar = view.findViewById(R.id.deleteLoadingIndicator)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,7 +62,21 @@ class ReportedPostsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = posts[position]
-        
+        val isLoading = post.id in loadingPostIds
+        bindViewHolder(holder, post, isLoading)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_LOADING_STATE)) {
+            // Only update loading state, don't rebind everything
+            val isLoading = posts[position].id in loadingPostIds
+            updateLoadingState(holder, isLoading)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
+    }
+
+    private fun bindViewHolder(holder: ViewHolder, post: ReportedPost, isLoading: Boolean) {
         holder.titleText.text = post.title
         holder.authorText.text = holder.itemView.context.getString(R.string.by_author, post.author)
         holder.dateText.text = post.date
@@ -79,14 +117,41 @@ class ReportedPostsAdapter(
             onReportBadgeClick(post)
         }
         
-        // Handle button clicks
+        // Handle button clicks (only if not loading)
         holder.dismissButton.setOnClickListener {
-            onDismissClick(post)
+            if (!isButtonLoading(holder)) {
+                onDismissClick(post)
+            }
         }
         
         holder.deleteButton.setOnClickListener {
-            onDeleteClick(post)
+            if (!isButtonLoading(holder)) {
+                onDeleteClick(post)
+            }
         }
+
+        // Apply loading state
+        updateLoadingState(holder, isLoading)
+    }
+
+    private fun updateLoadingState(holder: ViewHolder, isLoading: Boolean) {
+        // Update dismiss button loading state
+        holder.dismissLoadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+        holder.dismissIcon.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+        holder.dismissText.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+        holder.dismissButton.isEnabled = !isLoading
+        holder.dismissButton.alpha = if (isLoading) 0.6f else 1.0f
+
+        // Update delete button loading state
+        holder.deleteLoadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+        holder.deleteIcon.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+        holder.deleteText.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+        holder.deleteButton.isEnabled = !isLoading
+        holder.deleteButton.alpha = if (isLoading) 0.6f else 1.0f
+    }
+
+    private fun isButtonLoading(holder: ViewHolder): Boolean {
+        return holder.dismissLoadingIndicator.visibility == View.VISIBLE
     }
 
     override fun getItemCount() = posts.size
@@ -94,5 +159,9 @@ class ReportedPostsAdapter(
     fun updatePosts(newPosts: List<ReportedPost>) {
         posts = newPosts
         notifyDataSetChanged()
+    }
+
+    companion object {
+        private const val PAYLOAD_LOADING_STATE = "loading_state"
     }
 }

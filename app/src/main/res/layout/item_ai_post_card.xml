@@ -97,60 +97,90 @@
             android:weightSum="2">
 
             <!-- Reject Button -->
-            <LinearLayout
-                android:id="@+id/rejectButton"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
                 android:layout_weight="1"
-                android:layout_marginEnd="4dp"
-                android:background="@drawable/bg_reject_button"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_marginEnd="4dp">
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_reject"
-                    android:contentDescription="@string/reject_icon"
-                    android:layout_marginEnd="8dp" />
+                <LinearLayout
+                    android:id="@+id/rejectButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_reject_button"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/reject"
-                    android:textColor="@color/reject_button"
-                    android:textSize="@dimen/text_size_normal" />
-            </LinearLayout>
+                    <ImageView
+                        android:id="@+id/rejectIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_reject"
+                        android:contentDescription="@string/reject_icon"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/rejectText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reject"
+                        android:textColor="@color/reject_button"
+                        android:textSize="@dimen/text_size_normal" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/rejectLoadingIndicator"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:indeterminateTint="@color/reject_button" />
+            </FrameLayout>
 
             <!-- Approve Button -->
-            <LinearLayout
-                android:id="@+id/approveButton"
+            <FrameLayout
                 android:layout_width="0dp"
                 android:layout_height="@dimen/button_height"
                 android:layout_weight="1"
-                android:layout_marginStart="4dp"
-                android:background="@drawable/bg_approve_button"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_marginStart="4dp">
 
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_approve"
-                    android:contentDescription="@string/approve_icon"
-                    android:layout_marginEnd="8dp" />
+                <LinearLayout
+                    android:id="@+id/approveButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_approve_button"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/approve"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/text_size_normal" />
-            </LinearLayout>
+                    <ImageView
+                        android:id="@+id/approveIcon"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_approve"
+                        android:contentDescription="@string/approve_icon"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/approveText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/approve"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/text_size_normal" />
+                </LinearLayout>
+
+                <ProgressBar
+                    android:id="@+id/approveLoadingIndicator"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:indeterminateTint="@color/white" />
+            </FrameLayout>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

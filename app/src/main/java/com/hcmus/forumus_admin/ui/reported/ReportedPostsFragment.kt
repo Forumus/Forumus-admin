@@ -50,6 +50,9 @@ class ReportedPostsFragment : Fragment() {
     private var allPosts: List<ReportedPost> = emptyList()
     private var filteredPosts: List<ReportedPost> = emptyList()
     private var isLoading = false
+    
+    // Track which posts are currently being processed (dismiss/delete)
+    private val loadingPostIds = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -261,12 +264,20 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun dismissPost(post: ReportedPost) {
+        // Add to loading set and update adapter
+        loadingPostIds.add(post.id)
+        adapter.setLoadingPostIds(loadingPostIds.toSet())
+        
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 // Use atomic batch operation to dismiss all reports
                 val result = reportRepository.dismissReportsForPost(post.id)
                 
                 result.onSuccess {
+                    // Remove from loading set
+                    loadingPostIds.remove(post.id)
+                    adapter.setLoadingPostIds(loadingPostIds.toSet())
+                    
                     // Remove from local list only after successful Firebase operation
                     allPosts = allPosts.filter { it.id != post.id }
                     applySearchFilter(binding.searchInput.query.toString())
@@ -276,6 +287,10 @@ class ReportedPostsFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                 }.onFailure { exception ->
+                    // Remove from loading set on error
+                    loadingPostIds.remove(post.id)
+                    adapter.setLoadingPostIds(loadingPostIds.toSet())
+                    
                     Toast.makeText(
                         requireContext(), 
                         getString(R.string.failed_to_dismiss_reports, exception.message), 
@@ -283,6 +298,10 @@ class ReportedPostsFragment : Fragment() {
                     ).show()
                 }
             } catch (e: Exception) {
+                // Remove from loading set on exception
+                loadingPostIds.remove(post.id)
+                adapter.setLoadingPostIds(loadingPostIds.toSet())
+                
                 Toast.makeText(
                     requireContext(), 
                     getString(R.string.error_dismissing_reports, e.message), 
@@ -293,6 +312,10 @@ class ReportedPostsFragment : Fragment() {
     }
     
     private fun deletePost(post: ReportedPost) {
+        // Add to loading set and update adapter
+        loadingPostIds.add(post.id)
+        adapter.setLoadingPostIds(loadingPostIds.toSet())
+        
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = postRepository.deletePost(post.id)
@@ -328,10 +351,18 @@ class ReportedPostsFragment : Fragment() {
                         Toast.makeText(requireContext(), getString(R.string.post_deleted), Toast.LENGTH_SHORT).show()
                     }
                     
+                    // Remove from loading set on success (post is removed from list anyway)
+                    loadingPostIds.remove(post.id)
+                    adapter.setLoadingPostIds(loadingPostIds.toSet())
+                    
                     // Remove from local list
                     allPosts = allPosts.filter { it.id != post.id }
                     applySearchFilter(binding.searchInput.query.toString())
                 }.onFailure { exception ->
+                    // Remove from loading set on error
+                    loadingPostIds.remove(post.id)
+                    adapter.setLoadingPostIds(loadingPostIds.toSet())
+                    
                     Toast.makeText(
                         requireContext(), 
                         getString(R.string.failed_to_delete_post, exception.message), 
@@ -339,6 +370,10 @@ class ReportedPostsFragment : Fragment() {
                     ).show()
                 }
             } catch (e: Exception) {
+                // Remove from loading set on exception
+                loadingPostIds.remove(post.id)
+                adapter.setLoadingPostIds(loadingPostIds.toSet())
+                
                 Toast.makeText(
                     requireContext(), 
                     getString(R.string.error_deleting_post, e.message), 

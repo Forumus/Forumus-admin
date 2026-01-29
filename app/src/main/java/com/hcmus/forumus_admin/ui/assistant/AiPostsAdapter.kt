@@ -1,6 +1,7 @@
 package com.hcmus.forumus_admin.ui.assistant
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -21,6 +22,21 @@ class AiPostsAdapter(
     private val onReject: (String) -> Unit
 ) : ListAdapter<AiModerationResult, AiPostsAdapter.PostViewHolder>(PostDiffCallback()) {
 
+    // Track which posts are currently loading
+    private var loadingPostIds: Set<String> = emptySet()
+
+    fun setLoadingPostIds(ids: Set<String>) {
+        val oldIds = loadingPostIds
+        loadingPostIds = ids
+        // Notify items that changed loading state
+        currentList.forEachIndexed { index, result ->
+            val postId = result.postData.id
+            if ((postId in oldIds) != (postId in ids)) {
+                notifyItemChanged(index, PAYLOAD_LOADING_STATE)
+            }
+        }
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemAiPostCardBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -31,7 +47,18 @@ class AiPostsAdapter(
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val isLoading = getItem(position).postData.id in loadingPostIds
+        holder.bind(getItem(position), isLoading)
+    }
+
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_LOADING_STATE)) {
+            // Only update loading state, don't rebind everything
+            val isLoading = getItem(position).postData.id in loadingPostIds
+            holder.updateLoadingState(isLoading)
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     class PostViewHolder(
@@ -40,7 +67,11 @@ class AiPostsAdapter(
         private val onReject: (String) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(post: AiModerationResult) {
+        private var currentPostId: String? = null
+
+        fun bind(post: AiModerationResult, isLoading: Boolean) {
+            currentPostId = post.postData.id
+            
             binding.apply {
                 postTitle.text = post.postData.title
                 postAuthor.text = "by ${post.postData.authorName}"
@@ -49,21 +80,6 @@ class AiPostsAdapter(
 
                 // Clear previous tags
                 tagsContainer.removeAllViews()
-
-                // Add tags
-//                post.postData.tags.forEach { tag ->
-//                    val chip = Chip(binding.root.context).apply {
-//                        text = tag.name
-//                        chipBackgroundColor = ContextCompat.getColorStateList(
-//                            context,
-//                            tag.backgroundColor
-//                        )
-//                        setTextColor(ContextCompat.getColor(context, tag.textColor))
-//                        isClickable = false
-//                        isCheckable = false
-//                    }
-//                    tagsContainer.addView(chip)
-//                }
 
                 // Update approve button style based on post status
                 // If post is AI rejected (not approved), show blue active style
@@ -75,13 +91,42 @@ class AiPostsAdapter(
 
                 // Set click listeners
                 approveButton.setOnClickListener {
-                    onApprove(post.postData.id)
+                    if (!isButtonLoading()) {
+                        onApprove(post.postData.id)
+                    }
                 }
 
                 rejectButton.setOnClickListener {
-                    onReject(post.postData.id)
+                    if (!isButtonLoading()) {
+                        onReject(post.postData.id)
+                    }
                 }
             }
+
+            // Apply loading state
+            updateLoadingState(isLoading)
+        }
+
+        fun updateLoadingState(isLoading: Boolean) {
+            binding.apply {
+                // Update approve button loading state
+                approveLoadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+                approveIcon.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                approveText.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                approveButton.isEnabled = !isLoading
+                approveButton.alpha = if (isLoading) 0.6f else 1.0f
+
+                // Update reject button loading state
+                rejectLoadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
+                rejectIcon.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                rejectText.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
+                rejectButton.isEnabled = !isLoading
+                rejectButton.alpha = if (isLoading) 0.6f else 1.0f
+            }
+        }
+
+        private fun isButtonLoading(): Boolean {
+            return binding.approveLoadingIndicator.visibility == View.VISIBLE
         }
     }
 
@@ -93,5 +138,9 @@ class AiPostsAdapter(
         override fun areContentsTheSame(oldItem: AiModerationResult, newItem: AiModerationResult): Boolean {
             return oldItem == newItem
         }
+    }
+
+    companion object {
+        private const val PAYLOAD_LOADING_STATE = "loading_state"
     }
 }

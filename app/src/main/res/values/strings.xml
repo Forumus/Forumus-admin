@@ -237,6 +237,8 @@
     <string name="topic_delete_failed">Failed to delete topic</string>
     <string name="loading_topics">Loading topics...</string>
     <string name="loading">Loading…</string>
+    <string name="processing">Processing…</string>
+    <string name="processing_request">Processing your request…</string>
     <string name="topic_name_label">Topic: %s</string>
     
     <!-- Edit Topic Dialog -->
