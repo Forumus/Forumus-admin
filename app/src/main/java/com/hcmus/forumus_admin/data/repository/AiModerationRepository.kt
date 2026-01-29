@@ -29,12 +29,14 @@ class AiModerationRepository(
         return try {
             val approvedPosts = postsCollection
                 .whereEqualTo("status", PostStatus.APPROVED)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(limit.toLong())
                 .get()
                 .await()
                 .documents
                 .mapNotNull { doc ->
                     val post = doc.toObject(FirestorePost::class.java)?.copy(id = doc.id)
+                    Log.d("AiModerationRepository", "Fetched approved post: $post")
                     if (post != null) {
                         // Parse violation types from document
                         val violationTypeStrings = (doc.get("violation_type") as? List<*>)?.mapNotNull { it as? String } ?: emptyList()
@@ -68,6 +70,7 @@ class AiModerationRepository(
         return try {
             val rejectedPosts = postsCollection
                 .whereEqualTo("status", PostStatus.REJECTED)
+                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(limit.toLong())
                 .get()
                 .await()
