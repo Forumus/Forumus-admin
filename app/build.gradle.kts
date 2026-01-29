@@ -75,13 +75,13 @@ dependencies {
     implementation(libs.google.firebase.storage)
     
     // Glide for image loading
-    implementation("com.github.bumptech.glide:glide:5.0.5")
+    implementation(libs.glide)
     
     // Retrofit for REST API calls
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
