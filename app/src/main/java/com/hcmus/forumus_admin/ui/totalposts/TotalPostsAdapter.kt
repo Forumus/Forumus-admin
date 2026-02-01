@@ -45,7 +45,6 @@ class TotalPostsAdapter(
             postDate.text = post.date
             postDescription.text = post.description
 
-            // Format categories as breadcrumb (e.g., "Category 1 › Category 2 › Category 3")
             val categoriesText = post.tags.joinToString(" › ") { it.name }
             postCategories.text = categoriesText
 

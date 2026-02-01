@@ -15,6 +15,7 @@ import android.content.res.Configuration
 import com.hcmus.forumus_admin.core.LocaleHelper
 import com.hcmus.forumus_admin.core.ThemeManager
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
     
     override fun attachBaseContext(newBase: Context) {
@@ -26,13 +27,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme before super.onCreate()
         ThemeManager.applyTheme(this)
         
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Setup status bar based on current theme
         setupStatusBar()
         
         setupNavigation()
@@ -44,11 +43,9 @@ class MainActivity : AppCompatActivity() {
         val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         
         if (isDarkMode) {
-            // Dark mode: dark status bar with light icons
             window.statusBarColor = androidx.core.content.ContextCompat.getColor(this, R.color.background_gray)
             androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
         } else {
-            // Light mode: white status bar with dark icons
             window.statusBarColor = androidx.core.content.ContextCompat.getColor(this, android.R.color.white)
             androidx.core.view.WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = true
         }
@@ -56,8 +53,7 @@ class MainActivity : AppCompatActivity() {
     
     private fun setupNavigation() {
         drawerLayout = findViewById(R.id.drawerLayout)
-        
-        // Set drawer status bar background to match header gradient
+
         val isDarkMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
         val drawerStatusBarColor = if (isDarkMode) {
             androidx.core.content.ContextCompat.getColor(this, R.color.drawer_header_background)
@@ -71,11 +67,9 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.navHostFragment) as NavHostFragment
         navController = navHostFragment.navController
-        
-        // Setup NavigationView with NavController
+
         NavigationUI.setupWithNavController(navigationView, navController)
-        
-        // Handle navigation item selection
+
         navigationView.setNavigationItemSelectedListener { menuItem ->
             val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)
             if (handled) {
@@ -84,12 +78,9 @@ class MainActivity : AppCompatActivity() {
             handled
         }
 
-        // Handle Logout Click
         findViewById<android.view.View>(R.id.btnLogout).setOnClickListener {
-            // Sign out from Firebase
             com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
-            
-            // Navigate to LoginActivity
+
             val intent = android.content.Intent(this, com.hcmus.forumus_admin.ui.login.LoginActivity::class.java)
             intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

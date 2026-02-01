@@ -1,5 +1,6 @@
 package com.hcmus.forumus_admin.ui.postdetail
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,8 +36,7 @@ class PostDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupToolbar()
-        
-        // Get post ID from arguments
+
         postId = arguments?.getString("postId")
         
         if (postId != null) {
@@ -78,15 +78,13 @@ class PostDetailFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun displayPostDetails(post: FirestorePost) {
-        // Post title
         binding.postTitle.text = post.title
-        
-        // Author information
+
         binding.authorName.text = post.authorName
         binding.authorId.text = post.authorId
-        
-        // Load author avatar if available
+
         if (!post.author_avatar_url.isNullOrEmpty()) {
             Glide.with(this)
                 .load(post.author_avatar_url)
@@ -95,32 +93,25 @@ class PostDetailFragment : Fragment() {
                 .circleCrop()
                 .into(binding.authorAvatar)
         }
-        
-        // Date
+
         binding.postDate.text = PostRepository.formatFirebaseTimestamp(post.createdAt)
-        
-        // Categories/Topics
+
         if (post.topic.isNotEmpty()) {
             binding.postCategories.text = post.topic.joinToString(" › ")
         } else {
             binding.postCategories.text = "Uncategorized"
         }
-        
-        // Post content
+
         binding.postContent.text = post.content
-        
-        // Post statistics
+
         binding.upvoteCount.text = post.upvote_count.toString()
         binding.downvoteCount.text = post.downvote_count.toString()
         binding.commentCount.text = post.comment_count.toString()
-        
-        // Post ID
+
         binding.postId.text = post.post_id
-        
-        // Status information
+
         binding.postStatus.text = post.status.uppercase()
-        
-        // Set status color based on status
+
         val statusColor = when (post.status.uppercase()) {
             "APPROVED" -> R.color.success_green
             "REJECTED", "DELETED" -> R.color.danger_red
@@ -128,8 +119,7 @@ class PostDetailFragment : Fragment() {
             else -> R.color.text_primary
         }
         binding.postStatus.setTextColor(resources.getColor(statusColor, null))
-        
-        // Report count
+
         if (post.reportCount > 0) {
             binding.reportCountLayout.visibility = View.VISIBLE
             val reportText = "${post.reportCount} report${if (post.reportCount != 1L) "s" else ""}"
@@ -137,16 +127,14 @@ class PostDetailFragment : Fragment() {
         } else {
             binding.reportCountLayout.visibility = View.GONE
         }
-        
-        // Violation types
+
         if (post.violation_type.isNotEmpty()) {
             binding.violationTypesLayout.visibility = View.VISIBLE
             binding.violationTypes.text = post.violation_type.joinToString(", ")
         } else {
             binding.violationTypesLayout.visibility = View.GONE
         }
-        
-        // Display images if available
+
         if (post.image_link.isNotEmpty()) {
             binding.imagesContainer.visibility = View.VISIBLE
             binding.imagesContainer.removeAllViews()
@@ -181,11 +169,9 @@ class PostDetailFragment : Fragment() {
     private fun showError(message: String) {
         binding.loadingIndicator.visibility = View.GONE
         binding.contentScrollView.visibility = View.VISIBLE
-        
-        // You can show a toast or set an error message in the UI
+
         android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_LONG).show()
-        
-        // Optionally, navigate back
+
         findNavController().navigateUp()
     }
 

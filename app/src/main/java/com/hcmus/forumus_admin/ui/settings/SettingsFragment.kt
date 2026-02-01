@@ -19,7 +19,7 @@ class SettingsFragment : Fragment() {
     private var selectedTheme: ThemeManager.ThemeMode = ThemeManager.ThemeMode.LIGHT
     private var selectedLanguage: Language = Language.ENGLISH
 
-    // Theme buttons and their components
+    // Theme buttons
     private lateinit var lightThemeButton: FrameLayout
     private lateinit var lightThemeIconContainer: FrameLayout
     private lateinit var lightThemeIcon: ImageView
@@ -64,11 +64,9 @@ class SettingsFragment : Fragment() {
         
         initializeViews(view)
         setupClickListeners()
-        
-        // Load saved preferences
+
         loadPreferences()
-        
-        // Set initial selection
+
         updateThemeSelection(selectedTheme)
         updateLanguageSelection(selectedLanguage)
     }
@@ -76,7 +74,6 @@ class SettingsFragment : Fragment() {
     private fun initializeViews(view: View) {
         menuIcon = view.findViewById(R.id.menuIcon)
 
-        // Theme buttons
         lightThemeButton = view.findViewById(R.id.lightThemeButton)
         lightThemeIconContainer = view.findViewById(R.id.lightThemeIconContainer)
         lightThemeIcon = view.findViewById(R.id.lightThemeIcon)
@@ -98,7 +95,6 @@ class SettingsFragment : Fragment() {
         autoThemeIndicator = view.findViewById(R.id.autoThemeIndicator)
         autoThemeIndicatorDot = view.findViewById(R.id.autoThemeIndicatorDot)
 
-        // Language buttons
         englishLanguageButton = view.findViewById(R.id.englishLanguageButton)
         englishLanguageIndicator = view.findViewById(R.id.englishLanguageIndicator)
 
@@ -157,7 +153,6 @@ class SettingsFragment : Fragment() {
         activity?.recreate()
     }
 
-    // ... (theme update methods remain the same)
 
     private fun applyTheme(mode: ThemeManager.ThemeMode) {
         ThemeManager.saveThemeMode(requireContext(), mode)
@@ -165,12 +160,10 @@ class SettingsFragment : Fragment() {
     }
 
     private fun updateThemeSelection(theme: ThemeManager.ThemeMode) {
-        // Reset all theme buttons to default state
         resetThemeButton(lightThemeButton, lightThemeIconContainer, lightThemeIcon, lightThemeText, lightThemeIndicator)
         resetThemeButton(darkThemeButton, darkThemeIconContainer, darkThemeIcon, darkThemeText, darkThemeIndicator)
         resetThemeButton(autoThemeButton, autoThemeIconContainer, autoThemeIcon, autoThemeText, autoThemeIndicator)
 
-        // Apply selected state to the chosen theme
         when (theme) {
             ThemeManager.ThemeMode.LIGHT -> {
                 applySelectedTheme(
@@ -249,14 +242,12 @@ class SettingsFragment : Fragment() {
     }
 
     private fun updateLanguageSelection(language: Language) {
-        // Reset both language buttons to default state
         englishLanguageButton.setBackgroundResource(R.drawable.bg_language_button)
         englishLanguageIndicator.visibility = View.GONE
 
         vietnameseLanguageButton.setBackgroundResource(R.drawable.bg_language_button)
         vietnameseLanguageIndicator.visibility = View.GONE
 
-        // Apply selected state to the chosen language
         when (language) {
             Language.ENGLISH -> {
                 englishLanguageButton.setBackgroundResource(R.drawable.bg_language_button_selected)
@@ -270,10 +261,8 @@ class SettingsFragment : Fragment() {
     }
 
     private fun loadPreferences() {
-        // Load theme from ThemeManager
         selectedTheme = ThemeManager.getSavedThemeMode(requireContext())
-        
-        // Load language from LocaleHelper
+
         val currentLang = com.hcmus.forumus_admin.core.LocaleHelper.getLanguage(requireContext())
         selectedLanguage = if (currentLang == "vi") Language.VIETNAMESE else Language.ENGLISH
     }

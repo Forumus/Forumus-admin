@@ -2,10 +2,6 @@ package com.hcmus.forumus_admin.data.model.email
 
 import com.google.gson.annotations.SerializedName
 
-/**
- * Request model for sending report emails via backend API.
- * Matches the backend ReportEmailRequest DTO.
- */
 data class ReportEmailRequest(
     @SerializedName("recipientEmail")
     val recipientEmail: String,
@@ -20,9 +16,6 @@ data class ReportEmailRequest(
     val reportedPosts: List<ReportedPost>? = null
 )
 
-/**
- * Represents a reported post included in the email.
- */
 data class ReportedPost(
     @SerializedName("postId")
     val postId: String,

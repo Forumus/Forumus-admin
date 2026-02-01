@@ -5,15 +5,6 @@ import com.hcmus.forumus_admin.data.api.RetrofitClient
 import com.hcmus.forumus_admin.data.model.notification.NotificationTriggerRequest
 import com.hcmus.forumus_admin.data.model.notification.NotificationType
 
-/**
- * Service for sending push notifications to users about admin actions.
- * 
- * Notification types:
- * - POST_DELETED: When admin or AI deletes a user's post
- * - POST_APPROVED: When admin or AI approves a user's post
- * - STATUS_CHANGED: When user's account status changes
- * - POST_REJECTED: When admin or AI rejects a user's post
- */
 class PushNotificationService {
     
     companion object {
@@ -32,17 +23,7 @@ class PushNotificationService {
             }
         }
     }
-    
-    /**
-     * Send notification when a post is deleted by admin or AI.
-     * 
-     * @param postId The ID of the deleted post
-     * @param postAuthorId The user ID who created the post
-     * @param postTitle The title of the deleted post
-     * @param reason Reason for deletion
-     * @param isAiDeleted True if deleted by AI, false if by admin
-     * @return Result indicating success or failure
-     */
+
     suspend fun sendPostDeletedNotification(
         postId: String,
         postAuthorId: String,
@@ -84,16 +65,7 @@ class PushNotificationService {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Send notification when a post is approved by admin or AI.
-     * 
-     * @param postId The ID of the approved post
-     * @param postAuthorId The user ID who created the post
-     * @param postTitle The title of the approved post
-     * @param isAiApproved True if approved by AI, false if by admin
-     * @return Result indicating success or failure
-     */
+
     suspend fun sendPostApprovedNotification(
         postId: String,
         postAuthorId: String,
@@ -131,17 +103,7 @@ class PushNotificationService {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Send notification when a post is rejected by admin or AI.
-     * 
-     * @param postId The ID of the rejected post
-     * @param postAuthorId The user ID who created the post
-     * @param postTitle The title of the rejected post
-     * @param reason Reason for rejection
-     * @param isAiRejected True if rejected by AI, false if by admin
-     * @return Result indicating success or failure
-     */
+
     suspend fun sendPostRejectedNotification(
         postId: String,
         postAuthorId: String,
@@ -183,15 +145,7 @@ class PushNotificationService {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Send notification when user's account status changes.
-     * 
-     * @param userId The user ID whose status changed
-     * @param oldStatus The previous status
-     * @param newStatus The new status
-     * @return Result indicating success or failure
-     */
+
     suspend fun sendStatusChangedNotification(
         userId: String,
         oldStatus: String,

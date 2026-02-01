@@ -71,18 +71,15 @@ class TotalPostsFragment : Fragment() {
         endDate = calendar.time
         binding.endDateInput.setText(dateFormat.format(endDate!!))
 
-        // Set start date to 31 days before end date
         calendar.add(Calendar.DAY_OF_YEAR, -maxDaysRange)
         startDate = calendar.time
         binding.startDateInput.setText(dateFormat.format(startDate!!))
 
-        // Update date range display
         binding.dateRangeText.text = "${dateFormat.format(startDate!!)} - ${dateFormat.format(endDate!!)}"
     }
 
     private fun setupRecyclerView() {
         adapter = TotalPostsAdapter { post ->
-            // Navigate to post detail fragment with post ID
             val bundle = Bundle().apply {
                 putString("postId", post.id)
             }
@@ -170,8 +167,7 @@ class TotalPostsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val postsResult = postRepository.getAllPosts()
-                
-                // Check if fragment is still added to activity
+
                 if (!isAdded || _binding == null) return@launch
                 
                 postsResult.onSuccess { firestorePosts ->
@@ -181,7 +177,6 @@ class TotalPostsFragment : Fragment() {
                         }
                         allPosts = emptyList()
                     } else {
-                        // Convert Firestore posts to Post model - use authorName directly from Firebase
                         allPosts = firestorePosts.map { firestorePost ->
                             Post(
                                 id = firestorePost.post_id,
@@ -285,8 +280,7 @@ class TotalPostsFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = postRepository.getAllPosts()
-                
-                // Check if fragment is still added to activity
+
                 if (!isAdded || _binding == null) return@launch
                 
                 result.onSuccess { firestorePosts ->
@@ -331,8 +325,7 @@ class TotalPostsFragment : Fragment() {
                         Toast.makeText(it, "Error filtering posts: ${exception.message}", Toast.LENGTH_LONG).show()
                     }
                 }
-                
-                // Update date range display
+
                 _binding?.dateRangeText?.text = "${dateFormat.format(start)} - ${dateFormat.format(end)}"
             } finally {
                 isLoading = false

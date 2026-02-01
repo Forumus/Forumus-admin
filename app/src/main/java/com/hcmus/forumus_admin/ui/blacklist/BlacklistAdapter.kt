@@ -62,7 +62,6 @@ class BlacklistAdapter(
                 )
             }
             UserStatus.NORMAL -> {
-                // This case shouldn't appear in blacklist, but handle it for completeness
                 holder.statusBadge.text = "Normal"
                 holder.statusBadge.setBackgroundResource(R.drawable.bg_badge_remind)
                 holder.statusBadge.setTextColor(
@@ -70,18 +69,15 @@ class BlacklistAdapter(
                 )
             }
         }
-        
-        // Handle remove button click
+
         holder.removeButton.setOnClickListener {
             onRemoveClick(user)
         }
-        
-        // Handle status badge click to change status
+
         holder.statusBadge.setOnClickListener {
             onStatusClick(user)
         }
-        
-        // Load avatar using Glide
+
         if (!user.avatarUrl.isNullOrEmpty()) {
             Glide.with(holder.itemView.context)
                 .load(user.avatarUrl)

@@ -15,19 +15,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.hcmus.forumus_admin.R
 
-/**
- * Data class to hold user suggestion info
- */
 data class UserSuggestion(
     val id: String,
     val name: String,
     val displayText: String = "$name ($id)"
 )
 
-/**
- * Custom adapter for user autocomplete suggestions
- * Shows both user names and IDs in the dropdown with modern Google-style UI
- */
 class UserAutoCompleteAdapter(
     context: Context,
     private var suggestions: List<UserSuggestion> = emptyList()
@@ -46,37 +39,29 @@ class UserAutoCompleteAdapter(
             .inflate(R.layout.item_autocomplete_suggestion, parent, false)
         
         val suggestion = getItem(position) ?: return view
-        
-        // Get views
+
         val iconView = view.findViewById<ImageView>(R.id.suggestionIcon)
         val primaryText = view.findViewById<TextView>(R.id.suggestionPrimaryText)
         val secondaryText = view.findViewById<TextView>(R.id.suggestionSecondaryText)
         val arrowView = view.findViewById<ImageView>(R.id.suggestionArrow)
-        
-        // Set icon
+
         iconView?.setImageResource(R.drawable.ic_search)
-        
-        // Set primary text with bold highlighting for matching part
+
         val highlightedText = highlightMatchingText(suggestion.name, currentQuery)
         primaryText?.text = highlightedText
-        
-        // Set secondary text (ID) if different from name
+
         if (suggestion.id.isNotEmpty() && suggestion.id != suggestion.name) {
             secondaryText?.visibility = View.VISIBLE
             secondaryText?.text = "ID: ${suggestion.id}"
         } else {
             secondaryText?.visibility = View.GONE
         }
-        
-        // Show arrow on hover/focus (always visible for now)
+
         arrowView?.visibility = View.GONE
         
         return view
     }
-    
-    /**
-     * Highlights the matching text in bold
-     */
+
     private fun highlightMatchingText(text: String, query: String): SpannableString {
         val spannable = SpannableString(text)
         
@@ -100,9 +85,6 @@ class UserAutoCompleteAdapter(
         return spannable
     }
 
-    /**
-     * Update the suggestions list
-     */
     fun updateSuggestions(newSuggestions: List<UserSuggestion>) {
         suggestions = newSuggestions
         filteredSuggestions = newSuggestions

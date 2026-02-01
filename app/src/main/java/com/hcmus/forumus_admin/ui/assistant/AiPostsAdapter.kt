@@ -81,8 +81,6 @@ class AiPostsAdapter(
                 // Clear previous tags
                 tagsContainer.removeAllViews()
 
-                // Update approve button style based on post status
-                // If post is AI rejected (not approved), show blue active style
                 if (post.postData.status == PostStatus.REJECTED) {
                     approveButton.setBackgroundResource(com.hcmus.forumus_admin.R.drawable.bg_approve_button_active)
                 } else {

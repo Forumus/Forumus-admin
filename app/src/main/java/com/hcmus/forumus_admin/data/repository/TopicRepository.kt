@@ -64,8 +64,7 @@ class TopicRepository {
     suspend fun addTopic(name: String, description: String): Result<FirestoreTopic> {
         return try {
             val topicId = name.lowercase().replace(" ", "_")
-            
-            // Get existing colors to avoid duplicates
+
             val existingColors = mutableSetOf<String>()
             try {
                 val existingTopics = topicsCollection.get().await()
@@ -73,10 +72,9 @@ class TopicRepository {
                     doc.getString("fillColor")?.let { existingColors.add(it) }
                 }
             } catch (e: Exception) {
-                // Continue with empty set if can't fetch
+
             }
-            
-            // Generate a random color that's not gray and not already used
+
             val fillColor = generateUniqueColor(existingColors)
             val fillAlpha = 0.125
             
@@ -102,29 +100,27 @@ class TopicRepository {
     }
     
     private fun generateUniqueColor(existingColors: Set<String>): String {
-        // Predefined highly distinct colors with maximum perceptual difference
-        // Colors carefully chosen to be visually distinct even for color-blind users
         val distinctColors = listOf(
-            "#E74C3C", // Vivid Red
-            "#3498DB", // Bright Blue
-            "#2ECC71", // Emerald Green
-            "#F39C12", // Vibrant Orange
-            "#9B59B6", // Purple
-            "#1ABC9C", // Turquoise
-            "#E67E22", // Carrot Orange
-            "#16A085", // Dark Cyan
-            "#D35400", // Pumpkin
-            "#C0392B", // Dark Red
-            "#8E44AD", // Wisteria Purple
-            "#27AE60", // Nephritis Green
-            "#2980B9", // Belize Blue
-            "#F1C40F", // Sunflower Yellow
-            "#E91E63", // Pink
-            "#00BCD4", // Cyan
-            "#4CAF50", // Green
-            "#FF5722", // Deep Orange
-            "#673AB7", // Deep Purple
-            "#009688"  // Teal
+            "#E74C3C",
+            "#3498DB",
+            "#2ECC71",
+            "#F39C12",
+            "#9B59B6",
+            "#1ABC9C",
+            "#E67E22",
+            "#16A085",
+            "#D35400",
+            "#C0392B",
+            "#8E44AD",
+            "#27AE60",
+            "#2980B9",
+            "#F1C40F",
+            "#E91E63",
+            "#00BCD4",
+            "#4CAF50",
+            "#FF5722",
+            "#673AB7",
+            "#009688"
         )
         
         // First try to find an unused predefined color
@@ -142,8 +138,7 @@ class TopicRepository {
             val r = (80..255).random()
             val g = (80..255).random()
             val b = (80..255).random()
-            
-            // Ensure it's not a gray tone (RGB values should differ significantly)
+
             val maxDiff = maxOf(Math.abs(r - g), Math.abs(g - b), Math.abs(r - b))
             if (maxDiff < 80) {  // Skip gray-like colors
                 attempts++
@@ -151,19 +146,16 @@ class TopicRepository {
             }
             
             val candidateColor = String.format("#%02X%02X%02X", r, g, b)
-            
-            // Calculate minimum distance to all existing colors
+
             val minDistance = existingColors.minOfOrNull { existingColor ->
                 calculateColorDistance(candidateColor, existingColor)
             } ?: Double.MAX_VALUE
-            
-            // Keep the color with maximum minimum distance (most distinct from all existing)
+
             if (minDistance > maxMinDistance) {
                 maxMinDistance = minDistance
                 bestColor = candidateColor
             }
-            
-            // If we found a color that's very different from all existing ones, use it
+
             if (minDistance > 150.0) {
                 return candidateColor
             }
@@ -173,27 +165,18 @@ class TopicRepository {
         
         return bestColor
     }
-    
-    /**
-     * Calculate perceptual color distance using weighted Euclidean distance in RGB space
-     * This approximates human color perception where differences in certain colors are more noticeable
-     */
+
     private fun calculateColorDistance(color1: String, color2: String): Double {
         val rgb1 = hexToRgb(color1)
         val rgb2 = hexToRgb(color2)
-        
-        // Weighted RGB distance (approximates perceptual difference)
-        // Red and green have higher weights as humans are more sensitive to these
+
         val rDiff = (rgb1[0] - rgb2[0]) * 0.3
         val gDiff = (rgb1[1] - rgb2[1]) * 0.59
         val bDiff = (rgb1[2] - rgb2[2]) * 0.11
         
         return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff)
     }
-    
-    /**
-     * Convert hex color string to RGB array
-     */
+
     private fun hexToRgb(hex: String): IntArray {
         val cleanHex = hex.removePrefix("#")
         return intArrayOf(

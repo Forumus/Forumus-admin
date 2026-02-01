@@ -8,20 +8,12 @@ import com.hcmus.forumus_admin.data.service.AiModerationService
 import com.hcmus.forumus_admin.data.service.UserStatusEscalationService
 import kotlinx.coroutines.tasks.await
 
-/**
- * Repository for managing AI moderation data
- * Acts as a single source of truth for AI moderation operations
- */
 class AiModerationRepository(
-//    private val service: AiModerationService = AiModerationService()
     private val statusEscalationService: UserStatusEscalationService = UserStatusEscalationService.getInstance()
 ) {
     private val firestore = FirebaseFirestore.getInstance()
     private val postsCollection = firestore.collection("posts")
-    
-    /**
-     * Get approved posts
-     */
+
     suspend fun getApprovedPosts(
         limit: Int = 50,
         offset: Int = 0
@@ -59,10 +51,7 @@ class AiModerationRepository(
             return Result.failure(e)
         }
     }
-    
-    /**
-     * Get rejected posts
-     */
+
     suspend fun getRejectedPosts(
         limit: Int = 50,
         offset: Int = 0
@@ -96,33 +85,19 @@ class AiModerationRepository(
             return Result.failure(e)
         }
     }
-    
-    /**
-     * Parse violation type strings from Firebase to ViolationType objects
-     */
+
     private fun parseViolationTypes(violationStrings: List<String>): List<ViolationType> {
         return violationStrings.mapNotNull { typeString ->
             ViolationCategory.fromString(typeString)?.let { category ->
                 ViolationType(
                     type = category,
-                    score = 0.8, // Default score since Firebase may not have this
+                    score = 0.8, // Default score
                     description = category.displayName
                 )
             }
         }
     }
-    
-    /**
-     * Override AI decision manually.
-     * When rejecting a post (isApproved = false), this will also escalate the author's status.
-     * 
-     * @param postId The ID of the post to update
-     * @param isApproved Whether the post is approved (true) or rejected/deleted (false)
-     * @param authorId Optional author ID for status escalation (required when rejecting)
-     * @param postTitle Optional post title for audit purposes
-     * @param violationTypes List of violation types for audit purposes
-     * @return Result containing success status and optional escalation result
-     */
+
     suspend fun overrideModerationDecision(
         postId: String,
         isApproved: Boolean,
@@ -131,15 +106,13 @@ class AiModerationRepository(
         violationTypes: List<String> = emptyList()
     ): Result<ModerationDecisionResult> {
         return try {
-            // Update post status in Firestore
             val newStatus = if (isApproved) PostStatus.APPROVED else PostStatus.DELETED
             postsCollection.document(postId)
                 .update("status", newStatus)
                 .await()
             
             var escalationResult: StatusEscalationResult? = null
-            
-            // If post is being rejected/deleted and we have author info, escalate user status
+
             if (!isApproved && authorId != null && authorId.isNotEmpty()) {
                 Log.d("AiModerationRepository", "Post rejected, escalating status for author: $authorId")
                 escalationResult = statusEscalationService.escalateUserStatus(authorId)
@@ -165,15 +138,7 @@ class AiModerationRepository(
             Result.failure(e)
         }
     }
-    
-    /**
-     * Override AI decision with full post data.
-     * This version automatically extracts author info from the post.
-     * 
-     * @param post The FirestorePost to update
-     * @param isApproved Whether the post is approved (true) or rejected/deleted (false)
-     * @return Result containing success status and optional escalation result
-     */
+
     suspend fun overrideModerationDecisionWithPost(
         post: FirestorePost,
         isApproved: Boolean
@@ -186,10 +151,7 @@ class AiModerationRepository(
             violationTypes = post.violationTypes
         )
     }
-    
-    /**
-     * Search posts by query in title or content
-     */
+
     suspend fun searchModerationResults(
         query: String,
         isApproved: Boolean? = null,

@@ -46,7 +46,6 @@ class TotalUsersAdapter(
             userName.text = user.name
             userId.text = user.id
 
-            // Set status badge
             when (user.status) {
                 UserStatus.BANNED -> {
                     userStatus.text = itemView.context.getString(R.string.ban)
@@ -78,7 +77,6 @@ class TotalUsersAdapter(
                 }
             }
 
-            // Load avatar using Glide
             if (!user.avatarUrl.isNullOrEmpty()) {
                 Glide.with(itemView.context)
                     .load(user.avatarUrl)
@@ -90,7 +88,6 @@ class TotalUsersAdapter(
                 userAvatar.setImageResource(R.drawable.ic_default_avatar)
             }
 
-            // Set click listener
             itemView.setOnClickListener {
                 onUserClick?.invoke(user)
             }

@@ -18,13 +18,11 @@ class ReportedPostsAdapter(
     private val onReportBadgeClick: (ReportedPost) -> Unit
 ) : RecyclerView.Adapter<ReportedPostsAdapter.ViewHolder>() {
 
-    // Track which posts are currently loading (for dismiss/delete operations)
     private var loadingPostIds: Set<String> = emptySet()
 
     fun setLoadingPostIds(ids: Set<String>) {
         val oldIds = loadingPostIds
         loadingPostIds = ids
-        // Notify items that changed loading state
         posts.forEachIndexed { index, post ->
             if ((post.id in oldIds) != (post.id in ids)) {
                 notifyItemChanged(index, PAYLOAD_LOADING_STATE)
@@ -68,7 +66,6 @@ class ReportedPostsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.contains(PAYLOAD_LOADING_STATE)) {
-            // Only update loading state, don't rebind everything
             val isLoading = posts[position].id in loadingPostIds
             updateLoadingState(holder, isLoading)
         } else {
@@ -80,13 +77,9 @@ class ReportedPostsAdapter(
         holder.titleText.text = post.title
         holder.authorText.text = holder.itemView.context.getString(R.string.by_author, post.author)
         holder.dateText.text = post.date
-        
-        // Format categories with › separator
         holder.categoriesText.text = post.categories.joinToString(" › ")
-        
         holder.descriptionText.text = post.description
-        
-        // Set violation count
+
         val resources = holder.itemView.context.resources
         val violationText = resources.getQuantityString(
             R.plurals.violation_count, 
@@ -94,21 +87,18 @@ class ReportedPostsAdapter(
             post.violationCount
         )
         holder.violationBadgeText.text = violationText
-        
-        // Set report count
+
         val reportText = resources.getQuantityString(
             R.plurals.report_count, 
             post.reportCount, 
             post.reportCount
         )
         holder.reportBadgeText.text = reportText
-        
-        // Handle item click
+
         holder.itemView.setOnClickListener {
             onItemClick(post)
         }
-        
-        // Handle badge clicks
+
         holder.violationBadgeContainer.setOnClickListener {
             onViolationBadgeClick(post)
         }
@@ -116,8 +106,7 @@ class ReportedPostsAdapter(
         holder.reportBadgeContainer.setOnClickListener {
             onReportBadgeClick(post)
         }
-        
-        // Handle button clicks (only if not loading)
+
         holder.dismissButton.setOnClickListener {
             if (!isButtonLoading(holder)) {
                 onDismissClick(post)
@@ -130,19 +119,16 @@ class ReportedPostsAdapter(
             }
         }
 
-        // Apply loading state
         updateLoadingState(holder, isLoading)
     }
 
     private fun updateLoadingState(holder: ViewHolder, isLoading: Boolean) {
-        // Update dismiss button loading state
         holder.dismissLoadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
         holder.dismissIcon.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
         holder.dismissText.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
         holder.dismissButton.isEnabled = !isLoading
         holder.dismissButton.alpha = if (isLoading) 0.6f else 1.0f
 
-        // Update delete button loading state
         holder.deleteLoadingIndicator.visibility = if (isLoading) View.VISIBLE else View.GONE
         holder.deleteIcon.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE
         holder.deleteText.visibility = if (isLoading) View.INVISIBLE else View.VISIBLE

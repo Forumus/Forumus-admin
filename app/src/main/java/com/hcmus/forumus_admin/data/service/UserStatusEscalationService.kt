@@ -7,16 +7,6 @@ import com.hcmus.forumus_admin.data.model.UserStatusLevel
 import com.hcmus.forumus_admin.data.repository.UserRepository
 import com.hcmus.forumus_admin.data.model.email.ReportedPost
 
-/**
- * Service for handling user status escalation when posts are deleted.
- * 
- * Status escalation order:
- * NORMAL → REMINDED → WARNED → BANNED
- * 
- * Triggers:
- * - AI moderation rejection (AI reject feature)
- * - Admin deletion after report (reported post feature)
- */
 class UserStatusEscalationService(
     private val userRepository: UserRepository = UserRepository(),
     private val emailNotificationService: EmailNotificationService = EmailNotificationService.getInstance(),
@@ -24,8 +14,7 @@ class UserStatusEscalationService(
 ) {
     companion object {
         private const val TAG = "UserStatusEscalation"
-        
-        // Singleton instance for easy access
+
         @Volatile
         private var instance: UserStatusEscalationService? = null
         
@@ -36,17 +25,10 @@ class UserStatusEscalationService(
         }
     }
 
-    /**
-     * Escalate a user's status to the next level when their post is deleted.
-     * 
-     * @param userId The ID of the user whose status should be escalated
-     * @return StatusEscalationResult containing the result of the operation
-     */
     suspend fun escalateUserStatus(userId: String): StatusEscalationResult {
         return try {
             Log.d(TAG, "Starting status escalation for user: $userId")
-            
-            // Step 1: Get current user status
+
             val userResult = userRepository.getUserById(userId)
             if (userResult.isFailure) {
                 Log.e(TAG, "Failed to get user: $userId")
@@ -72,12 +54,10 @@ class UserStatusEscalationService(
                     error = "User not found: $userId"
                 )
             }
-            
-            // Step 2: Get current status level
+
             val currentStatusLevel = UserStatusLevel.fromString(user.status)
             Log.d(TAG, "Current user status: ${currentStatusLevel.value}")
-            
-            // Step 3: Calculate next status level
+
             val nextStatusLevel = UserStatusLevel.getNextLevel(currentStatusLevel)
             val wasEscalated = nextStatusLevel != currentStatusLevel
             
@@ -93,8 +73,7 @@ class UserStatusEscalationService(
             }
             
             Log.d(TAG, "Escalating status: ${currentStatusLevel.value} -> ${nextStatusLevel.value}")
-            
-            // Step 4: Update user status in Firebase
+
             val newUserStatus = convertToUserStatus(nextStatusLevel)
             val updateResult = userRepository.updateUserStatus(userId, newUserStatus)
             
@@ -109,8 +88,7 @@ class UserStatusEscalationService(
                     error = "Failed to update user status: ${updateResult.exceptionOrNull()?.message}"
                 )
             }
-            
-            // Step 5: Send email notification to user about status change
+
             try {
                 val emailResult = emailNotificationService.sendEscalationEmail(
                     userEmail = user.email,
@@ -123,14 +101,11 @@ class UserStatusEscalationService(
                     Log.d(TAG, "Email notification sent successfully to ${user.email}")
                 } else {
                     Log.w(TAG, "Failed to send email notification: ${emailResult.exceptionOrNull()?.message}")
-                    // Continue even if email fails - don't block status escalation
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Error sending email notification (non-blocking)", e)
-                // Continue even if email fails
             }
-            
-            // Step 6: Send push notification to user about status change
+
             try {
                 val pushResult = pushNotificationService.sendStatusChangedNotification(
                     userId = userId,
@@ -142,11 +117,9 @@ class UserStatusEscalationService(
                     Log.d(TAG, "Push notification sent successfully to user $userId")
                 } else {
                     Log.w(TAG, "Failed to send push notification: ${pushResult.exceptionOrNull()?.message}")
-                    // Continue even if push notification fails
                 }
             } catch (e: Exception) {
                 Log.w(TAG, "Error sending push notification (non-blocking)", e)
-                // Continue even if push notification fails
             }
             
             Log.d(TAG, "Status escalation completed successfully for user: $userId")
@@ -172,9 +145,6 @@ class UserStatusEscalationService(
         }
     }
 
-    /**
-     * Check if a user is banned.
-     */
     suspend fun isUserBanned(userId: String): Boolean {
         return try {
             val userResult = userRepository.getUserById(userId)
@@ -186,9 +156,6 @@ class UserStatusEscalationService(
         }
     }
 
-    /**
-     * Convert UserStatusLevel to UserStatus enum used by UserRepository.
-     */
     private fun convertToUserStatus(level: UserStatusLevel): UserStatus {
         return when (level) {
             UserStatusLevel.NORMAL -> UserStatus.NORMAL

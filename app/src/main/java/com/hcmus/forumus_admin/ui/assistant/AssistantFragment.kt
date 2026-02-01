@@ -30,11 +30,10 @@ class AssistantFragment : Fragment() {
     private val viewModel: AiModerationViewModel by viewModels()
     private lateinit var adapter: AiPostsAdapter
     private val violationRepository = ViolationRepository()
-    
-    // Current filter state for dialogs
+
     private var currentSortOrder = SortOrder.NEWEST_FIRST
-    private val selectedViolationIds = mutableSetOf<String>()  // Changed to store violation IDs
-    private var availableViolations: List<Violation> = emptyList()  // Store all available violations
+    private val selectedViolationIds = mutableSetOf<String>()
+    private var availableViolations: List<Violation> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -124,7 +123,6 @@ class AssistantFragment : Fragment() {
             .setTitle(title)
             .setMessage("$message\n\nTitle: ${post.postData.title}")
             .setPositiveButton(getString(R.string.reject)) { _, _ ->
-                // Only send notification if rejecting from AI Approved tab
                 viewModel.rejectPost(post.postData.id, sendNotification = isApprovedTab)
                 Toast.makeText(requireContext(), getString(R.string.post_rejected_toast), Toast.LENGTH_SHORT).show()
             }
@@ -171,8 +169,7 @@ class AssistantFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-        
-        // Make dialog background transparent for rounded corners
+
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         
         // Track selection
@@ -240,24 +237,19 @@ class AssistantFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-        
-        // Make dialog background transparent for rounded corners
+
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        
-        // Temp selection (copy of current selection)
+
         val tempSelectedIds = selectedViolationIds.toMutableSet()
-        
-        // Get views
+
         val closeButton = dialogView.findViewById<View>(R.id.closeButton)
         val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
         val applyButton = dialogView.findViewById<View>(R.id.applyButton)
         val optionsContainer = dialogView.findViewById<android.widget.LinearLayout>(R.id.violationOptionsContainer)
         
         if (optionsContainer != null) {
-            // Clear existing static options
             optionsContainer.removeAllViews()
-            
-            // Create dynamic violation buttons from Firebase data
+
             val violationButtons = mutableMapOf<String, Pair<LinearLayout, ImageView>>()
             
             availableViolations.forEach { violation ->
@@ -272,11 +264,9 @@ class AssistantFragment : Fragment() {
                     val checkmark = buttonLayout.findViewById<ImageView>(R.id.violationCheckmark)
                     
                     textView?.text = violation.name
-                    
-                    // Initialize selection state
+
                     updateFilterButtonState(buttonLayout, checkmark, violation.violation in tempSelectedIds)
-                    
-                    // Add click listener
+
                     buttonLayout.setOnClickListener {
                         val isSelected = violation.violation in tempSelectedIds
                         if (isSelected) {
@@ -318,7 +308,6 @@ class AssistantFragment : Fragment() {
                 dialog.dismiss()
             }
         } else {
-            // Fallback: Use existing static buttons if container not found
             setupStaticFilterButtons(dialogView, tempSelectedIds, dialog)
         }
         
@@ -330,12 +319,10 @@ class AssistantFragment : Fragment() {
         tempSelectedIds: MutableSet<String>,
         dialog: AlertDialog
     ) {
-        // Fallback implementation using static buttons
         val closeButton = dialogView.findViewById<View>(R.id.closeButton)
         val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
         val applyButton = dialogView.findViewById<View>(R.id.applyButton)
-        
-        // Map static button IDs to violation IDs (based on common violation codes)
+
         val buttonMapping = mapOf(
             R.id.toxicityButton to "vio_001",
             R.id.severeToxicityButton to "vio_002",
@@ -421,19 +408,15 @@ class AssistantFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             updateTabSelection(state.currentTab)
             adapter.submitList(state.filteredPosts)
-            
-            // Update loading states for individual posts
+
             adapter.setLoadingPostIds(state.loadingPostIds)
-            
-            // Update sort/filter state from ViewModel
+
             currentSortOrder = state.sortOrder
             selectedViolationIds.clear()
             selectedViolationIds.addAll(state.selectedViolationIds)
-            
-            // Show/hide loading indicator (for full list loading)
+
             binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
-            
-            // Show/hide empty state
+
             if (state.filteredPosts.isEmpty() && !state.isLoading) {
                 binding.emptyState.visibility = View.VISIBLE
                 binding.postsRecyclerView.visibility = View.GONE
@@ -447,26 +430,22 @@ class AssistantFragment : Fragment() {
     private fun updateTabSelection(selectedTab: TabType) {
         when (selectedTab) {
             TabType.AI_APPROVED -> {
-                // Update approved tab
                 binding.tabApprovedText.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.tab_selected)
                 )
                 binding.tabApprovedIndicator.visibility = View.VISIBLE
-                
-                // Update rejected tab
+
                 binding.tabRejectedText.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.tab_unselected)
                 )
                 binding.tabRejectedIndicator.visibility = View.INVISIBLE
             }
             TabType.AI_REJECTED -> {
-                // Update approved tab
                 binding.tabApprovedText.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.tab_unselected)
                 )
                 binding.tabApprovedIndicator.visibility = View.INVISIBLE
-                
-                // Update rejected tab
+
                 binding.tabRejectedText.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.tab_selected)
                 )

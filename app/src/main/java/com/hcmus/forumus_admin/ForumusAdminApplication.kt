@@ -17,27 +17,22 @@ class ForumusAdminApplication : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        
-        // Apply saved theme preference
+
         ThemeManager.applyTheme(this)
-        
-        // Initialize Firebase
+
         FirebaseApp.initializeApp(this)
-        
-        // Sign in anonymously to get Firestore access
+
         authenticateApp()
     }
     
     private fun authenticateApp() {
         val auth = FirebaseAuth.getInstance()
-        
-        // Check if already signed in
+
         if (auth.currentUser != null) {
             Log.d("ForumusAdmin", "Already authenticated: ${auth.currentUser?.uid}")
             return
         }
-        
-        // Sign in anonymously
+
         auth.signInAnonymously()
             .addOnSuccessListener { authResult ->
                 Log.d("ForumusAdmin", "Anonymous authentication successful: ${authResult.user?.uid}")

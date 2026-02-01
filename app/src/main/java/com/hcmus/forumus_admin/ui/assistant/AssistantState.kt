@@ -11,8 +11,8 @@ data class AiModerationState(
     val currentTab: TabType = TabType.AI_APPROVED,
     val searchQuery: String = "",
     val sortOrder: SortOrder = SortOrder.NEWEST_FIRST,
-    val selectedViolationIds: Set<String> = emptySet(),  // Changed from ViolationCategory to String
-    val loadingPostIds: Set<String> = emptySet()  // Track individual posts that are currently being processed
+    val selectedViolationIds: Set<String> = emptySet(),
+    val loadingPostIds: Set<String> = emptySet()
 )
 
 enum class TabType {

@@ -1,8 +1,5 @@
 package com.hcmus.forumus_admin.data.model
 
-/**
- * Represents the result of AI moderation analysis for a post
- */
 data class AiModerationResult(
     val postData: FirestorePost,
     val isApproved: Boolean,
@@ -11,18 +8,12 @@ data class AiModerationResult(
     val analyzedAt: Long = System.currentTimeMillis()
 )
 
-/**
- * Types of content violations detected by AI
- */
 data class ViolationType(
     val type: ViolationCategory,
     val score: Double, // Confidence score 0.0 to 1.0
     val description: String
 )
 
-/**
- * Categories of content violations
- */
 enum class ViolationCategory(val displayName: String) {
     TOXICITY("Toxic Content"),
     SEVERE_TOXICITY("Severe Toxicity"),
@@ -42,9 +33,6 @@ enum class ViolationCategory(val displayName: String) {
     }
 }
 
-/**
- * Request for analyzing a post with AI moderation
- */
 data class AiModerationRequest(
     val postId: String,
     val content: String,
@@ -52,19 +40,12 @@ data class AiModerationRequest(
     val authorId: String
 )
 
-/**
- * Response from AI moderation API
- */
 data class AiModerationResponse(
     val success: Boolean,
     val result: AiModerationResult?,
     val error: String? = null
 )
 
-/**
- * Result of a moderation decision override.
- * Contains information about the post status change and optional user status escalation.
- */
 data class ModerationDecisionResult(
     val success: Boolean,
     val postId: String,

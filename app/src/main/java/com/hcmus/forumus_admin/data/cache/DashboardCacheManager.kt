@@ -7,12 +7,6 @@ import com.google.gson.reflect.TypeToken
 import com.hcmus.forumus_admin.data.repository.FirestorePost
 import com.hcmus.forumus_admin.data.repository.FirestoreTopic
 
-/**
- * Manages caching of dashboard statistics to avoid recalculating complex statistics
- * every time the app is opened. Data is refreshed when:
- * - User manually pulls to refresh
- * - Cache expires (default: 5 minutes)
- */
 class DashboardCacheManager(context: Context) {
     
     companion object {
@@ -25,7 +19,7 @@ class DashboardCacheManager(context: Context) {
         private const val KEY_TOPICS_DATA = "topics_data"
         private const val KEY_CACHE_TIMESTAMP = "cache_timestamp"
         
-        // Cache expiration time: 5 minutes (in milliseconds)
+        // Cache expiration time
         private const val CACHE_EXPIRATION_MS = 5 * 60 * 1000L
         
         @Volatile
@@ -42,29 +36,22 @@ class DashboardCacheManager(context: Context) {
     
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private val gson = Gson()
-    
-    /**
-     * Data class to hold all dashboard statistics
-     */
+
+     // Data class to hold all dashboard statistics
     data class DashboardStats(
         val totalUsers: Int,
         val blacklistedUsers: Int,
         val totalPosts: Int,
         val reportedPosts: Int
     )
-    
-    /**
-     * Check if cache is still valid (not expired)
-     */
+
+     // Check if cache is still valid
     fun isCacheValid(): Boolean {
         val cacheTimestamp = prefs.getLong(KEY_CACHE_TIMESTAMP, 0)
         val currentTime = System.currentTimeMillis()
         return (currentTime - cacheTimestamp) < CACHE_EXPIRATION_MS
     }
-    
-    /**
-     * Get the cache age in a human-readable format
-     */
+
     fun getCacheAge(): String {
         val cacheTimestamp = prefs.getLong(KEY_CACHE_TIMESTAMP, 0)
         if (cacheTimestamp == 0L) return "No cache"
@@ -79,10 +66,7 @@ class DashboardCacheManager(context: Context) {
             else -> "Just now"
         }
     }
-    
-    /**
-     * Save dashboard statistics to cache
-     */
+
     fun saveDashboardStats(stats: DashboardStats) {
         prefs.edit().apply {
             putInt(KEY_TOTAL_USERS, stats.totalUsers)
@@ -93,11 +77,7 @@ class DashboardCacheManager(context: Context) {
             apply()
         }
     }
-    
-    /**
-     * Get cached dashboard statistics
-     * Returns null if no cache exists
-     */
+
     fun getDashboardStats(): DashboardStats? {
         val totalUsers = prefs.getInt(KEY_TOTAL_USERS, -1)
         if (totalUsers == -1) return null
@@ -109,10 +89,7 @@ class DashboardCacheManager(context: Context) {
             reportedPosts = prefs.getInt(KEY_REPORTED_POSTS, 0)
         )
     }
-    
-    /**
-     * Save posts data to cache (serialized as JSON)
-     */
+
     fun savePostsData(posts: List<FirestorePost>) {
         val postsJson = gson.toJson(posts.map { post ->
             // Convert to a cacheable format (without Firebase Timestamp)
@@ -136,10 +113,7 @@ class DashboardCacheManager(context: Context) {
         })
         prefs.edit().putString(KEY_POSTS_DATA, postsJson).apply()
     }
-    
-    /**
-     * Get cached posts data
-     */
+
     fun getPostsData(): List<FirestorePost>? {
         val postsJson = prefs.getString(KEY_POSTS_DATA, null) ?: return null
         return try {
@@ -168,10 +142,7 @@ class DashboardCacheManager(context: Context) {
             null
         }
     }
-    
-    /**
-     * Save topics data to cache
-     */
+
     fun saveTopicsData(topics: List<FirestoreTopic>) {
         val topicsJson = gson.toJson(topics.map { topic ->
             CachedTopic(
@@ -183,10 +154,7 @@ class DashboardCacheManager(context: Context) {
         })
         prefs.edit().putString(KEY_TOPICS_DATA, topicsJson).apply()
     }
-    
-    /**
-     * Get cached topics data
-     */
+
     fun getTopicsData(): List<FirestoreTopic>? {
         val topicsJson = prefs.getString(KEY_TOPICS_DATA, null) ?: return null
         return try {
@@ -204,24 +172,16 @@ class DashboardCacheManager(context: Context) {
             null
         }
     }
-    
-    /**
-     * Force refresh - invalidate the cache
-     */
+
     fun invalidateCache() {
         prefs.edit().putLong(KEY_CACHE_TIMESTAMP, 0).apply()
     }
-    
-    /**
-     * Clear all cached data
-     */
+
     fun clearCache() {
         prefs.edit().clear().apply()
     }
-    
-    /**
-     * Helper to convert Firebase Timestamp to milliseconds
-     */
+
+     // Helper to convert Firebase Timestamp to milliseconds
     private fun getTimestampMillis(timestamp: Any?): Long {
         return when (timestamp) {
             is com.google.firebase.Timestamp -> timestamp.toDate().time
@@ -229,10 +189,7 @@ class DashboardCacheManager(context: Context) {
             else -> 0L
         }
     }
-    
-    /**
-     * Cacheable version of FirestorePost (without Firebase-specific types)
-     */
+
     private data class CachedPost(
         val authorId: String = "",
         val comment_count: Long = 0,
@@ -250,10 +207,7 @@ class DashboardCacheManager(context: Context) {
         val video_link: List<String> = emptyList(),
         val violation_type: List<String> = emptyList()
     )
-    
-    /**
-     * Cacheable version of FirestoreTopic
-     */
+
     private data class CachedTopic(
         val id: String = "",
         val name: String = "",

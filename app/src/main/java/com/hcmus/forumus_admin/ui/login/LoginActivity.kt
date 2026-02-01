@@ -22,7 +22,6 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize Firebase instances
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
 
@@ -38,7 +37,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupListeners() {
         binding.btnLogin.setOnClickListener {
-            // Basic validation
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
@@ -54,10 +52,8 @@ class LoginActivity : AppCompatActivity() {
             }
             binding.tilPassword.error = null
 
-            // Show loading
             showLoading(true)
 
-            // Firebase Login
             auth.signInWithEmailAndPassword(email, password)
                 .addOnSuccessListener { authResult ->
                     checkAdminRole(authResult.user?.uid)
@@ -83,7 +79,6 @@ class LoginActivity : AppCompatActivity() {
                         showLoading(false)
                         navigateToDashboard()
                     } else {
-                        // Not an admin
                         auth.signOut()
                         showLoading(false)
                         Toast.makeText(this, getString(R.string.access_denied), Toast.LENGTH_LONG).show()
@@ -115,7 +110,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateToDashboard() {
         val intent = Intent(this, MainActivity::class.java)
-        // Clear back stack so user can't go back to login
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()

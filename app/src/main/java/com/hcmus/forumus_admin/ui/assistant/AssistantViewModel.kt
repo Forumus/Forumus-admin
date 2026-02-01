@@ -19,8 +19,7 @@ class AiModerationViewModel : ViewModel() {
     
     private val _state = MutableLiveData(AiModerationState())
     val state: LiveData<AiModerationState> = _state
-    
-    // LiveData for status escalation events (for UI notification)
+
     private val _statusEscalationEvent = MutableLiveData<StatusEscalationResult?>()
     val statusEscalationEvent: LiveData<StatusEscalationResult?> = _statusEscalationEvent
     
@@ -35,8 +34,7 @@ class AiModerationViewModel : ViewModel() {
         viewModelScope.launch {
             val currentState = _state.value ?: AiModerationState()
             _state.value = currentState.copy(isLoading = true)
-            
-            // Fetch approved posts by default
+
             val posts = if (isApproved) {
                 repository.getApprovedPosts()
             } else {
@@ -106,23 +104,20 @@ class AiModerationViewModel : ViewModel() {
         violationIds: Set<String>
     ): List<AiModerationResult> {
         var result = posts
-        
-        // Apply search filter
+
         if (searchQuery.isNotEmpty()) {
             result = result.filter { post ->
                 post.postData.title.contains(searchQuery, ignoreCase = true) ||
                 post.postData.content.contains(searchQuery, ignoreCase = true)
             }
         }
-        
-        // Apply violation type filter - check if post's violationTypes array contains any of the selected IDs
+
         if (violationIds.isNotEmpty()) {
             result = result.filter { post ->
                 post.postData.violationTypes.any { violationType -> violationType in violationIds }
             }
         }
-        
-        // Apply sort
+
         result = when (sortOrder) {
             SortOrder.NEWEST_FIRST -> result.sortedByDescending { 
                 it.postData.createdAt?.seconds ?: 0L
@@ -138,14 +133,12 @@ class AiModerationViewModel : ViewModel() {
     fun approvePost(postId: String) {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
-            
-            // Add post to loading set (show loading indicator on this specific post)
+
             _state.value = currentState.copy(
                 loadingPostIds = currentState.loadingPostIds + postId
             )
             
             try {
-                // Call repository to override decision (approval doesn't trigger escalation)
                 val result = repository.overrideModerationDecision(
                     postId = postId,
                     isApproved = true
@@ -153,8 +146,7 @@ class AiModerationViewModel : ViewModel() {
                 
                 result.onSuccess {
                     Log.d("AiModerationViewModel", "Approved post: $postId")
-                    
-                    // Send push notification about post approval
+
                     val post = currentState.allPosts.find { it.postData.id == postId }?.postData
                     if (post != null) {
                         try {
@@ -168,15 +160,13 @@ class AiModerationViewModel : ViewModel() {
                             Log.w("AiModerationViewModel", "Failed to send notification (non-blocking)", e)
                         }
                     }
-                    
-                    // Remove from loading set and reload posts after approval
+
                     val updatedState = _state.value ?: currentState
                     _state.value = updatedState.copy(
                         loadingPostIds = updatedState.loadingPostIds - postId
                     )
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
-                    // Remove from loading set on error
                     val updatedState = _state.value ?: currentState
                     _state.value = updatedState.copy(
                         error = error.message,
@@ -184,7 +174,6 @@ class AiModerationViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                // Remove from loading set on exception
                 val updatedState = _state.value ?: currentState
                 _state.value = updatedState.copy(
                     error = e.message,
@@ -193,36 +182,26 @@ class AiModerationViewModel : ViewModel() {
             }
         }
     }
-    
-    /**
-     * Reject a post and escalate the author's status.
-     * This will trigger the status escalation workflow.
-     */
+
     fun rejectPost(postId: String, sendNotification: Boolean = true) {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
-            
-            // Find the post to get author information
             val post = currentState.allPosts.find { it.postData.id == postId }?.postData
-            
-            // Add post to loading set (show loading indicator on this specific post)
+
             _state.value = currentState.copy(
                 loadingPostIds = currentState.loadingPostIds + postId
             )
             
             try {
-                // Call repository to override decision with author info for escalation
                 val result = if (post != null) {
                     repository.overrideModerationDecisionWithPost(post, false)
                 } else {
-                    // Fallback if post not found in current state
                     repository.overrideModerationDecision(postId, false)
                 }
                 
                 result.onSuccess { decisionResult ->
                     Log.d("AiModerationViewModel", "Rejected post: $postId")
-                    
-                    // Notify UI about status escalation if it happened
+
                     decisionResult.escalationResult?.let { escalation ->
                         if (escalation.wasEscalated) {
                             Log.d("AiModerationViewModel", 
@@ -230,8 +209,7 @@ class AiModerationViewModel : ViewModel() {
                             _statusEscalationEvent.value = escalation
                         }
                     }
-                    
-                    // Send push notification about post rejection
+
                     if (sendNotification && post != null) {
                         try {
                             pushNotificationService.sendPostRejectedNotification(
@@ -246,14 +224,12 @@ class AiModerationViewModel : ViewModel() {
                         }
                     }
 
-                    // Remove from loading set and reload posts after rejection
                     val updatedState = _state.value ?: currentState
                     _state.value = updatedState.copy(
                         loadingPostIds = updatedState.loadingPostIds - postId
                     )
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
-                    // Remove from loading set on error
                     val updatedState = _state.value ?: currentState
                     _state.value = updatedState.copy(
                         error = error.message,
@@ -261,7 +237,6 @@ class AiModerationViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                // Remove from loading set on exception
                 val updatedState = _state.value ?: currentState
                 _state.value = updatedState.copy(
                     error = e.message,
@@ -270,16 +245,11 @@ class AiModerationViewModel : ViewModel() {
             }
         }
     }
-    
-    /**
-     * Reject a post with full post data (preferred method).
-     * This ensures proper status escalation with all author information.
-     */
+
     fun rejectPostWithData(post: FirestorePost) {
         viewModelScope.launch {
             val currentState = _state.value ?: return@launch
-            
-            // Add post to loading set (show loading indicator on this specific post)
+
             _state.value = currentState.copy(
                 loadingPostIds = currentState.loadingPostIds + post.id
             )
@@ -289,8 +259,7 @@ class AiModerationViewModel : ViewModel() {
                 
                 result.onSuccess { decisionResult ->
                     Log.d("AiModerationViewModel", "Rejected post: ${post.id}")
-                    
-                    // Notify UI about status escalation if it happened
+
                     decisionResult.escalationResult?.let { escalation ->
                         if (escalation.wasEscalated) {
                             Log.d("AiModerationViewModel", 
@@ -298,28 +267,25 @@ class AiModerationViewModel : ViewModel() {
                             _statusEscalationEvent.value = escalation
                         }
                     }
-                    
-                    // Send push notification about post rejection
+
                     try {
                         pushNotificationService.sendPostRejectedNotification(
                             postId = post.id,
                             postAuthorId = post.authorId,
                             postTitle = post.title,
                             postContent = post.content,
-                            isAiRejected = false // Admin rejected
+                            isAiRejected = false
                         )
                     } catch (e: Exception) {
                         Log.w("AiModerationViewModel", "Failed to send notification (non-blocking)", e)
                     }
 
-                    // Remove from loading set and reload posts after rejection
                     val updatedState = _state.value ?: currentState
                     _state.value = updatedState.copy(
                         loadingPostIds = updatedState.loadingPostIds - post.id
                     )
                     loadPosts(currentState.currentTab == TabType.AI_APPROVED)
                 }.onFailure { error ->
-                    // Remove from loading set on error
                     val updatedState = _state.value ?: currentState
                     _state.value = updatedState.copy(
                         error = error.message,
@@ -327,7 +293,6 @@ class AiModerationViewModel : ViewModel() {
                     )
                 }
             } catch (e: Exception) {
-                // Remove from loading set on exception
                 val updatedState = _state.value ?: currentState
                 _state.value = updatedState.copy(
                     error = e.message,
@@ -336,10 +301,7 @@ class AiModerationViewModel : ViewModel() {
             }
         }
     }
-    
-    /**
-     * Clear the status escalation event after it's been handled by the UI.
-     */
+
     fun clearStatusEscalationEvent() {
         _statusEscalationEvent.value = null
     }

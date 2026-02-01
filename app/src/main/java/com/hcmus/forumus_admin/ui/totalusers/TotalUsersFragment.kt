@@ -42,8 +42,7 @@ class TotalUsersFragment : Fragment() {
     private val itemsPerPage = 10
     private var totalPages = 0
     private var isLoading = false
-    
-    // Filter state
+
     private val selectedStatuses = mutableSetOf<UserStatus>()
     private val selectedRoles = mutableSetOf<String>()
 
@@ -86,37 +85,31 @@ class TotalUsersFragment : Fragment() {
     }
 
     private fun setupSearchBar() {
-        // Initialize autocomplete adapter
         autoCompleteAdapter = UserAutoCompleteAdapter(requireContext())
         binding.searchInput.setAdapter(autoCompleteAdapter)
-        
-        // Handle text changes for filtering
+
         binding.searchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString() ?: ""
                 applySearchFilter(query)
-                
-                // Show/hide clear button
+
                 binding.clearSearchButton.visibility = if (query.isNotEmpty()) View.VISIBLE else View.GONE
             }
             
             override fun afterTextChanged(s: Editable?) {}
         })
-        
-        // Handle item selection from autocomplete dropdown
+
         binding.searchInput.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             val suggestion = autoCompleteAdapter.getItem(position)
             suggestion?.let {
-                // Set the selected text and filter
                 binding.searchInput.setText(it.name)
                 binding.searchInput.setSelection(it.name.length)
                 applySearchFilter(it.name)
             }
         }
-        
-        // Handle keyboard search action
+
         binding.searchInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 applySearchFilter(binding.searchInput.text.toString())
@@ -124,8 +117,7 @@ class TotalUsersFragment : Fragment() {
                 true
             } else false
         }
-        
-        // Clear button click
+
         binding.clearSearchButton.setOnClickListener {
             binding.searchInput.setText("")
             applySearchFilter("")
@@ -173,8 +165,7 @@ class TotalUsersFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val result = userRepository.getAllUsers()
-                
-                // Check if fragment is still added to activity
+
                 if (!isAdded || _binding == null) return@launch
                 
                 result.onSuccess { firestoreUsers ->
@@ -184,7 +175,6 @@ class TotalUsersFragment : Fragment() {
                         }
                         allUsers = emptyList()
                     } else {
-                        // Convert Firestore users to User model
                         allUsers = firestoreUsers.map { firestoreUser ->
                             User(
                                 id = extractIdFromEmail(firestoreUser.email),
@@ -248,18 +238,15 @@ class TotalUsersFragment : Fragment() {
 
     private fun applySearchFilter(query: String) {
         var users = allUsers
-        
-        // Apply status filter first
+
         if (selectedStatuses.isNotEmpty()) {
             users = users.filter { it.status in selectedStatuses }
         }
-        
-        // Apply role filter
+
         if (selectedRoles.isNotEmpty()) {
             users = users.filter { it.role in selectedRoles }
         }
-        
-        // Apply search query
+
         filteredUsers = if (query.isEmpty()) {
             users
         } else {
@@ -308,15 +295,12 @@ class TotalUsersFragment : Fragment() {
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-        
-        // Make dialog background transparent for rounded corners
+
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        
-        // Track current selections (copy of selected filters)
+
         val tempSelectedStatuses = selectedStatuses.toMutableSet()
         val tempSelectedRoles = selectedRoles.toMutableSet()
-        
-        // Get all views
+
         val closeButton = dialogView.findViewById<View>(R.id.closeButton)
         val clearAllButton = dialogView.findViewById<View>(R.id.clearAllButton)
         val normalButton = dialogView.findViewById<View>(R.id.normalButton)
@@ -332,21 +316,18 @@ class TotalUsersFragment : Fragment() {
         val teacherCheckmark = dialogView.findViewById<View>(R.id.teacherCheckmark)
         val studentCheckmark = dialogView.findViewById<View>(R.id.studentCheckmark)
         val applyButton = dialogView.findViewById<View>(R.id.applyButton)
-        
-        // Initialize UI based on current selections
+
         updateFilterButtonState(normalButton, normalCheckmark, UserStatus.NORMAL in tempSelectedStatuses)
         updateFilterButtonState(remindButton, remindCheckmark, UserStatus.REMINDED in tempSelectedStatuses)
         updateFilterButtonState(warningButton, warningCheckmark, UserStatus.WARNED in tempSelectedStatuses)
         updateFilterButtonState(banButton, banCheckmark, UserStatus.BANNED in tempSelectedStatuses)
         updateRoleButtonState(teacherButton, teacherCheckmark, "Teacher" in tempSelectedRoles)
         updateRoleButtonState(studentButton, studentCheckmark, "Student" in tempSelectedRoles)
-        
-        // Close button
+
         closeButton.setOnClickListener {
             dialog.dismiss()
         }
-        
-        // Clear all button
+
         clearAllButton.setOnClickListener {
             tempSelectedStatuses.clear()
             tempSelectedRoles.clear()
@@ -357,8 +338,7 @@ class TotalUsersFragment : Fragment() {
             updateRoleButtonState(teacherButton, teacherCheckmark, false)
             updateRoleButtonState(studentButton, studentCheckmark, false)
         }
-        
-        // Normal button
+
         normalButton.setOnClickListener {
             val isSelected = UserStatus.NORMAL in tempSelectedStatuses
             if (isSelected) {
@@ -368,8 +348,7 @@ class TotalUsersFragment : Fragment() {
             }
             updateFilterButtonState(normalButton, normalCheckmark, !isSelected)
         }
-        
-        // Remind button
+
         remindButton.setOnClickListener {
             val isSelected = UserStatus.REMINDED in tempSelectedStatuses
             if (isSelected) {
@@ -379,8 +358,7 @@ class TotalUsersFragment : Fragment() {
             }
             updateFilterButtonState(remindButton, remindCheckmark, !isSelected)
         }
-        
-        // Warning button
+
         warningButton.setOnClickListener {
             val isSelected = UserStatus.WARNED in tempSelectedStatuses
             if (isSelected) {
@@ -390,8 +368,7 @@ class TotalUsersFragment : Fragment() {
             }
             updateFilterButtonState(warningButton, warningCheckmark, !isSelected)
         }
-        
-        // Ban button
+
         banButton.setOnClickListener {
             val isSelected = UserStatus.BANNED in tempSelectedStatuses
             if (isSelected) {
@@ -401,8 +378,7 @@ class TotalUsersFragment : Fragment() {
             }
             updateFilterButtonState(banButton, banCheckmark, !isSelected)
         }
-        
-        // Teacher button
+
         teacherButton.setOnClickListener {
             val isSelected = "Teacher" in tempSelectedRoles
             if (isSelected) {
@@ -412,8 +388,7 @@ class TotalUsersFragment : Fragment() {
             }
             updateRoleButtonState(teacherButton, teacherCheckmark, !isSelected)
         }
-        
-        // Student button
+
         studentButton.setOnClickListener {
             val isSelected = "Student" in tempSelectedRoles
             if (isSelected) {
@@ -423,8 +398,7 @@ class TotalUsersFragment : Fragment() {
             }
             updateRoleButtonState(studentButton, studentCheckmark, !isSelected)
         }
-        
-        // Apply button
+
         applyButton.setOnClickListener {
             selectedStatuses.clear()
             selectedStatuses.addAll(tempSelectedStatuses)
@@ -454,7 +428,6 @@ class TotalUsersFragment : Fragment() {
     }
     
     private fun updateFilterButtonState(button: View, checkmark: View, isSelected: Boolean) {
-        // Get the TextView inside the button (first child TextView)
         val textView = (button as? ViewGroup)?.let { group ->
             (0 until group.childCount).map { group.getChildAt(it) }
                 .firstOrNull { it is android.widget.TextView } as? android.widget.TextView
@@ -488,7 +461,6 @@ class TotalUsersFragment : Fragment() {
     }
     
     private fun updateRoleButtonState(button: View, checkmark: View, isSelected: Boolean) {
-        // Get the TextView inside the button (first child TextView)
         val textView = (button as? ViewGroup)?.let { group ->
             (0 until group.childCount).map { group.getChildAt(it) }
                 .firstOrNull { it is android.widget.TextView } as? android.widget.TextView
@@ -507,8 +479,7 @@ class TotalUsersFragment : Fragment() {
 
     private fun showUserDetailsDialog(user: User) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_user_details, null)
-        
-        // Find views
+
         val userAvatar = dialogView.findViewById<ImageView>(R.id.dialogUserAvatar)
         val userName = dialogView.findViewById<TextView>(R.id.dialogUserName)
         val userId = dialogView.findViewById<TextView>(R.id.dialogUserId)
@@ -516,14 +487,12 @@ class TotalUsersFragment : Fragment() {
         val userRole = dialogView.findViewById<TextView>(R.id.dialogUserRole)
         val userCreatedAt = dialogView.findViewById<TextView>(R.id.dialogUserCreatedAt)
         val closeButton = dialogView.findViewById<ImageView>(R.id.closeButton)
-        
-        // Set user data
+
         userName.text = user.name
         userId.text = user.id
         userRole.text = user.role
         userCreatedAt.text = user.createdAt
-        
-        // Load avatar using Glide
+
         if (!user.avatarUrl.isNullOrEmpty()) {
             Glide.with(requireContext())
                 .load(user.avatarUrl)
@@ -534,8 +503,7 @@ class TotalUsersFragment : Fragment() {
         } else {
             userAvatar.setImageResource(R.drawable.ic_default_avatar)
         }
-        
-        // Set status badge
+
         when (user.status) {
             UserStatus.BANNED -> {
                 userStatus.text = getString(R.string.ban)
@@ -558,16 +526,13 @@ class TotalUsersFragment : Fragment() {
                 userStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.success_green))
             }
         }
-        
-        // Create and show dialog
+
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-        
-        // Set transparent background to show rounded corners
+
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        
-        // Set close button click listener
+
         closeButton.setOnClickListener {
             dialog.dismiss()
         }

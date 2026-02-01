@@ -70,12 +70,6 @@ class UserRepository {
         }
     }
 
-    /**
-     * Get a user by their document ID (uid).
-     * 
-     * @param userId The document ID of the user
-     * @return Result containing the user or error
-     */
     suspend fun getUserById(userId: String): Result<FirestoreUser?> {
         return try {
             val doc = usersCollection.document(userId).get().await()
@@ -98,12 +92,6 @@ class UserRepository {
         }
     }
 
-    /**
-     * Check if a user is banned.
-     * 
-     * @param userId The document ID of the user
-     * @return true if the user is banned, false otherwise
-     */
     suspend fun isUserBanned(userId: String): Boolean {
         return try {
             val result = getUserById(userId)
@@ -114,19 +102,12 @@ class UserRepository {
         }
     }
 
-    /**
-     * Check if a user can create posts (not banned).
-     * 
-     * @param userId The document ID of the user
-     * @return Result containing true if user can post, false if banned, or error
-     */
     suspend fun canUserCreatePost(userId: String): Result<Boolean> {
         return try {
             val result = getUserById(userId)
             val user = result.getOrNull()
             
             if (user == null) {
-                // User not found - allow posting (they might be new)
                 return Result.success(true)
             }
             
@@ -144,8 +125,7 @@ class UserRepository {
                 try {
                     val email = doc.getString("email") ?: ""
                     val status = (doc.getString("status") ?: "NORMAL").uppercase()
-                    
-                    // Only include users with status: BANNED, WARNED, or REMINDED
+
                     if (email.isNotEmpty() && status in listOf("BANNED", "WARNED", "REMINDED")) {
                         FirestoreUser(
                             email = email,
@@ -159,7 +139,6 @@ class UserRepository {
                         null
                     }
                 } catch (e: Exception) {
-                    // Skip documents that fail to parse
                     null
                 }
             }

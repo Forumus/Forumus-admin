@@ -84,13 +84,7 @@ class PostRepository {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Get paginated posts with efficient loading
-     * @param limit Number of posts to load
-     * @param startAfterDoc Last document from previous page (null for first page)
-     * @return Pair of posts list and last document for next page
-     */
+
     suspend fun getPaginatedPosts(
         limit: Long = 20,
         startAfterDoc: com.google.firebase.firestore.DocumentSnapshot? = null
@@ -149,14 +143,7 @@ class PostRepository {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Get posts filtered by violation types with pagination
-     * @param violationTypes List of violation type IDs to filter by (e.g., ["vio_001", "vio_007"])
-     * @param limit Number of posts to load
-     * @param startAfterDoc Last document from previous page (null for first page)
-     * @return Pair of posts list and last document for next page
-     */
+
     suspend fun getPostsByViolationTypes(
         violationTypes: List<String>,
         limit: Long = 20,
@@ -167,8 +154,6 @@ class PostRepository {
         }
         
         return try {
-            // Firestore doesn't support array-contains-any with pagination directly
-            // So we fetch all matching posts and handle pagination in memory
             var query = postsCollection
                 .whereArrayContainsAny("violation_type", violationTypes)
                 .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
@@ -205,17 +190,13 @@ class PostRepository {
                     null
                 }
             }
-            
-            // Return all matching posts (pagination will be handled by the fragment)
+
             Result.success(Pair(allMatchingPosts, null))
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Clear cached posts - call this when data changes
-     */
+
     fun clearCache() {
         cachedPosts = null
         cacheTimestamp = 0
@@ -244,12 +225,7 @@ class PostRepository {
             Result.failure(e)
         }
     }
-    
-    /**
-     * Update post to clear all report-related fields.
-     * Sets reportCount to 0 and clears reportedUsers array.
-     * This is internal - use ReportRepository.dismissReportsForPost for the complete atomic operation.
-     */
+
     internal suspend fun updatePostReportStatus(postId: String, batch: com.google.firebase.firestore.WriteBatch? = null): Result<Unit> {
         return try {
             // Find the document with matching post_id field
@@ -263,8 +239,7 @@ class PostRepository {
             }
             
             val docRef = snapshot.documents.first().reference
-            
-            // Prepare the update data
+
             val updates = hashMapOf<String, Any>(
                 "reportCount" to 0,
                 "reportedUsers" to emptyList<String>()

@@ -53,42 +53,32 @@ class DashboardFragment : Fragment() {
     private val userRepository = UserRepository()
     private val postRepository = PostRepository()
     private val topicRepository = TopicRepository()
-    
-    // Cache manager for efficient data loading
+
     private lateinit var cacheManager: DashboardCacheManager
-    
-    // Threshold for grouping small topics into "Others" (3%)
+
     private val othersThreshold = 3f
-    
-    // Predefined colors for topics - distinct colors for better visibility
+
     private val topicColors = listOf(
-        R.color.chart_tech_blue,    // Bright blue
-        R.color.chart_red,          // Red
-        R.color.chart_green,        // Green
-        R.color.chart_orange,       // Orange
-        R.color.chart_purple,       // Purple
-        R.color.chart_teal,         // Teal
-        R.color.chart_pink,         // Pink
-        R.color.chart_indigo,       // Indigo
-        R.color.chart_amber,        // Amber/Yellow
-        R.color.chart_cyan,         // Cyan
-        R.color.chart_lime,         // Lime
-        R.color.chart_deep_orange,  // Deep Orange
-        R.color.chart_brown,        // Brown
-        R.color.chart_blue_gray,    // Blue Gray
-        R.color.chart_gray          // Gray (last resort)
+        R.color.chart_tech_blue,
+        R.color.chart_red,
+        R.color.chart_green,
+        R.color.chart_orange,
+        R.color.chart_purple,
+        R.color.chart_teal,
+        R.color.chart_pink,
+        R.color.chart_indigo,
+        R.color.chart_amber,
+        R.color.chart_cyan,
+        R.color.chart_lime,
+        R.color.chart_deep_orange,
+        R.color.chart_brown,
+        R.color.chart_blue_gray,
+        R.color.chart_gray
     )
-    
-    // Cache for topics loaded from Firebase (used in manage dialog)
+
     private var cachedFirebaseTopics: List<com.hcmus.forumus_admin.data.repository.FirestoreTopic> = emptyList()
-    
-    // Cache for posts loaded from Firebase (used in charts)
     private var cachedPosts: List<FirestorePost> = emptyList()
-    
-    // Current chart period
     private var currentChartPeriod = "week"
-    
-    // Navigation state for charts
     private var currentYear = Calendar.getInstance().get(Calendar.YEAR)
     private var currentMonth = Calendar.getInstance().get(Calendar.MONTH)
     private var currentWeekStart: Calendar = Calendar.getInstance().apply {
@@ -157,13 +147,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.total_users),
             "..."
         )
-        
-        // Add click listener to navigate to total users screen
+
         binding.statCardUsers.root.setOnClickListener {
             findNavController().navigate(R.id.action_dashboardFragment_to_totalUsersFragment)
         }
 
-        // Total Posts Card
         setupStatCard(
             binding.statCardPosts.root,
             R.drawable.ic_total_posts,
@@ -171,13 +159,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.total_posts),
             "..."
         )
-        
-        // Add click listener to navigate to total posts screen
+
         binding.statCardPosts.root.setOnClickListener {
             findNavController().navigate(R.id.action_dashboardFragment_to_totalPostsFragment)
         }
 
-        // Blacklisted Users Card
         setupStatCard(
             binding.statCardBlacklisted.root,
             R.drawable.ic_blacklist,
@@ -185,13 +171,11 @@ class DashboardFragment : Fragment() {
             getString(R.string.blacklisted_users),
             "..."
         )
-        
-        // Add click listener to navigate to blacklist screen
+
         binding.statCardBlacklisted.root.setOnClickListener {
             findNavController().navigate(R.id.action_dashboardFragment_to_blacklistFragment)
         }
 
-        // Reported Posts Card
         setupStatCard(
             binding.statCardReported.root,
             R.drawable.ic_reported_posts,
@@ -199,15 +183,13 @@ class DashboardFragment : Fragment() {
             getString(R.string.reported_posts),
             "..."
         )
-        
-        // Add click listener to navigate to reported posts screen
+
         binding.statCardReported.root.setOnClickListener {
             findNavController().navigate(R.id.action_dashboardFragment_to_reportedPostsFragment)
         }
     }
 
     private fun loadDashboardData() {
-        // Try to load from cache first if valid
         if (cacheManager.isCacheValid()) {
             val cachedStats = cacheManager.getDashboardStats()
             if (cachedStats != null) {
@@ -219,8 +201,7 @@ class DashboardFragment : Fragment() {
                 return
             }
         }
-        
-        // Cache is invalid or doesn't exist, load from network
+
         loadDashboardDataFromNetwork(forceRefresh = false)
     }
     
@@ -231,8 +212,7 @@ class DashboardFragment : Fragment() {
                 var blacklistedUsers = 0
                 var totalPosts = 0
                 var reportedPosts = 0
-                
-                // Check if fragment is still added
+
                 if (!isAdded || _binding == null) return@launch
                 
                 // Load users data
@@ -272,7 +252,7 @@ class DashboardFragment : Fragment() {
                     )
                 )
             } catch (e: Exception) {
-                // Keep loading indicators if error occurs
+
             }
         }
     }
@@ -331,15 +311,13 @@ class DashboardFragment : Fragment() {
                 return
             }
         }
-        
-        // Load from network
+
         loadPostsDataFromNetwork(forceRefresh = false)
     }
     
     private fun loadPostsDataFromNetwork(forceRefresh: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // Check if fragment is still added
                 if (!isAdded || _binding == null) return@launch
                 
                 val result = postRepository.getAllPosts()
@@ -351,7 +329,6 @@ class DashboardFragment : Fragment() {
                         updateChartWithPeriod(currentChartPeriod)
                     }
                 }.onFailure {
-                    // Use empty data if Firebase fails
                     if (isAdded && _binding != null) {
                         updateChartWithPeriod(currentChartPeriod)
                     }
@@ -423,12 +400,10 @@ class DashboardFragment : Fragment() {
             "day" -> {
                 val weekEnd = currentWeekStart.clone() as Calendar
                 weekEnd.add(Calendar.DAY_OF_WEEK, 6)
-                
-                // Use localized formatted string for the date range
+
                 val startFormat = SimpleDateFormat(getString(R.string.chart_day_format), Locale.getDefault())
                 val endFormat = SimpleDateFormat(getString(R.string.chart_day_format), Locale.getDefault())
-                
-                // Format: "Nov 17 - Nov 23, 2024" or equivalent
+
                 "${startFormat.format(currentWeekStart.time)} - ${endFormat.format(weekEnd.time)}, ${currentWeekStart.get(Calendar.YEAR)}"
             }
             else -> ""
@@ -458,8 +433,7 @@ class DashboardFragment : Fragment() {
     
     private fun setupBarChartForDay() {
         val barChart = binding.barChart
-        
-        // Get the week start and end
+
         val weekStart = currentWeekStart.clone() as Calendar
         weekStart.set(Calendar.HOUR_OF_DAY, 0)
         weekStart.set(Calendar.MINUTE, 0)
@@ -468,19 +442,12 @@ class DashboardFragment : Fragment() {
         
         val weekEnd = weekStart.clone() as Calendar
         weekEnd.add(Calendar.DAY_OF_WEEK, 7)
-        
-        // Initialize daily counts for 7 days of the week
+
         val dailyCounts = IntArray(7) { 0 }
         val dayLabels = mutableListOf<String>()
-        
-        // Generate day labels using localized strings
-        // We order them based on the calendar (e.g. starting Monday or Sunday)
-        // Instead of hardcoded array, we can use format 
+
         val dayFormat = SimpleDateFormat("EEE", Locale.getDefault())
-        // BUT user provided resources: mon, tue etc. Let's try to map if we can, 
-        // OR rely on SimpleDateFormat("EEE", Locale.getDefault()) which is standard.
-        // Given user provided "Th 2", "Th 3" etc for Vietnam, standard EEE might give "Th 2" or "Mon".
-        // Let's use the resources to be safe and match user expectation
+
         
         val tempCal = weekStart.clone() as Calendar
         // Map calendar day constant to resource string
@@ -590,18 +557,10 @@ class DashboardFragment : Fragment() {
         calendar.set(Calendar.MILLISECOND, 0)
         
         val monthStart = calendar.time
-        
-        // Get the number of weeks in this month
         val maxWeek = calendar.getActualMaximum(Calendar.WEEK_OF_MONTH)
-        
-        // Move to next month for end boundary
         calendar.add(Calendar.MONTH, 1)
         val monthEnd = calendar.time
-        
-        // Initialize weekly counts
         val weeklyCounts = IntArray(maxWeek) { 0 }
-        
-        // Use localized label for "Week X"
         val weekLabels = (1..maxWeek).map { getString(R.string.chart_week_label).format(it) }
         
         // Count posts per week in this month
@@ -610,16 +569,14 @@ class DashboardFragment : Fragment() {
             if (postDate != null && !postDate.before(monthStart) && postDate.before(monthEnd)) {
                 val postCalendar = Calendar.getInstance()
                 postCalendar.time = postDate
-                
-                // Get week of month (1-based)
+
                 val weekOfMonth = postCalendar.get(Calendar.WEEK_OF_MONTH) - 1
                 if (weekOfMonth in 0 until maxWeek) {
                     weeklyCounts[weekOfMonth]++
                 }
             }
         }
-        
-        // Create bar entries
+
         val entries = weeklyCounts.mapIndexed { index, count ->
             BarEntry(index.toFloat(), count.toFloat())
         }
@@ -642,13 +599,11 @@ class DashboardFragment : Fragment() {
             setDrawBarShadow(false)
             setDrawBorders(false)
             animateY(1000)
-            
-            // Disable zooming and scaling for immediate proper view
+
             setScaleEnabled(false)
             setPinchZoom(false)
             isDoubleTapToZoomEnabled = false
-            
-            // Configure X axis
+
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
@@ -657,8 +612,7 @@ class DashboardFragment : Fragment() {
                 textColor = ContextCompat.getColor(requireContext(), R.color.text_secondary)
                 valueFormatter = IndexAxisValueFormatter(weekLabels)
             }
-            
-            // Configure left Y axis
+
             axisLeft.apply {
                 setDrawGridLines(true)
                 gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
@@ -666,12 +620,10 @@ class DashboardFragment : Fragment() {
                 axisMinimum = 0f
                 granularity = 1f
             }
-            
-            // Disable right Y axis
+
             axisRight.isEnabled = false
             legend.isEnabled = false
-            
-            // Reset zoom and fit data
+
             setVisibleXRangeMaximum(maxWeek.toFloat())
             moveViewToX(0f)
             
@@ -681,8 +633,7 @@ class DashboardFragment : Fragment() {
     
     private fun setupBarChartForMonth() {
         val barChart = binding.barChart
-        
-        // Get all 12 months in the selected year
+
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.YEAR, currentYear)
         calendar.set(Calendar.MONTH, 0) // January
@@ -693,12 +644,10 @@ class DashboardFragment : Fragment() {
         calendar.set(Calendar.MILLISECOND, 0)
         
         val yearStart = calendar.time
-        
-        // Move to next year for end boundary
+
         calendar.add(Calendar.YEAR, 1)
         val yearEnd = calendar.time
-        
-        // Initialize monthly counts
+
         val monthlyCounts = IntArray(12) { 0 }
         
         // Use localized month names
@@ -722,8 +671,7 @@ class DashboardFragment : Fragment() {
                 }
             }
         }
-        
-        // Create bar entries
+
         val entries = monthlyCounts.mapIndexed { index, count ->
             BarEntry(index.toFloat(), count.toFloat())
         }
@@ -746,13 +694,11 @@ class DashboardFragment : Fragment() {
             setDrawBarShadow(false)
             setDrawBorders(false)
             animateY(1000)
-            
-            // Disable zooming and scaling for immediate proper view
+
             setScaleEnabled(false)
             setPinchZoom(false)
             isDoubleTapToZoomEnabled = false
-            
-            // Configure X axis
+
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
@@ -762,8 +708,7 @@ class DashboardFragment : Fragment() {
                 textSize = 9f
                 valueFormatter = IndexAxisValueFormatter(monthLabels)
             }
-            
-            // Configure left Y axis
+
             axisLeft.apply {
                 setDrawGridLines(true)
                 gridColor = ContextCompat.getColor(requireContext(), R.color.border_gray)
@@ -771,12 +716,10 @@ class DashboardFragment : Fragment() {
                 axisMinimum = 0f
                 granularity = 1f
             }
-            
-            // Disable right Y axis
+
             axisRight.isEnabled = false
             legend.isEnabled = false
-            
-            // Reset zoom and fit data
+
             setVisibleXRangeMaximum(12f)
             moveViewToX(0f)
             
@@ -803,27 +746,22 @@ class DashboardFragment : Fragment() {
     private fun loadTopicsDataFromNetwork(forceRefresh: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                // Check if fragment is still added
                 if (!isAdded || _binding == null) return@launch
                 
                 val topicsResult = topicRepository.getAllTopics()
                 topicsResult.onSuccess { topics ->
-                    // Cache topics for use in manage dialog
                     cachedFirebaseTopics = topics
-                    // Save to cache
                     cacheManager.saveTopicsData(topics)
                     if (isAdded && _binding != null) {
                         val topicsData = processTopicsData(topics)
                         updatePieChart(topicsData)
                     }
                 }.onFailure {
-                    // Fallback to sample data if Firebase fails
                     if (isAdded && _binding != null) {
                         updatePieChart(getSampleTopicData())
                     }
                 }
             } catch (e: Exception) {
-                // Fallback to sample data if error occurs
                 if (isAdded && _binding != null) {
                     updatePieChart(getSampleTopicData())
                 }
@@ -905,7 +843,6 @@ class DashboardFragment : Fragment() {
             valueLinePart1OffsetPercentage = 80f
             valueLinePart1Length = 0.3f
             valueLinePart2Length = 0.4f
-            // Set selection shift for expanding effect when clicked
             selectionShift = 12f
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
@@ -924,19 +861,16 @@ class DashboardFragment : Fragment() {
             holeRadius = 0f
             transparentCircleRadius = 0f
             animateY(1000)
-            
-            // Disable built-in legend - we'll create custom legend below
+
             legend.isEnabled = false
             
             // Add click listener for segment selection
             setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
                 override fun onValueSelected(e: Entry?, h: Highlight?) {
                     if (e != null && h != null) {
-                        // Show percentage only for selected segment
                         dataSet.setDrawValues(true)
                         dataSet.valueFormatter = object : ValueFormatter() {
                             override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
-                                // Only show value for the selected entry
                                 return if (pieEntry == e) "${value.toInt()}%" else ""
                             }
                         }
@@ -945,7 +879,6 @@ class DashboardFragment : Fragment() {
                 }
 
                 override fun onNothingSelected() {
-                    // Hide all values when nothing is selected
                     dataSet.setDrawValues(false)
                     invalidate()
                 }
@@ -953,8 +886,7 @@ class DashboardFragment : Fragment() {
             
             invalidate()
         }
-        
-        // Update custom legends
+
         updateCustomLegends(topicsData)
     }
     
@@ -1014,7 +946,6 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupButtonListeners() {
-        // Menu icon to open drawer
         binding.menuIcon.setOnClickListener {
             (activity as? MainActivity)?.openDrawer()
         }
@@ -1034,8 +965,7 @@ class DashboardFragment : Fragment() {
             updateToggleSelection(binding.btnMonth)
             updateChartWithPeriod("month")
         }
-        
-        // Manage topics button
+
         binding.btnManageTopics.setOnClickListener {
             showManageTopicsDialog()
         }
@@ -1054,25 +984,21 @@ class DashboardFragment : Fragment() {
         val etNewTopic = dialogView.findViewById<EditText>(R.id.etNewTopic)
         val btnAddTopic = dialogView.findViewById<MaterialButton>(R.id.btnAddTopic)
         val rvTopics = dialogView.findViewById<RecyclerView>(R.id.rvTopics)
-        
-        // Get current topics from Firebase cache with their colors
+
         val currentTopics = mutableListOf<ManageTopicItem>()
         
         val adapter = ManageTopicsAdapter(
             onItemClick = { topic ->
-                // Show edit dialog when item is clicked
                 showEditTopicDialog(topic, currentTopics, dialog)
             },
             onDeleteClick = { topic ->
-                // Show confirmation dialog before deleting
                 showDeleteTopicConfirmation(topic, currentTopics, dialog)
             }
         )
         
         rvTopics.layoutManager = LinearLayoutManager(requireContext())
         rvTopics.adapter = adapter
-        
-        // Load topics from Firebase
+
         loadTopicsForDialog(currentTopics, adapter)
         
         btnClose.setOnClickListener {
@@ -1085,14 +1011,12 @@ class DashboardFragment : Fragment() {
                 context?.let { Toast.makeText(it, R.string.topic_name_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
-            
-            // Check if topic already exists
+
             if (currentTopics.any { it.name.equals(topicName, ignoreCase = true) }) {
                 context?.let { Toast.makeText(it, R.string.topic_already_exists, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
-            
-            // Show description dialog
+
             showTopicDescriptionDialog(topicName, currentTopics, adapter, etNewTopic)
         }
         
@@ -1130,15 +1054,13 @@ class DashboardFragment : Fragment() {
                 context?.let { Toast.makeText(it, R.string.topic_description_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
-            
-            // Save to Firebase
+
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
                     if (!isAdded) return@launch
                     
                     val result = topicRepository.addTopic(topicName, description)
                     result.onSuccess { newFirestoreTopic ->
-                        // Add new topic with a color from predefined palette
                         val colorIndex = topicsList.size % topicColors.size
                         context?.let { ctx ->
                             val newTopic = ManageTopicItem(
@@ -1152,8 +1074,7 @@ class DashboardFragment : Fragment() {
                             etNewTopic.text.clear()
                             
                             Toast.makeText(ctx, R.string.topic_added, Toast.LENGTH_SHORT).show()
-                            
-                            // Refresh the pie chart
+
                             if (isAdded && _binding != null) {
                                 refreshPieChart()
                             }
@@ -1172,7 +1093,6 @@ class DashboardFragment : Fragment() {
     }
     
     private fun loadTopicsForDialog(topicsList: MutableList<ManageTopicItem>, adapter: ManageTopicsAdapter) {
-        // Load topics from Firebase
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 if (!isAdded) return@launch
@@ -1195,7 +1115,6 @@ class DashboardFragment : Fragment() {
                         adapter.submitList(topicsList.toList())
                     }
                 }.onFailure {
-                    // Show error or use cached data
                     if (isAdded) {
                         loadCachedTopicsForDialog(topicsList, adapter)
                     }
@@ -1209,7 +1128,6 @@ class DashboardFragment : Fragment() {
     }
     
     private fun loadCachedTopicsForDialog(topicsList: MutableList<ManageTopicItem>, adapter: ManageTopicsAdapter) {
-        // Use cached Firebase topics if available
         if (cachedFirebaseTopics.isNotEmpty()) {
             topicsList.clear()
             context?.let { ctx ->
@@ -1248,12 +1166,10 @@ class DashboardFragment : Fragment() {
         val etTopicDescription = editDialogView.findViewById<EditText>(R.id.etTopicDescription)
         val btnCancel = editDialogView.findViewById<MaterialButton>(R.id.btnCancel)
         val btnSave = editDialogView.findViewById<MaterialButton>(R.id.btnSave)
-        
-        // Set current values
+
         etTopicName.setText(topic.name)
         etTopicDescription.setText(topic.description)
-        
-        // Set color indicator
+
         val drawable = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 6f * requireContext().resources.displayMetrics.density
@@ -1282,21 +1198,18 @@ class DashboardFragment : Fragment() {
                 context?.let { Toast.makeText(it, R.string.topic_description_empty, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
-            
-            // Check if name already exists (excluding current topic)
+
             if (topicsList.any { it.id != topic.id && it.name.equals(newName, ignoreCase = true) }) {
                 context?.let { Toast.makeText(it, R.string.topic_already_exists, Toast.LENGTH_SHORT).show() }
                 return@setOnClickListener
             }
-            
-            // Update in Firebase
+
             viewLifecycleOwner.lifecycleScope.launch {
                 try {
                     if (!isAdded) return@launch
                     
                     val result = topicRepository.updateTopic(topic.id, newName, newDescription)
                     result.onSuccess {
-                        // Update local list
                         val index = topicsList.indexOfFirst { it.id == topic.id }
                         if (index != -1) {
                             topicsList[index] = topic.copy(
@@ -1308,8 +1221,7 @@ class DashboardFragment : Fragment() {
                         }
                         
                         context?.let { Toast.makeText(it, R.string.topic_updated, Toast.LENGTH_SHORT).show() }
-                        
-                        // Refresh the pie chart
+
                         if (isAdded && _binding != null) {
                             refreshPieChart()
                         }
@@ -1349,7 +1261,6 @@ class DashboardFragment : Fragment() {
             .setTitle(R.string.confirm_delete_topic_title)
             .setMessage(getString(R.string.confirm_delete_topic_message, topic.name))
             .setPositiveButton(R.string.ok) { _, _ ->
-                // Delete from Firebase
                 viewLifecycleOwner.lifecycleScope.launch {
                     try {
                         if (!isAdded) return@launch
@@ -1361,8 +1272,7 @@ class DashboardFragment : Fragment() {
                                 ?.submitList(topicsList.toList())
                             
                             context?.let { Toast.makeText(it, R.string.topic_deleted, Toast.LENGTH_SHORT).show() }
-                            
-                            // Refresh the pie chart
+
                             if (isAdded && _binding != null) {
                                 refreshPieChart()
                             }
@@ -1379,17 +1289,14 @@ class DashboardFragment : Fragment() {
     }
     
     private fun refreshPieChart() {
-        // Refresh the pie chart with updated topics
         setupPieChart()
     }
     
     private fun updateToggleSelection(selectedButton: View) {
-        // Reset all buttons to unselected state
         binding.btnDay.setBackgroundResource(R.drawable.bg_toggle_button)
         binding.btnWeek.setBackgroundResource(R.drawable.bg_toggle_button)
         binding.btnMonth.setBackgroundResource(R.drawable.bg_toggle_button)
-        
-        // Set selected button
+
         selectedButton.setBackgroundResource(R.drawable.bg_toggle_button_selected)
     }
 

@@ -40,8 +40,7 @@ class ManageTopicsAdapter(
 
         fun bind(topic: ManageTopicItem) {
             tvTopicName.text = topic.name
-            
-            // Set the color indicator
+
             val drawable = GradientDrawable().apply {
                 shape = GradientDrawable.RECTANGLE
                 cornerRadius = 6f * itemView.context.resources.displayMetrics.density
@@ -49,7 +48,6 @@ class ManageTopicsAdapter(
             }
             colorIndicator.background = drawable
 
-            // Item click to view/edit topic details
             itemView.setOnClickListener {
                 onItemClick(topic)
             }
